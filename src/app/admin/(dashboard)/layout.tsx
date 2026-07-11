@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin/auth";
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
+import Image from "next/image";
 
 export default async function AdminDashboardLayout({
   children,
@@ -22,10 +23,13 @@ export default async function AdminDashboardLayout({
         <div className="space-y-12">
           {/* Logo Brand Header */}
           <div className="flex items-center space-x-3">
-            <svg className="w-6 h-6 text-crimson" viewBox="0 0 100 100" fill="currentColor">
-              <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="2.5" />
-              <path d="M 30,50 L 50,22 L 70,50 L 50,78 Z" fill="currentColor" />
-            </svg>
+            <Image
+              src="/brand/dullys-logo.png"
+              alt="DULLY'S"
+              width={24}
+              height={24}
+              className="object-contain"
+            />
             <span className="font-condensed text-[14px] font-bold tracking-[0.2em] uppercase text-white">
               Dully&apos;s CMS
             </span>

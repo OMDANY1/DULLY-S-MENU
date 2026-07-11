@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import Image from "next/image";
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -23,23 +24,22 @@ export default function AdminLogin() {
       });
 
       if (authError) {
-        setError(authError.message);
-        setLoading(false);
-        return;
+        throw new Error(authError.message);
       }
 
-      // Check if user is actually authorized as admin
-      const { data: profile, error: dbError } = await supabase
+      // Check if user has admin role in database
+      const { data: profile, error: profileError } = await supabase
         .from("admin_profiles")
         .select("role, is_active")
         .eq("user_id", data.user.id)
         .maybeSingle();
 
-      if (dbError || !profile || !profile.is_active || profile.role !== "admin") {
-        await supabase.auth.signOut();
-        setError("Unauthorized: Access restricted to active administrative users.");
-        setLoading(false);
-        return;
+      if (profileError || !profile) {
+        throw new Error("Access denied: missing administrative profile");
+      }
+
+      if (!profile.is_active || profile.role !== "admin") {
+        throw new Error("Access denied: inactive or insufficient privileges");
       }
 
       // Redirect to admin area
@@ -48,6 +48,7 @@ export default function AdminLogin() {
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
       setLoading(false);
+      await supabase.auth.signOut();
     }
   };
 
@@ -58,10 +59,13 @@ export default function AdminLogin() {
 
       <div className="w-full max-w-md bg-charcoal/30 border border-white/5 p-8 relative z-10">
         <div className="flex flex-col items-center mb-8">
-          <svg className="w-12 h-12 text-crimson mb-3" viewBox="0 0 100 100" fill="currentColor">
-            <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="2.5" />
-            <path d="M 30,50 L 50,22 L 70,50 L 50,78 Z" fill="currentColor" />
-          </svg>
+          <Image
+            src="/brand/dullys-logo.png"
+            alt="DULLY'S"
+            width={48}
+            height={48}
+            className="object-contain mb-3"
+          />
           <span className="font-condensed text-[16px] font-bold tracking-[0.25em] uppercase text-white">
             DULLY&apos;S ADMIN PORTAL
           </span>

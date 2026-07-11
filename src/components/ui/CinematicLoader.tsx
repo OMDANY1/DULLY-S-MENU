@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import Image from "next/image";
 
 interface CinematicLoaderProps {
   onComplete: () => void;
@@ -13,7 +14,7 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
   const dotRef = useRef<HTMLDivElement>(null);
   const circleRef = useRef<SVGCircleElement>(null);
   const pathsRef = useRef<SVGSVGElement>(null);
-  const logoRef = useRef<HTMLHeadingElement>(null);
+  const logoRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
@@ -49,7 +50,7 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
       gsap.set(dotRef.current, { scale: 0, opacity: 0 });
       gsap.set(circleRef.current, { strokeDasharray: 283, strokeDashoffset: 283, opacity: 0 });
       gsap.set(pathsRef.current, { opacity: 0, scale: 0.85 });
-      gsap.set(logoRef.current, { opacity: 0, letterSpacing: "1.2em" });
+      gsap.set(logoRef.current, { opacity: 0, scale: 0.94 });
       gsap.set(glowRef.current, { opacity: 0, scale: 0.6 });
 
       // Step 1: Tiny red point appears
@@ -83,10 +84,10 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
         ease: "power2.out",
       }, "-=0.2");
 
-      // Step 4: Typographic Logo Reveal
+      // Step 4: Official Logo Reveal
       tl.to(logoRef.current, {
         opacity: 1,
-        letterSpacing: "0.3em",
+        scale: 1,
         duration: 0.8,
         ease: "power3.out",
       }, "-=0.4");
@@ -168,14 +169,19 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
         </svg>
       </div>
 
-      {/* Typographic Logo */}
-      <div className="absolute mt-36 z-10 text-center">
-        <h1
-          ref={logoRef}
-          className="font-condensed text-[24px] md:text-[30px] font-bold text-white tracking-[0.3em] uppercase"
-        >
-          Dully&apos;s
-        </h1>
+      {/* Official Brand Logo */}
+      <div
+        ref={logoRef}
+        className="absolute mt-36 z-10 flex items-center justify-center"
+      >
+        <Image
+          src="/brand/dullys-logo.png"
+          alt="DULLY'S"
+          width={100}
+          height={100}
+          className="object-contain"
+          priority
+        />
       </div>
     </div>
   );

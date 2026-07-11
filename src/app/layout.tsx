@@ -24,10 +24,37 @@ const tajawal = Tajawal({
   display: "swap",
 });
 
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "https://dullys-menu-app.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "DULLY'S — Digital Menu 2026",
   description: "Explore the contemporary beverage selection from DULLY'S, featuring hot tea, tea lattes, iced tea, boba milk, and snow ice.",
   keywords: ["Dully's", "Boba Tea", "Matcha Latte", "Hojicha", "Japanese Tea", "Snow Ice", "Beverage Menu"],
+  openGraph: {
+    title: "DULLY'S — Digital Menu 2026",
+    description: "Explore the contemporary beverage selection from DULLY'S, featuring hot tea, tea lattes, iced tea, boba milk, and snow ice.",
+    url: siteUrl,
+    siteName: "DULLY'S",
+    images: [
+      {
+        url: "/brand/dullys-og.png",
+        width: 1200,
+        height: 630,
+        alt: "DULLY'S — Digital Menu",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DULLY'S — Digital Menu 2026",
+    description: "Explore the contemporary beverage selection from DULLY'S, featuring hot tea, tea lattes, iced tea, boba milk, and snow ice.",
+    images: ["/brand/dullys-og.png"],
+  },
 };
 
 export default function RootLayout({
