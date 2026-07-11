@@ -457,7 +457,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
               {/* Exploration control button */}
               <Link
-                href={`/menu/${activeCategory.id}`}
+                href={`/menu/${activeCategory.slug}`}
                 className="interactive-hover mt-10 inline-flex items-center space-x-6 py-2 group"
                 data-cursor-text="EXPLORE"
               >

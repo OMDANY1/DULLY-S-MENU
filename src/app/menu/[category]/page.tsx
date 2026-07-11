@@ -13,11 +13,13 @@ interface PageProps {
 
 export default async function CategoryPage({ params }: PageProps) {
   const resolvedParams = await params;
-  const categoryId = resolvedParams.category;
+  const categorySlug = resolvedParams.category;
 
   const repo = getMenuRepository();
   const categories = await repo.getCategories();
-  const category = categories.find((cat) => cat.id === categoryId);
+
+  // Route parameter is treated as a slug — never a UUID
+  const category = categories.find((cat) => cat.slug === categorySlug);
 
   if (!category || !isCategoryVisible(category)) {
     notFound();

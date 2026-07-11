@@ -22,6 +22,7 @@ export interface MenuItem {
 
 export interface MenuCategory {
   id: string;
+  slug: string;
   name: string;
   displayName: string;
   arabicName: string;

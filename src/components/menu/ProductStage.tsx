@@ -83,7 +83,7 @@ export function ProductVisual({
         style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)" }}
       />
 
-      {imageError ? (
+      {imageError || !resolvedSrc ? (
         /* Restrained missing-asset locator */
         <div className="relative w-36 h-36 flex flex-col items-center justify-center border-l border-crimson/30 px-4">
           <div className="w-[1px] h-12 bg-crimson mb-2" />

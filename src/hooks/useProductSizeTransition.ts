@@ -42,7 +42,8 @@ export function useProductSizeTransition(
     setRequestedIdx(idx);
   };
 
-  // Reset state during render if product changes
+  // Reset state during render when product changes (React-recommended pattern
+  // to avoid cascading renders from setState inside useEffect)
   const [prevProductId, setPrevProductId] = useState(product.id);
   if (product.id !== prevProductId) {
     setPrevProductId(product.id);
@@ -53,7 +54,7 @@ export function useProductSizeTransition(
     setIsTransitioning(false);
   }
 
-  // Handle ref cleanup inside useEffect to satisfy ref lint rules
+  // Handle ref cleanup inside useEffect (refs must only be mutated in effects/callbacks)
   useEffect(() => {
     currentAssetRef.current = "";
     activePreloadUrlRef.current = "";

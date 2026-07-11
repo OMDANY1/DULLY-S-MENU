@@ -11,6 +11,7 @@ import { productAssetManifest } from "@/data/productAssetManifest";
 
 const fallbackCategories: MenuCategory[] = menuCategories.map((cat) => ({
   id: cat.id,
+  slug: cat.id,
   name: cat.name,
   displayName: cat.displayName,
   arabicName: cat.arabicName,
@@ -209,10 +210,10 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
           {/* Categories List */}
           <nav className="flex flex-col justify-center space-y-6 md:space-y-7 pl-8 md:pl-16 w-full overflow-y-auto">
             {visibleCategories.map((cat, idx) => {
-              const isActive = pathname === `/menu/${cat.id}`;
+              const isActive = pathname === `/menu/${cat.slug}`;
               return (
                 <div
-                  key={cat.id}
+                  key={cat.slug}
                   ref={(el) => { itemsRef.current[idx] = el; }}
                   className="relative flex items-center space-x-6 md:space-x-8 overflow-hidden py-1"
                 >
@@ -228,7 +229,7 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
                   <div className="relative overflow-hidden flex flex-col">
                     <div className="overflow-hidden">
                       <Link
-                        href={`/menu/${cat.id}`}
+                        href={`/menu/${cat.slug}`}
                         className="interactive-hover block nav-link-text opacity-0 transform translate-y-full"
                         data-cursor-text="VIEW"
                       >

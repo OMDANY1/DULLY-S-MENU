@@ -3,6 +3,17 @@ import { MenuRepository } from "./MenuRepository";
 import { supabase as browserClient } from "@/lib/supabase/client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 
+// ─── RPC Envelope Shape ────────────────────────────────────────
+interface RpcEnvelope {
+  version: number;
+  settings: {
+    menuMode: string;
+    publicationStatus: string;
+    maintenanceMessage: string | null;
+  };
+  categories: RpcCategory[];
+}
+
 interface RpcSize {
   id: string;
   size_label: string;
@@ -33,6 +44,19 @@ interface RpcCategory {
   items: RpcProduct[];
 }
 
+// ─── Envelope Validation ───────────────────────────────────────
+function isValidEnvelope(data: unknown): data is RpcEnvelope {
+  if (!data || typeof data !== "object") return false;
+  const obj = data as Record<string, unknown>;
+  return (
+    typeof obj.version === "number" &&
+    obj.settings !== null &&
+    typeof obj.settings === "object" &&
+    Array.isArray(obj.categories)
+  );
+}
+
+// ─── Client Resolution ─────────────────────────────────────────
 async function getClient() {
   if (typeof window === "undefined") {
     return await createServerSupabaseClient();
@@ -41,44 +65,62 @@ async function getClient() {
 }
 
 export class SupabaseMenuRepository implements MenuRepository {
+  /**
+   * Fetches menu settings from the RPC envelope.
+   * Falls back to safe defaults on any failure.
+   */
   async getSettings(): Promise<MenuSettings> {
-    const client = await getClient();
-    
-    // Read global settings from the secure public view to enforce bounds
-    const { data, error } = await client
-      .from("public_menu_settings")
-      .select("value")
-      .eq("key", "global")
-      .maybeSingle();
+    try {
+      const client = await getClient();
+      const { data, error } = await client.rpc("get_public_menu");
 
-    if (error || !data) {
       if (error) {
-        console.error("[DATABASE ERROR] Failed to fetch settings from public view:", error.message);
+        console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
+        return this.defaultSettings();
       }
-      return {
-        menuMode: "standard",
-        publicationStatus: "published",
-        maintenanceMessage: null,
-      };
-    }
 
-    const val = data.value as { menuMode?: string; publicationStatus?: string; maintenanceMessage?: string | null } | null;
-    return {
-      menuMode: (val?.menuMode || "standard") as "standard" | "ipad",
-      publicationStatus: val?.publicationStatus || "published",
-      maintenanceMessage: val?.maintenanceMessage || null,
-    };
+      if (!isValidEnvelope(data)) {
+        console.error("[RPC VALIDATION ERROR] get_public_menu returned invalid envelope shape");
+        return this.defaultSettings();
+      }
+
+      return {
+        menuMode: (data.settings.menuMode || "standard") as "standard" | "ipad",
+        publicationStatus: data.settings.publicationStatus || "published",
+        maintenanceMessage: data.settings.maintenanceMessage || null,
+      };
+    } catch (err) {
+      console.error("[UNEXPECTED ERROR] getSettings failed:", err);
+      return this.defaultSettings();
+    }
   }
 
+  /**
+   * Fetches menu categories from the RPC envelope.
+   * Distinguishes between:
+   * - Valid unpublished state (envelope.categories is []) → returns []
+   * - RPC/database failure (error or invalid envelope) → throws Error
+   */
   async getCategories(): Promise<MenuCategory[]> {
     const client = await getClient();
 
-    // Invoke database RPC for public visibility enforcement
-    const { data: rawMenu, error } = await client.rpc("get_public_menu");
+    const { data: rawPayload, error } = await client.rpc("get_public_menu");
 
+    // RPC or database failure → throw (caller should show error state)
     if (error) {
       console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
       throw new Error("Failed to load menu data. Please try again later.");
+    }
+
+    // Validate envelope structure before normalization
+    if (!isValidEnvelope(rawPayload)) {
+      console.error("[RPC VALIDATION ERROR] get_public_menu returned invalid envelope shape:", typeof rawPayload);
+      throw new Error("Menu data format is invalid. Please contact support.");
+    }
+
+    // Valid unpublished response → return empty array (not an error)
+    if (rawPayload.settings.publicationStatus !== "published") {
+      return [];
     }
 
     const getUrl = (path: string | null) => {
@@ -87,10 +129,9 @@ export class SupabaseMenuRepository implements MenuRepository {
       return client.storage.from("menu-products").getPublicUrl(path).data.publicUrl;
     };
 
-    const categories = (rawMenu as RpcCategory[] || []);
-
-    return categories.map((cat) => ({
+    return rawPayload.categories.map((cat) => ({
       id: cat.id,
+      slug: cat.id,
       name: cat.display_name,
       displayName: cat.display_name,
       arabicName: cat.arabic_name,
@@ -118,6 +159,11 @@ export class SupabaseMenuRepository implements MenuRepository {
     }));
   }
 
+  async getCategoryBySlug(slug: string): Promise<MenuCategory | null> {
+    const categories = await this.getCategories();
+    return categories.find((cat) => cat.slug === slug) || null;
+  }
+
   async getCategoryById(id: string): Promise<MenuCategory | null> {
     const categories = await this.getCategories();
     return categories.find((cat) => cat.id === id) || null;
@@ -135,5 +181,13 @@ export class SupabaseMenuRepository implements MenuRepository {
       if (item) return item;
     }
     return null;
+  }
+
+  private defaultSettings(): MenuSettings {
+    return {
+      menuMode: "standard",
+      publicationStatus: "published",
+      maintenanceMessage: null,
+    };
   }
 }

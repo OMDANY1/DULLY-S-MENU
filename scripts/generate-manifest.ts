@@ -1,80 +1,173 @@
 import fs from "fs";
 import path from "path";
 
-const SRC_DIR_1 = path.join(process.cwd(), "public", "assets", "products");
-const SRC_DIR_2 = path.join(process.cwd(), "public", "products");
+// Source directories — priority order: public/products FIRST, then public/assets/products
+// If the same logical product ID is found in both directories, public/products wins.
+const SOURCE_DIRS = [
+  { dir: path.join(process.cwd(), "public", "products"), webPrefix: "/products" },
+  { dir: path.join(process.cwd(), "public", "assets", "products"), webPrefix: "/assets/products" },
+];
+
 const OUTPUT_FILE = path.join(process.cwd(), "src", "data", "productAssetManifest.ts");
+const MENU_DATA_FILE = path.join(process.cwd(), "src", "data", "menu.ts");
+
+const IMAGE_EXTENSIONS = new Set([".png", ".webp", ".avif", ".jpg", ".jpeg"]);
+const SIZE_PATTERN = /-(16oz|22oz|8oz|12oz|premium|standard)$/i;
 
 interface ManifestEntry {
   default: string | null;
   variants: Record<string, string>;
 }
 
+/** Read all known product IDs from menu.ts for validation */
+function getKnownProductIds(): Set<string> {
+  const ids = new Set<string>();
+  try {
+    const content = fs.readFileSync(MENU_DATA_FILE, "utf-8");
+    // Match "id": "some-product-id" patterns
+    const idPattern = /"id"\s*:\s*"([a-z0-9-]+)"/g;
+    let match;
+    while ((match = idPattern.exec(content)) !== null) {
+      ids.add(match[1]);
+    }
+  } catch {
+    console.warn("[WARN] Could not read menu data file for product ID validation.");
+  }
+  return ids;
+}
+
 export function generateManifest() {
   const manifest: Record<string, ManifestEntry> = {};
+  const duplicates: string[] = [];
+  const unknownIds: string[] = [];
 
-  const scanDirectory = (dir: string, webPrefix: string) => {
-    if (!fs.existsSync(dir)) return;
+  for (const { dir, webPrefix } of SOURCE_DIRS) {
+    if (!fs.existsSync(dir)) {
+      console.log(`[INFO] Source directory not found, skipping: ${dir}`);
+      continue;
+    }
 
-    const files = fs.readdirSync(dir);
+    // Deterministic sort: read and sort files alphabetically
+    const files = fs.readdirSync(dir).sort();
+
     for (const file of files) {
       const ext = path.extname(file).toLowerCase();
-      if (![".png", ".webp", ".avif", ".jpg", ".jpeg"].includes(ext)) {
-        continue;
-      }
+      if (!IMAGE_EXTENSIONS.has(ext)) continue;
 
       const basename = path.basename(file, ext);
-      // Example: "asam-black-tea-16oz" or "asam-black-tea"
-      // Split by dash to extract size code
-      // Wait, some product IDs contain dashes (e.g. "asam-black-tea")
-      // We want to detect if the end matches a size code.
-      // Sizes are typically: "16oz", "22oz", "premium", "standard", "8oz", etc.
-      const sizePattern = /-(16oz|22oz|8oz|premium|standard|12oz)$/i;
-      const match = basename.match(sizePattern);
+      const sizeMatch = basename.match(SIZE_PATTERN);
 
-      if (match) {
-        const sizeCode = match[1].toLowerCase();
-        const productId = basename.replace(sizePattern, "");
+      if (sizeMatch) {
+        // Size-variant asset
+        const sizeCode = sizeMatch[1].toLowerCase();
+        const productId = basename.replace(SIZE_PATTERN, "");
         const webPath = `${webPrefix}/${file}`;
 
         if (!manifest[productId]) {
           manifest[productId] = { default: null, variants: {} };
         }
-        manifest[productId].variants[sizeCode] = webPath;
+
+        // Duplicate detection: warn if this variant already exists from a higher-priority source
+        if (manifest[productId].variants[sizeCode]) {
+          duplicates.push(`DUPLICATE VARIANT: ${productId}/${sizeCode} — kept "${manifest[productId].variants[sizeCode]}", ignoring "${webPath}"`);
+        } else {
+          manifest[productId].variants[sizeCode] = webPath;
+        }
       } else {
+        // Default asset
         const productId = basename;
         const webPath = `${webPrefix}/${file}`;
 
         if (!manifest[productId]) {
           manifest[productId] = { default: null, variants: {} };
         }
-        manifest[productId].default = webPath;
+
+        // Duplicate detection: warn if default already exists from a higher-priority source
+        if (manifest[productId].default !== null) {
+          duplicates.push(`DUPLICATE DEFAULT: ${productId} — kept "${manifest[productId].default}", ignoring "${webPath}"`);
+        } else {
+          manifest[productId].default = webPath;
+        }
       }
     }
-  };
+  }
 
-  scanDirectory(SRC_DIR_1, "/assets/products");
-  scanDirectory(SRC_DIR_2, "/products");
+  // Unknown product ID validation
+  const knownIds = getKnownProductIds();
+  if (knownIds.size > 0) {
+    for (const assetProductId of Object.keys(manifest)) {
+      if (!knownIds.has(assetProductId)) {
+        unknownIds.push(assetProductId);
+      }
+    }
+  }
 
-  // Format code output
+  // Sort manifest keys deterministically for stable output
+  const sortedKeys = Object.keys(manifest).sort();
+  const sortedManifest: Record<string, ManifestEntry> = {};
+  for (const key of sortedKeys) {
+    // Also sort variant keys
+    const entry = manifest[key];
+    const sortedVariants: Record<string, string> = {};
+    for (const vk of Object.keys(entry.variants).sort()) {
+      sortedVariants[vk] = entry.variants[vk];
+    }
+    sortedManifest[key] = { default: entry.default, variants: sortedVariants };
+  }
+
+  // Generate output
   const content = `// DULLY'S PRODUCT ASSET MANIFEST
 // Automatically generated by scripts/generate-manifest.ts
 // Do not modify manually.
+// Generated at: ${new Date().toISOString()}
 
 export interface ManifestAsset {
   default: string | null;
   variants: Record<string, string>;
 }
 
-export const productAssetManifest: Record<string, ManifestAsset> = ${JSON.stringify(manifest, null, 2)};
+export const productAssetManifest: Record<string, ManifestAsset> = ${JSON.stringify(sortedManifest, null, 2)};
 `;
 
   fs.writeFileSync(OUTPUT_FILE, content, "utf-8");
-  console.log(`Successfully generated static product asset manifest at ${OUTPUT_FILE}`);
+
+  // Report
+  const totalProducts = sortedKeys.length;
+  const totalVariants = sortedKeys.reduce((sum, k) => sum + Object.keys(sortedManifest[k].variants).length, 0);
+  const nullDefaults = sortedKeys.filter((k) => sortedManifest[k].default === null).length;
+
+  console.log(`\n✓ Generated asset manifest: ${OUTPUT_FILE}`);
+  console.log(`  Products: ${totalProducts}`);
+  console.log(`  Size variants: ${totalVariants}`);
+  console.log(`  Products with null default image: ${nullDefaults}`);
+
+  if (duplicates.length > 0) {
+    console.warn(`\n⚠ DUPLICATES DETECTED (${duplicates.length}):`);
+    for (const d of duplicates) {
+      console.warn(`  ${d}`);
+    }
+  }
+
+  if (unknownIds.length > 0) {
+    console.warn(`\n⚠ UNKNOWN PRODUCT IDs (${unknownIds.length}) — assets found for products not in menu.ts:`);
+    for (const uid of unknownIds) {
+      console.warn(`  ${uid}`);
+    }
+  }
+
+  if (totalProducts === 0) {
+    console.warn("\n⚠ No product assets found. Manifest is empty.");
+  }
+
+  console.log("");
 }
 
 // If run directly
-const isDirectRun = process.argv[1] && (process.argv[1].endsWith("generate-manifest.ts") || process.argv[1].endsWith("generate-manifest.js") || process.argv[1].includes("generate-manifest"));
+const isDirectRun =
+  process.argv[1] &&
+  (process.argv[1].endsWith("generate-manifest.ts") ||
+    process.argv[1].endsWith("generate-manifest.js") ||
+    process.argv[1].includes("generate-manifest"));
 if (isDirectRun) {
   generateManifest();
 }

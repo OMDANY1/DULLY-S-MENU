@@ -39,6 +39,7 @@ export class StaticMenuRepository implements MenuRepository {
       .filter((cat) => isIpadMode || cat.visibility === "standard")
       .map((cat) => ({
         id: cat.id,
+        slug: cat.id,
         name: cat.name,
         displayName: cat.displayName,
         arabicName: cat.arabicName,
@@ -46,6 +47,11 @@ export class StaticMenuRepository implements MenuRepository {
         items: cat.items.map((item) => this.mapItem(item, cat.id)),
         visibility: (cat.visibility || "standard") as "standard" | "ipad",
       }));
+  }
+
+  async getCategoryBySlug(slug: string): Promise<MenuCategory | null> {
+    const categories = await this.getCategories();
+    return categories.find((c) => c.slug === slug) || null;
   }
 
   async getCategoryById(id: string): Promise<MenuCategory | null> {
@@ -56,6 +62,7 @@ export class StaticMenuRepository implements MenuRepository {
 
     return {
       id: cat.id,
+      slug: cat.id,
       name: cat.name,
       displayName: cat.displayName,
       arabicName: cat.arabicName,
