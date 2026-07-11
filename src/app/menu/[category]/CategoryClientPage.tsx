@@ -113,7 +113,11 @@ export default function CategoryClientPage({ category, categories }: CategoryCli
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen bg-background overflow-x-hidden flex flex-col justify-between p-6 md:p-12 select-none"
+      className="relative min-h-screen bg-background overflow-x-hidden flex flex-col justify-between select-none"
+      style={{
+        paddingTop: "max(var(--site-gutter-top), env(safe-area-inset-top))",
+        paddingBottom: "max(var(--site-gutter-bottom), env(safe-area-inset-bottom))",
+      }}
     >
       {/* Floating Navigator menu overlay */}
       <CategoryNavigator categories={categories} />
@@ -125,7 +129,7 @@ export default function CategoryClientPage({ category, categories }: CategoryCli
       <Header showBackLabel={true} />
 
       {/* EDITORIAL HERO OPENING */}
-      <section className="relative z-10 w-full max-w-6xl mx-auto pt-8 md:pt-16 pb-12 text-center flex flex-col items-center">
+      <section className="site-container relative z-10 w-full pt-8 md:pt-16 pb-12 text-center flex flex-col items-center">
         {/* Horizontal White Line */}
         <div className="relative w-full max-w-4xl h-[1px] bg-white/10 mb-8 overflow-hidden">
           <div ref={lineRef} className="absolute inset-0 bg-white/40" />

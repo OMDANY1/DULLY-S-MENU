@@ -357,7 +357,13 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
       {loading ? (
         <CinematicLoader onComplete={handleLoaderComplete} />
       ) : (
-        <main className="relative w-full h-screen bg-[#060606] overflow-hidden flex flex-col justify-between p-8 md:p-12 select-none">
+        <main 
+          className="relative w-full h-screen bg-[#060606] overflow-hidden flex flex-col justify-between select-none"
+          style={{
+            paddingTop: "max(var(--site-gutter-top), env(safe-area-inset-top))",
+            paddingBottom: "max(var(--site-gutter-bottom), env(safe-area-inset-bottom))",
+          }}
+        >
           
           {/* Burger Navigation Overlay */}
           <CategoryNavigator categories={categories} />
@@ -384,7 +390,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
           <Header />
 
           {/* Category Hero Composition Area */}
-          <section className="relative z-20 flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-12">
+          <section className="site-container relative z-20 flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-6 w-full">
             
             {/* Left Column: Visual Guide Indicator (Index) */}
             <div className="hidden md:flex md:col-span-2 flex-col space-y-4 pl-4">
@@ -461,7 +467,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
           </section>
 
           {/* Footer Bar */}
-          <footer className="relative z-20 flex items-end justify-between text-white/30 text-[9px] font-condensed tracking-[0.2em] uppercase mt-auto">
+          <footer className="site-container relative z-20 flex items-end justify-between text-white/30 text-[9px] font-condensed tracking-[0.2em] uppercase mt-auto w-full">
             <div>
               <span>SCROLL TO EXPLORE</span>
             </div>

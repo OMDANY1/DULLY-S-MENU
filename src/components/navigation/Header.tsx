@@ -7,7 +7,13 @@ interface HeaderProps {
 
 export default function Header({ showBackLabel = false }: HeaderProps) {
   return (
-    <header className="relative w-full z-20 flex items-center justify-between select-none pb-4">
+    <header 
+      className="site-container relative z-20 flex items-center justify-between select-none pointer-events-none"
+      style={{
+        paddingTop: "max(var(--site-gutter-top), env(safe-area-inset-top))",
+        paddingBottom: "var(--space-section-sm)",
+      }}
+    >
       {/* Left: Official DULLY'S logo link home */}
       <Link href="/" className="interactive-hover flex items-center space-x-3 group pointer-events-auto">
         <BrandLogo size={40} />

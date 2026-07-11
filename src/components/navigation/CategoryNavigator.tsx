@@ -182,7 +182,11 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
       <button
         ref={menuBtnRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="interactive-hover fixed top-8 right-8 z-[999] flex items-center justify-center w-12 h-12 bg-charcoal/30 border border-white/5 hover:border-crimson/30 transition-colors duration-300"
+        className="interactive-hover fixed z-[999] flex items-center justify-center w-12 h-12 bg-charcoal/30 border border-white/5 hover:border-crimson/30 transition-colors duration-300"
+        style={{
+          top: "max(var(--site-gutter-top), env(safe-area-inset-top))",
+          right: "max(var(--site-gutter-x), env(safe-area-inset-right))",
+        }}
         data-cursor-text={isOpen ? "CLOSE" : "MENU"}
         aria-label="Toggle navigation menu"
         aria-expanded={isOpen}
@@ -202,7 +206,13 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
         style={{ clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }}
       >
         {/* Branding in top-left of the overlay */}
-        <div className="absolute top-8 left-8 flex items-center space-x-3 pointer-events-none">
+        <div 
+          className="absolute flex items-center space-x-3 pointer-events-none"
+          style={{
+            top: "max(var(--site-gutter-top), env(safe-area-inset-top))",
+            left: "max(var(--site-gutter-x), env(safe-area-inset-left))",
+          }}
+        >
           <BrandLogo size={36} />
           <span className="font-condensed text-[14px] font-bold tracking-[0.2em] uppercase text-white">
             DULLY&apos;S
