@@ -12,8 +12,78 @@ import CategoryNavigator from "@/components/navigation/CategoryNavigator";
 import Atmosphere from "@/components/effects/Atmosphere";
 import ArchFrame from "@/components/ui/ArchFrame";
 
+// ==========================================
+// CATEGORY FOCAL VISUAL COMPONENT
+// ==========================================
+function CategoryFocalVisual({ categoryId }: { categoryId: string }) {
+  switch (categoryId) {
+    case "hot-tea":
+      // three narrow vertical steam traces
+      return (
+        <svg className="w-full h-full text-crimson/35" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.4">
+          <line x1="45" y1="20" x2="45" y2="80" strokeDasharray="2,2" />
+          <line x1="50" y1="15" x2="50" y2="85" strokeDasharray="3,3" />
+          <line x1="55" y1="20" x2="55" y2="80" strokeDasharray="2,2" />
+        </svg>
+      );
+    case "hot-tea-latte":
+      // broad arch with a giant central circular line
+      return (
+        <svg className="w-full h-full text-crimson/30" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.3">
+          <circle cx="50" cy="50" r="35" />
+          <circle cx="50" cy="50" r="12" fill="currentColor" className="text-crimson/5" />
+          <line x1="15" y1="50" x2="85" y2="50" />
+        </svg>
+      );
+    case "iced-tea":
+      // horizontal precision rails and condensation nodes
+      return (
+        <svg className="w-full h-full text-crimson/35" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.4">
+          <line x1="10" y1="40" x2="90" y2="40" />
+          <line x1="10" y1="60" x2="90" y2="60" />
+          <circle cx="30" cy="40" r="2.5" fill="currentColor" />
+          <circle cx="70" cy="40" r="2.5" fill="currentColor" />
+          <circle cx="50" cy="60" r="2.5" fill="currentColor" />
+        </svg>
+      );
+    case "iced-japanese-tea":
+      // ceremonial gate abstraction and fine modular geometry
+      return (
+        <svg className="w-full h-full text-crimson/25" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.35">
+          <path d="M 20,30 L 80,30 M 30,30 L 30,80 M 70,30 L 70,80 M 20,40 L 80,40" />
+          <circle cx="50" cy="60" r="16" />
+        </svg>
+      );
+    case "iced-fruit-tea":
+      // organic curved paths and cropped growth
+      return (
+        <svg className="w-full h-full text-crimson/30" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.45">
+          <path d="M 20,80 Q 50,20 80,80" />
+          <path d="M 30,80 Q 50,40 70,80" strokeDasharray="1.5,1.5" />
+        </svg>
+      );
+    case "snow-ice":
+      // crystalline structures and low mist coordinates
+      return (
+        <svg className="w-full h-full text-crimson/35" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.35">
+          <polygon points="50,15 80,65 20,65" />
+          <line x1="20" y1="75" x2="80" y2="75" strokeWidth="0.8" />
+          <line x1="10" y1="82" x2="90" y2="82" strokeDasharray="2,2" />
+        </svg>
+      );
+    default:
+      // default abstract coordinate lattice
+      return (
+        <svg className="w-full h-full text-crimson/20" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.25">
+          <rect x="20" y="20" width="60" height="60" />
+          <line x1="50" y1="0" x2="50" y2="100" />
+          <line x1="0" y1="50" x2="100" y2="50" />
+        </svg>
+      );
+  }
+}
+
 export default function Home() {
-  // Session-cached loader state to avoid replaying on internal return navigation
   const [loading, setLoading] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const hasLoaded = sessionStorage.getItem("dullys_loaded");
@@ -23,8 +93,8 @@ export default function Home() {
   });
 
   const [activeIdx, setActiveIdx] = useState(0);
+  const isTransitioningRef = useRef(false);
 
-  // Central visibility system
   const categories = getVisibleCategories(menuCategories);
   const activeCategory = categories[activeIdx];
 
@@ -32,40 +102,53 @@ export default function Home() {
   const arTitleRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const bgWrapperRef = useRef<HTMLDivElement>(null);
+  const focalRef = useRef<HTMLDivElement>(null);
 
   // Transition handler
   const transitionTo = useCallback((newIdx: number) => {
-    if (newIdx === activeIdx) return;
+    if (newIdx === activeIdx || isTransitioningRef.current) return;
+    isTransitioningRef.current = true;
 
     const title = titleRef.current;
     const arTitle = arTitleRef.current;
     const desc = descRef.current;
     const bg = bgWrapperRef.current;
+    const focal = focalRef.current;
 
     const tl = gsap.timeline({
       onComplete: () => {
         setActiveIdx(newIdx);
+        isTransitioningRef.current = false;
       },
     });
 
-    // Stagger clip-out and compress active atmosphere
+    // 1. DEPARTURE PHASE: Retract coordinates, compress, and clip-reveal out
     tl.to([title, arTitle, desc], {
-      y: -25,
+      clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+      y: -35,
       opacity: 0,
-      duration: 0.35,
-      ease: "power2.in",
+      duration: 0.4,
+      ease: "power3.in",
       stagger: 0.05,
     });
 
+    tl.to(focal, {
+      scale: 0.88,
+      opacity: 0,
+      filter: "blur(12px)",
+      duration: 0.45,
+      ease: "power2.in",
+    }, "<");
+
     tl.to(bg, {
-      scale: 0.96,
-      opacity: 0.2,
-      duration: 0.4,
+      scale: 0.95,
+      opacity: 0.15,
+      duration: 0.5,
       ease: "power2.inOut",
     }, "<");
   }, [activeIdx]);
 
-  // Stagger reveal on category entry
+  // Stagger reveal on category entry (Arrival Phase)
   useEffect(() => {
     if (loading) return;
 
@@ -73,29 +156,77 @@ export default function Home() {
     const arTitle = arTitleRef.current;
     const desc = descRef.current;
     const bg = bgWrapperRef.current;
+    const focal = focalRef.current;
 
-    gsap.fromTo([title, arTitle, desc],
-      { y: 25, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.55, ease: "power2.out", stagger: 0.08, delay: 0.1 }
-    );
+    // Reset initial states for arrival
+    gsap.set([title, arTitle, desc], {
+      clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+      y: 40,
+      opacity: 0,
+    });
+    gsap.set(focal, {
+      scale: 1.1,
+      opacity: 0,
+      filter: "blur(15px)",
+    });
+    gsap.set(bg, {
+      scale: 1.06,
+      opacity: 0.25,
+    });
 
-    gsap.fromTo(bg,
-      { scale: 1.04, opacity: 0.4 },
-      { scale: 1, opacity: 1, duration: 0.7, ease: "power2.out" }
-    );
+    // 3. ARRIVAL PHASE Timeline
+    const arrivalTimeline = gsap.timeline();
+
+    arrivalTimeline.to(bg, {
+      scale: 1,
+      opacity: 1,
+      duration: 0.8,
+      ease: "power3.out",
+    });
+
+    arrivalTimeline.to(focal, {
+      scale: 1,
+      opacity: 1,
+      filter: "blur(0px)",
+      duration: 1.0,
+      ease: "power3.out",
+    }, "-=0.6");
+
+    arrivalTimeline.to(title, {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      y: 0,
+      opacity: 1,
+      duration: 0.75,
+      ease: "power3.out",
+    }, "-=0.6");
+
+    arrivalTimeline.to(arTitle, {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      y: 0,
+      opacity: 1,
+      duration: 0.65,
+      ease: "power2.out",
+    }, "-=0.5");
+
+    arrivalTimeline.to(desc, {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      y: 0,
+      opacity: 1,
+      duration: 0.65,
+      ease: "power2.out",
+    }, "-=0.5");
+
   }, [activeIdx, loading]);
 
-  // Observer Scroll/Touch gesture binder
+  // Bind GSAP Observer for mouse wheel & touch swipes
   useEffect(() => {
     if (loading) return;
 
-    // Suspend global Lenis scroll on Home scene
-    const globalLenis = (window as unknown as { lenis?: { stop: () => void } }).lenis;
-    if (globalLenis) globalLenis.stop();
+    if ((window as unknown as { lenis?: { stop: () => void } }).lenis) {
+      (window as unknown as { lenis?: { stop: () => void } }).lenis?.stop();
+    }
 
     gsap.registerPlugin(Observer);
-
-    let isTransitioning = false;
 
     const obs = Observer.create({
       target: window,
@@ -103,37 +234,24 @@ export default function Home() {
       wheelSpeed: 0.8,
       tolerance: 15,
       onChangeY: (self) => {
-        if (isTransitioning) return;
+        if (isTransitioningRef.current) return;
 
         if (self.deltaY > 15) {
-          isTransitioning = true;
           const nextIdx = (activeIdx + 1) % categories.length;
           transitionTo(nextIdx);
-          setTimeout(() => {
-            isTransitioning = false;
-          }, 800);
         } else if (self.deltaY < -15) {
-          isTransitioning = true;
           const prevIdx = (activeIdx - 1 + categories.length) % categories.length;
           transitionTo(prevIdx);
-          setTimeout(() => {
-            isTransitioning = false;
-          }, 800);
         }
       },
     });
 
-    // Keyboard support
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isTransitioning) return;
+      if (isTransitioningRef.current) return;
       if (e.key === "ArrowDown" || e.key === "ArrowRight") {
-        isTransitioning = true;
         transitionTo((activeIdx + 1) % categories.length);
-        setTimeout(() => { isTransitioning = false; }, 800);
       } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
-        isTransitioning = true;
         transitionTo((activeIdx - 1 + categories.length) % categories.length);
-        setTimeout(() => { isTransitioning = false; }, 800);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -141,9 +259,9 @@ export default function Home() {
     return () => {
       obs.kill();
       window.removeEventListener("keydown", handleKeyDown);
-      // Restore global Lenis scroll when navigating away
-      const globalLenis = (window as unknown as { lenis?: { start: () => void } }).lenis;
-      if (globalLenis) globalLenis.start();
+      if ((window as unknown as { lenis?: { start: () => void } }).lenis) {
+        (window as unknown as { lenis?: { start: () => void } }).lenis?.start();
+      }
     };
   }, [activeIdx, loading, categories.length, transitionTo]);
 
@@ -158,23 +276,31 @@ export default function Home() {
         <CinematicLoader onComplete={handleLoaderComplete} />
       ) : (
         <main className="relative w-full h-screen bg-[#060606] overflow-hidden flex flex-col justify-between p-8 md:p-12 select-none">
-
-
-          {/* Navigation trigger (rebuilt burger index) */}
+          
+          {/* Burger Navigation Overlay */}
           <CategoryNavigator />
 
-          {/* Background Exhibition Atmosphere portal */}
+          {/* Background Exhibition Atmosphere & Arches */}
           <div ref={bgWrapperRef} className="absolute inset-0 z-0">
             <Atmosphere profile={activeCategory.id as "hot-tea"} />
-            <div className="absolute inset-x-8 md:inset-x-28 top-[16vh] bottom-[16vh]">
+            <div className="absolute inset-x-8 md:inset-x-32 top-[16vh] bottom-[16vh]">
               <ArchFrame family={getArchFamily(activeCategory.id)} />
             </div>
           </div>
 
+          {/* Category-Specific Focal Visual Layer */}
+          <div
+            ref={focalRef}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 scale-[1.08]"
+          >
+            <div className="w-[300px] h-[300px] md:w-[480px] md:h-[480px] opacity-60">
+              <CategoryFocalVisual categoryId={activeCategory.id} />
+            </div>
+          </div>
+
           {/* Header Bar */}
-          <header className="relative z-10 flex items-center justify-between">
+          <header className="relative z-20 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {/* Brand icon logo */}
               <svg className="w-8 h-8 text-crimson" viewBox="0 0 100 100" fill="currentColor">
                 <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="2.5" />
                 <path d="M 30,50 L 50,22 L 70,50 L 50,78 Z" fill="currentColor" />
@@ -188,9 +314,10 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Category hero display */}
-          <section className="relative z-10 flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-12">
-            {/* Left page guides (Desktop only) */}
+          {/* Category Hero Composition Area */}
+          <section className="relative z-20 flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-12">
+            
+            {/* Left Column: Visual Guide Indicator (Index) */}
             <div className="hidden md:flex md:col-span-2 flex-col space-y-4 pl-4">
               {categories.map((cat, idx) => (
                 <button
@@ -211,27 +338,29 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Central details */}
-            <div className="col-span-1 md:col-span-8 flex flex-col items-center md:items-start text-center md:text-left">
+            {/* Central / Right: Massive Composition Title */}
+            <div className="col-span-1 md:col-span-8 flex flex-col items-center md:items-start text-center md:text-left relative h-full justify-center">
               <div className="overflow-hidden h-5 mb-2">
                 <span className="font-condensed text-[11px] text-crimson tracking-[0.2em] font-bold block uppercase">
                   CHAPTER {(activeIdx + 1).toString().padStart(2, "0")}
                 </span>
               </div>
 
-              {/* Masked Category Title */}
+              {/* English Category Title */}
               <h2
                 ref={titleRef}
-                className="font-condensed text-[54px] md:text-[80px] lg:text-[96px] font-black uppercase tracking-[0.05em] text-white leading-none"
+                className="font-condensed text-[54px] md:text-[90px] lg:text-[115px] font-black uppercase tracking-[0.03em] text-white leading-[0.85] w-full"
+                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
               >
                 {activeCategory.displayName}
               </h2>
 
-              {/* Arabic translation (RTL) */}
+              {/* Arabic translation on an opposite, offset baseline */}
               <div
                 ref={arTitleRef}
                 dir="rtl"
-                className="font-arabic text-[18px] md:text-[24px] text-crimson font-medium mt-2 leading-none"
+                className="font-arabic text-[22px] md:text-[28px] text-crimson font-bold mt-4 leading-none select-none"
+                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
               >
                 {activeCategory.arabicName}
               </div>
@@ -239,42 +368,31 @@ export default function Home() {
               {/* Description */}
               <p
                 ref={descRef}
-                className="font-condensed text-[11px] md:text-[13px] text-white/45 tracking-[0.18em] uppercase mt-5 max-w-md leading-relaxed"
+                className="font-condensed text-[11px] md:text-[13px] text-white/45 tracking-[0.18em] uppercase mt-6 max-w-md leading-relaxed"
+                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
               >
                 {activeCategory.description}
               </p>
 
-              {/* Explore Button */}
+              {/* Exploration control button */}
               <Link
                 href={`/menu/${activeCategory.id}`}
-                className="interactive-hover mt-8 inline-flex items-center space-x-4 py-3 px-7 border border-crimson/25 bg-crimson/5 hover:bg-crimson/15 hover:border-crimson transition-all duration-300 group"
+                className="interactive-hover mt-10 inline-flex items-center space-x-6 py-2 group"
                 data-cursor-text="EXPLORE"
               >
-                <span className="font-condensed text-[11px] font-bold tracking-[0.2em] uppercase text-white">
-                  EXPLORE CATEGORY
+                <span className="font-condensed text-[11px] font-bold tracking-[0.25em] uppercase text-white group-hover:text-crimson transition-colors duration-300">
+                  [ {(activeIdx + 1).toString().padStart(2, "0")} ] &nbsp; EXPLORE CATEGORY
                 </span>
-                <svg className="w-5 h-3 text-crimson transform group-hover:translate-x-1.5 transition-transform duration-300" viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="1.2">
-                  <line x1="0" y1="6" x2="18" y2="6" />
-                  <path d="M 12,1 L 18,6 L 12,11" />
-                </svg>
+                <span className="text-crimson text-[14px] font-condensed tracking-tighter transform group-hover:translate-x-3 transition-transform duration-300">
+                  ─────────────→
+                </span>
               </Link>
             </div>
-            
-            {/* Visual Abstraction Details (Right side decoration) */}
-            <div className="hidden md:flex md:col-span-2 h-full items-center justify-center">
-              <div className="w-48 h-48 border border-white/5 rounded-full flex items-center justify-center relative animate-spin-slow opacity-10">
-                <svg className="w-4/5 h-4/5 text-crimson" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.25">
-                  <circle cx="50" cy="50" r="45" />
-                  <rect x="25" y="25" width="50" height="50" />
-                  <line x1="50" y1="0" x2="50" y2="100" />
-                  <line x1="0" y1="50" x2="100" y2="50" />
-                </svg>
-              </div>
-            </div>
+
           </section>
 
           {/* Footer Bar */}
-          <footer className="relative z-10 flex items-end justify-between text-white/30 text-[9px] font-condensed tracking-[0.2em] uppercase mt-auto">
+          <footer className="relative z-20 flex items-end justify-between text-white/30 text-[9px] font-condensed tracking-[0.2em] uppercase mt-auto">
             <div>
               <span>SCROLL TO EXPLORE</span>
             </div>

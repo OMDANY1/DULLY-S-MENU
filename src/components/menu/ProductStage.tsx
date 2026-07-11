@@ -5,52 +5,30 @@ import gsap from "gsap";
 import { MenuItem } from "@/data/menu";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { getProductAssetCandidates } from "@/lib/productAssets";
-import ArchFrame, { getArchFamily } from "@/components/ui/ArchFrame";
-import StoneStage, { VolcanicStageVariant } from "@/components/ui/StoneStage";
-import GeometricField from "@/components/ui/GeometricField";
+import { imageCurtain } from "@/lib/motion";
 import ProductSizeSelector from "./ProductSizeSelector";
 
-interface ProductStageProps {
+// ==========================================
+// 1. PRODUCT VISUAL PRIMITIVE
+// ==========================================
+interface ProductVisualProps {
   product: MenuItem;
-  layoutMode?: string;
+  sizeLabel: string;
+  imageClass?: string;
 }
 
-export default function ProductStage({ product, layoutMode = "standard" }: ProductStageProps) {
-  const [sizeIdx, setSizeIdx] = useState(0);
-  const [imageError, setImageError] = useState(false);
+export function ProductVisual({ product, sizeLabel, imageClass = "" }: ProductVisualProps) {
   const [resolvedSrc, setResolvedSrc] = useState<string>("");
+  const [imageError, setImageError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const imgWrapperRef = useRef<HTMLDivElement>(null);
+  const curtainRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
-  const priceRef = useRef<HTMLDivElement>(null);
-  const calRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
-  const selectedSize = product.sizes[sizeIdx];
-
-  // Resolve VolcanicStage variant based on category
-  const getStoneVariant = (cat: string): VolcanicStageVariant => {
-    switch (cat) {
-      case "hot-tea":
-        return "slab";
-      case "hot-tea-latte":
-        return "monolith";
-      case "iced-tea":
-      case "iced-japanese-tea":
-        return "fractured";
-      case "iced-fruit-tea":
-        return "low-rock";
-      case "snow-ice":
-        return "wide-platform";
-      default:
-        return "slab";
-    }
-  };
-
-  // Sequential image candidates resolution chain
+  // Load and resolve size-specific candidates sequentially with curtain sweep
   useEffect(() => {
     let active = true;
-    const candidates = getProductAssetCandidates(product.id, selectedSize.label);
+    const candidates = getProductAssetCandidates(product.id, sizeLabel);
     let idx = 0;
 
     const tryLoadNext = () => {
@@ -63,26 +41,19 @@ export default function ProductStage({ product, layoutMode = "standard" }: Produ
       const img = new Image();
       img.onload = () => {
         if (!active) return;
-        
-        // Swapping image with GSAP fade transition
-        const imageElement = imgRef.current;
-        if (imageElement) {
-          gsap.to(imageElement, {
-            opacity: 0,
-            scale: 0.96,
-            duration: 0.15,
-            onComplete: () => {
-              if (!active) return;
-              setResolvedSrc(candidatePath);
-              setImageError(false);
-              gsap.to(imageElement, {
-                opacity: 1,
-                scale: 1,
-                duration: 0.35,
-                ease: "power2.out",
-              });
-            },
-          });
+
+        // Perform premium curtain sweep transition on size swap
+        if (imgRef.current && curtainRef.current && resolvedSrc && !reducedMotion) {
+          imageCurtain(
+            curtainRef.current,
+            imgRef.current,
+            () => {
+              if (active) {
+                setResolvedSrc(candidatePath);
+                setImageError(false);
+              }
+            }
+          );
         } else {
           setResolvedSrc(candidatePath);
           setImageError(false);
@@ -101,31 +72,28 @@ export default function ProductStage({ product, layoutMode = "standard" }: Produ
     return () => {
       active = false;
     };
-  }, [product.id, selectedSize.label]);
+  }, [product.id, sizeLabel, resolvedSrc, reducedMotion]);
 
-  // Mouse-reactive pointer parallax with quickTo
+  // Pointer Parallax quickTo
   useEffect(() => {
     const container = containerRef.current;
-    const wrapper = imgWrapperRef.current;
-    if (!container || !wrapper) return;
+    if (!container || reducedMotion) return;
 
-    // Detect touch device or reduced-motion
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouch || reducedMotion) return;
+    if (isTouch) return;
 
-    // quickTo indicators for smooth movements without queue bloat
-    const xTo = gsap.quickTo(wrapper, "x", { duration: 0.4, ease: "power2.out" });
-    const yTo = gsap.quickTo(wrapper, "y", { duration: 0.4, ease: "power2.out" });
-    const rotYTo = gsap.quickTo(wrapper, "rotationY", { duration: 0.4, ease: "power2.out" });
-    const rotXTo = gsap.quickTo(wrapper, "rotationX", { duration: 0.4, ease: "power2.out" });
+    const xTo = gsap.quickTo(container, "x", { duration: 0.4, ease: "power2.out" });
+    const yTo = gsap.quickTo(container, "y", { duration: 0.4, ease: "power2.out" });
+    const rotYTo = gsap.quickTo(container, "rotationY", { duration: 0.4, ease: "power2.out" });
+    const rotXTo = gsap.quickTo(container, "rotationX", { duration: 0.4, ease: "power2.out" });
 
     const onMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
 
-      xTo(x * 20);
-      yTo(y * 20);
+      xTo(x * 25);
+      yTo(y * 25);
       rotYTo(x * 12);
       rotXTo(-y * 12);
     };
@@ -146,161 +114,209 @@ export default function ProductStage({ product, layoutMode = "standard" }: Produ
     };
   }, [reducedMotion]);
 
-  // size changes typographic transitions
-  const onSizeChange = (idx: number) => {
-    const priceEl = priceRef.current;
-    const calEl = calRef.current;
-    if (!priceEl || !calEl || reducedMotion) {
-      setSizeIdx(idx);
-      return;
-    }
-
-    const tl = gsap.timeline();
-    tl.to([priceEl, calEl], {
-      y: -6,
-      opacity: 0,
-      duration: 0.12,
-      ease: "power2.in",
-      onComplete: () => {
-        setSizeIdx(idx);
-        gsap.set([priceEl, calEl], { y: 6 });
-      },
-    });
-
-    tl.to([priceEl, calEl], {
-      y: 0,
-      opacity: 1,
-      duration: 0.2,
-      ease: "power2.out",
-    });
-  };
-
-  const getImageSizeClass = () => {
-    switch (layoutMode) {
-      case "monument":
-      case "full-bleed":
-        return "w-60 h-60 md:w-72 md:h-72";
-      case "offset-small":
-        return "w-32 h-32 md:w-40 md:h-40";
-      case "triptych-side":
-        return "w-40 h-40 md:w-44 md:h-44";
-      default:
-        return "w-48 h-48 md:w-56 md:h-56";
-    }
-  };
-
   return (
     <div
       ref={containerRef}
-      className="group relative w-full flex flex-col items-center select-none"
-      style={{
-        transformStyle: "preserve-3d",
-        perspective: 1000,
-      }}
+      className={`relative flex items-center justify-center select-none ${imageClass}`}
+      style={{ transformStyle: "preserve-3d", perspective: 1000 }}
     >
-      {/* Background geometric line coordinates */}
-      <GeometricField categoryId={product.category} />
+      {/* Visual sweep transition curtain overlay */}
+      <div
+        ref={curtainRef}
+        className="absolute inset-0 bg-crimson z-20 pointer-events-none"
+        style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)" }}
+      />
 
-      {/* Portal Arch System */}
-      <ArchFrame family={getArchFamily(product.category)} />
-
-      {/* Main product scene composition (No rounded cards or borders) */}
-      <div className="relative w-full h-[260px] md:h-[320px] flex items-center justify-center z-10">
-        <div
-          ref={imgWrapperRef}
-          className={`relative ${getImageSizeClass()} flex items-center justify-center`}
-          style={{ transformStyle: "preserve-3d" }}
-        >
-          {imageError ? (
-            /* Cinematic Fallback Silhouette (No generic card backgrounds) */
-            <div className="relative w-36 h-36 rounded-full flex flex-col items-center justify-center border border-crimson/10 shadow-[0_0_30px_rgba(217,33,33,0.1)]">
-              <svg
-                className="absolute w-4/5 h-4/5 text-crimson/25 animate-spin-slow"
-                viewBox="0 0 100 100"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.2"
-              >
-                <circle cx="50" cy="50" r="40" />
-                <line x1="50" y1="0" x2="50" y2="100" />
-                <line x1="0" y1="50" x2="100" y2="50" />
-              </svg>
-              <span className="font-condensed text-[8px] uppercase tracking-[0.25em] text-white/30 text-center px-4 leading-normal z-10">
-                {product.name}
-              </span>
-            </div>
-          ) : (
-            /* Resolved candidates chain image */
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              ref={imgRef}
-              src={resolvedSrc}
-              alt={product.name}
-              className="w-full h-full object-contain filter drop-shadow-[0_16px_24px_rgba(0,0,0,0.85)]"
-              style={{ transform: "translateZ(30px)" }}
-            />
-          )}
+      {imageError ? (
+        /* Restrained missing-asset locator (No generic rotating targets) */
+        <div className="relative w-36 h-36 flex flex-col items-center justify-center border-l border-crimson/30 px-4">
+          <div className="w-[1px] h-12 bg-crimson mb-2" />
+          <span className="font-condensed text-[9px] uppercase tracking-[0.25em] text-white/30 text-center leading-normal">
+            {product.name}
+          </span>
+          <span className="text-[7px] font-condensed tracking-widest text-crimson/50 uppercase mt-1">
+            Locator {product.num || "00"}
+          </span>
         </div>
-      </div>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          ref={imgRef}
+          src={resolvedSrc}
+          alt={product.name}
+          className="w-full h-full object-contain filter drop-shadow-[0_24px_32px_rgba(0,0,0,0.9)]"
+          style={{ transform: "translateZ(30px)" }}
+        />
+      )}
+    </div>
+  );
+}
 
-      {/* Volcanic rock pedestal base */}
-      <div className="w-full max-w-sm px-8 z-10 mt-[-10px]">
-        <StoneStage variant={getStoneVariant(product.category)} />
-      </div>
+// ==========================================
+// 2. PRODUCT IDENTITY PRIMITIVE
+// ==========================================
+interface ProductIdentityProps {
+  num: string | null;
+  name: string;
+  arabicName: string;
+  align?: "center" | "left" | "right" | "vertical";
+}
 
-      {/* Details Typography */}
-      <div className="relative w-full text-center mt-6 z-10 flex flex-col items-center">
-        {/* Identifier Number */}
-        {product.num && (
-          <span className="font-condensed text-[9px] text-crimson tracking-[0.25em] uppercase font-bold block mb-1">
-            {product.num.padStart(2, "0")}
+export function ProductIdentity({ num, name, arabicName, align = "center" }: ProductIdentityProps) {
+  const isVertical = align === "vertical";
+  
+  const alignClass =
+    align === "left"
+      ? "text-left items-start"
+      : align === "right"
+      ? "text-right items-end"
+      : "text-center items-center";
+
+  if (isVertical) {
+    return (
+      <div className="relative flex flex-col items-start text-left select-none pl-4 border-l border-white/5">
+        {num && (
+          <span className="font-condensed text-[10px] text-crimson tracking-[0.25em] uppercase font-bold block mb-2">
+            {num.padStart(2, "0")}
           </span>
         )}
-
-        {/* English Name */}
-        <h3 className="font-condensed text-[16px] md:text-[18px] font-bold text-white tracking-[0.12em] uppercase leading-tight">
-          {product.name}
-        </h3>
-
-        {/* Arabic Name */}
-        <span
-          dir="rtl"
-          className="font-arabic text-[11px] md:text-[12px] text-crimson mt-0.5 block leading-normal font-medium"
+        {/* Vertical lettering for English */}
+        <h3 
+          className="font-condensed text-[24px] md:text-[32px] font-black text-white tracking-[0.2em] uppercase leading-none"
+          style={{ writingMode: "vertical-lr" }}
         >
-          {product.arabicName}
+          {name}
+        </h3>
+        <span className="font-arabic text-[12px] text-crimson mt-4 block leading-normal font-medium">
+          {arabicName}
         </span>
+      </div>
+    );
+  }
 
-        {/* Price / Calorie transition window */}
+  return (
+    <div className={`relative flex flex-col select-none ${alignClass}`}>
+      {num && (
+        <span className="font-condensed text-[9px] text-crimson tracking-[0.25em] uppercase font-bold block mb-1">
+          {num.padStart(2, "0")}
+        </span>
+      )}
+      <h3 className="font-condensed text-[16px] md:text-[20px] font-bold text-white tracking-[0.12em] uppercase leading-tight">
+        {name}
+      </h3>
+      <span dir="rtl" className="font-arabic text-[11px] md:text-[12px] text-crimson mt-0.5 block leading-normal font-medium">
+        {arabicName}
+      </span>
+    </div>
+  );
+}
+
+// ==========================================
+// 3. PRODUCT PRICE PRIMITIVE
+// ==========================================
+interface ProductPriceProps {
+  price: number;
+  align?: "center" | "left" | "right";
+  size?: "standard" | "large";
+}
+
+export function ProductPrice({ price, align = "center", size = "standard" }: ProductPriceProps) {
+  const alignClass =
+    align === "left"
+      ? "justify-start text-left"
+      : align === "right"
+      ? "justify-end text-right"
+      : "justify-center text-center";
+
+  const sizeClass = size === "large" ? "text-[26px] md:text-[36px]" : "text-[18px] md:text-[22px]";
+
+  return (
+    <div className={`flex items-baseline select-none ${alignClass} ${sizeClass} font-condensed font-bold text-white`}>
+      <span>{price}</span>
+      <span className="text-[9px] uppercase tracking-widest text-white/40 ml-1.5 font-medium">
+        SAR
+      </span>
+    </div>
+  );
+}
+
+// ==========================================
+// 4. PRODUCT CALORIES PRIMITIVE
+// ==========================================
+interface ProductCaloriesProps {
+  calories: number | null;
+  calorieNote?: string | null;
+  align?: "center" | "left" | "right";
+}
+
+export function ProductCalories({ calories, calorieNote, align = "center" }: ProductCaloriesProps) {
+  const alignClass =
+    align === "left"
+      ? "text-left"
+      : align === "right"
+      ? "text-right"
+      : "text-center";
+
+  return (
+    <div className={`text-[9px] tracking-wider text-white/40 select-none ${alignClass}`}>
+      {calories !== null ? (
+        <>
+          <span className="text-crimson font-medium mr-1 font-condensed">CAL.</span>
+          <span className="font-condensed font-medium text-white/60">{calories}</span>
+        </>
+      ) : calorieNote ? (
+        <span className="text-[8px] uppercase tracking-[0.1em] text-white/30">{calorieNote}</span>
+      ) : (
+        <span className="opacity-0">-</span>
+      )}
+    </div>
+  );
+}
+
+// ==========================================
+// 5. COMPOSITE DEFAULT PRODUCTSTAGE
+// ==========================================
+interface ProductStageProps {
+  product: MenuItem;
+}
+
+export default function ProductStage({ product }: ProductStageProps) {
+  const [sizeIdx, setSizeIdx] = useState(0);
+  const selectedSize = product.sizes[sizeIdx];
+
+  return (
+    <div className="relative w-full flex flex-col items-center select-none">
+      {/* Product Image Stage (No background containers or borders) */}
+      <ProductVisual
+        product={product}
+        sizeLabel={selectedSize.label}
+        imageClass="w-48 h-48 md:w-56 md:h-56"
+      />
+
+      {/* Identity block */}
+      <div className="relative w-full text-center mt-6 z-10 flex flex-col items-center">
+        <ProductIdentity
+          num={product.num}
+          name={product.name}
+          arabicName={product.arabicName}
+          align="center"
+        />
+
+        {/* Price / Calories block */}
         <div className="h-12 mt-2 flex flex-col justify-end overflow-hidden">
-          <div ref={priceRef} className="flex items-baseline justify-center space-x-1">
-            <span className="font-condensed text-[18px] font-bold text-white">
-              {selectedSize.price}
-            </span>
-            <span className="font-condensed text-[8px] uppercase tracking-widest text-white/50">
-              SAR
-            </span>
-          </div>
-
-          <div ref={calRef} className="text-[9px] tracking-wider text-white/40">
-            {/* explicit nullable checks replacing truthy check */}
-            {selectedSize.calories !== null ? (
-              <>
-                <span className="text-crimson font-medium mr-1 font-condensed">CAL.</span>
-                <span className="font-condensed font-medium text-white/60">{selectedSize.calories}</span>
-              </>
-            ) : selectedSize.calorieNote ? (
-              <span className="text-[8px] uppercase tracking-[0.1em] text-white/30">{selectedSize.calorieNote}</span>
-            ) : (
-              <span className="opacity-0">-</span>
-            )}
-          </div>
+          <ProductPrice price={selectedSize.price} align="center" />
+          <ProductCalories
+            calories={selectedSize.calories}
+            calorieNote={selectedSize.calorieNote}
+            align="center"
+          />
         </div>
 
         {/* Sizes Selector */}
         <ProductSizeSelector
           sizes={product.sizes}
           selectedIdx={sizeIdx}
-          onChange={onSizeChange}
+          onChange={setSizeIdx}
         />
       </div>
     </div>
