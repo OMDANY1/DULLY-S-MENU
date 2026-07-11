@@ -43,9 +43,8 @@ export default function AdminLogin() {
         throw new Error("Access denied: inactive or insufficient privileges");
       }
 
-      // Redirect to admin area
-      router.push("/admin");
-      router.refresh();
+      // Redirect to admin area via full page load to flush cookies to headers
+      window.location.assign("/admin");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
       setLoading(false);
