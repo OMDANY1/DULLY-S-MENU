@@ -178,7 +178,7 @@ export default function CategoryClientPage({ category, categories }: CategoryCli
       {/* PRODUCTS CHAPTERS SYSTEM SECTION */}
       <section
         ref={productsRef}
-        className="relative z-10 w-full max-w-6xl mx-auto py-12 px-2 md:px-6"
+        className="relative z-10 w-full py-12"
       >
         <ProductChapter products={category.items} categoryId={category.id} />
       </section>
