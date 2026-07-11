@@ -2,22 +2,13 @@ import { MenuCategory, MenuItem, MenuSettings } from "@/domain/menu/types";
 import { MenuRepository } from "./MenuRepository";
 import { supabase as browserClient } from "@/lib/supabase/client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { cache } from "react";
 
-// ─── RPC Envelope Shape ────────────────────────────────────────
-interface RpcEnvelope {
-  version: number;
-  settings: {
-    menuMode: string;
-    publicationStatus: string;
-    maintenanceMessage: string | null;
-  };
-  categories: RpcCategory[];
-}
-
+// ─── RPC Type Interfaces ───────────────────────────────────────
 interface RpcSize {
   id: string;
   size_label: string;
-  size_code: string;
+  size_code: string | null;
   price: number;
   calories: number | null;
   calorie_note: string | null;
@@ -27,7 +18,7 @@ interface RpcSize {
 
 interface RpcProduct {
   id: string;
-  menu_code: string;
+  menu_code: string | null;
   name: string;
   arabic_name: string;
   dairy_milk: string | null;
@@ -37,6 +28,7 @@ interface RpcProduct {
 
 interface RpcCategory {
   id: string;
+  slug: string;
   display_name: string;
   arabic_name: string;
   description: string;
@@ -44,16 +36,163 @@ interface RpcCategory {
   items: RpcProduct[];
 }
 
-// ─── Envelope Validation ───────────────────────────────────────
-function isValidEnvelope(data: unknown): data is RpcEnvelope {
-  if (!data || typeof data !== "object") return false;
-  const obj = data as Record<string, unknown>;
-  return (
-    typeof obj.version === "number" &&
-    obj.settings !== null &&
-    typeof obj.settings === "object" &&
-    Array.isArray(obj.categories)
-  );
+// ─── Validation Helpers ────────────────────────────────────────
+function assertString(val: any, path: string): string {
+  if (typeof val !== "string") {
+    throw new Error(`Data format error: Expected string at ${path}, got ${typeof val}`);
+  }
+  return val;
+}
+
+function assertStringOrNull(val: any, path: string): string | null {
+  if (val !== null && typeof val !== "string") {
+    throw new Error(`Data format error: Expected string or null at ${path}, got ${typeof val}`);
+  }
+  return val;
+}
+
+function assertFiniteNumber(val: any, path: string): number {
+  const num = Number(val);
+  if (typeof val === "boolean" || isNaN(num) || !Number.isFinite(num)) {
+    throw new Error(`Data format error: Expected finite number at ${path}, got ${typeof val}`);
+  }
+  return num;
+}
+
+function assertFiniteNumberOrNull(val: any, path: string): number | null {
+  if (val === null || val === undefined) return null;
+  return assertFiniteNumber(val, path);
+}
+
+function validateAndNormalizePayload(data: unknown): { settings: MenuSettings; categories: MenuCategory[] } {
+  if (!data || typeof data !== "object") {
+    throw new Error("Data format error: RPC payload is not an object");
+  }
+  const payload = data as any;
+
+  if (payload.version !== 1) {
+    throw new Error(`Data format error: Expected version 1, got ${payload.version}`);
+  }
+
+  const rawSettings = payload.settings;
+  if (!rawSettings || typeof rawSettings !== "object") {
+    throw new Error("Data format error: settings must be an object");
+  }
+
+  const menuMode = rawSettings.menuMode;
+  if (menuMode !== "standard" && menuMode !== "ipad") {
+    throw new Error(`Data format error: Invalid menuMode "${menuMode}"`);
+  }
+
+  const publicationStatus = assertString(rawSettings.publicationStatus, "settings.publicationStatus");
+  const maintenanceMessage = assertStringOrNull(rawSettings.maintenanceMessage, "settings.maintenanceMessage");
+
+  const settings: MenuSettings = {
+    menuMode,
+    publicationStatus,
+    maintenanceMessage,
+  };
+
+  const rawCategories = payload.categories;
+  if (!Array.isArray(rawCategories)) {
+    throw new Error("Data format error: categories must be an array");
+  }
+
+  // If unpublished, return empty list of categories immediately (valid business state)
+  if (publicationStatus !== "published") {
+    return { settings, categories: [] };
+  }
+
+  const categories: MenuCategory[] = rawCategories.map((cat: any, cIdx: number) => {
+    const cPath = `categories[${cIdx}]`;
+    if (!cat || typeof cat !== "object") {
+      throw new Error(`Data format error: Category at index ${cIdx} is not an object`);
+    }
+
+    const id = assertString(cat.id, `${cPath}.id`);
+    const slug = assertString(cat.slug, `${cPath}.slug`);
+    const displayName = assertString(cat.display_name, `${cPath}.display_name`);
+    const arabicName = assertString(cat.arabic_name, `${cPath}.arabic_name`);
+    const description = assertString(cat.description, `${cPath}.description`);
+    
+    const visibilityMode = cat.visibility_mode;
+    if (visibilityMode !== "standard" && visibilityMode !== "ipad") {
+      throw new Error(`Data format error: Invalid visibility_mode "${visibilityMode}" at ${cPath}`);
+    }
+
+    if (!Array.isArray(cat.items)) {
+      throw new Error(`Data format error: Category items must be an array at ${cPath}`);
+    }
+
+    const items: MenuItem[] = cat.items.map((prod: any, pIdx: number) => {
+      const pPath = `${cPath}.items[${pIdx}]`;
+      if (!prod || typeof prod !== "object") {
+        throw new Error(`Data format error: Product at index ${pIdx} is not an object under ${cPath}`);
+      }
+
+      const pId = assertString(prod.id, `${pPath}.id`);
+      const num = assertStringOrNull(prod.menu_code, `${pPath}.menu_code`);
+      const name = assertString(prod.name, `${pPath}.name`);
+      const arabicNameProd = assertString(prod.arabic_name, `${pPath}.arabic_name`);
+      const dairyMilk = assertStringOrNull(prod.dairy_milk, `${pPath}.dairy_milk`);
+      const image = assertStringOrNull(prod.image, `${pPath}.image`);
+
+      if (!Array.isArray(prod.sizes)) {
+        throw new Error(`Data format error: Product sizes must be an array at ${pPath}`);
+      }
+
+      const sizes = prod.sizes.map((sz: any, sIdx: number) => {
+        const sPath = `${pPath}.sizes[${sIdx}]`;
+        if (!sz || typeof sz !== "object") {
+          throw new Error(`Data format error: Size at index ${sIdx} is not an object under ${pPath}`);
+        }
+
+        const sId = assertString(sz.id, `${sPath}.id`);
+        const label = assertString(sz.size_label, `${sPath}.size_label`);
+        const code = assertStringOrNull(sz.size_code, `${sPath}.size_code`);
+        const price = assertFiniteNumber(sz.price, `${sPath}.price`);
+        const calories = assertFiniteNumberOrNull(sz.calories, `${sPath}.calories`);
+        const calorieNote = assertStringOrNull(sz.calorie_note, `${sPath}.calorie_note`);
+        const oz = assertFiniteNumberOrNull(sz.oz, `${sPath}.oz`);
+        const szImage = assertStringOrNull(sz.image, `${sPath}.image`);
+
+        return {
+          id: sId,
+          label,
+          code,
+          price,
+          calories,
+          calorieNote,
+          oz,
+          image: szImage,
+        };
+      });
+
+      return {
+        id: pId,
+        num,
+        name,
+        arabicName: arabicNameProd,
+        category: id,
+        image,
+        dairyMilk,
+        sizes,
+      };
+    });
+
+    return {
+      id,
+      slug,
+      name: displayName,
+      displayName,
+      arabicName,
+      description,
+      items,
+      visibility: visibilityMode,
+    };
+  });
+
+  return { settings, categories };
 }
 
 // ─── Client Resolution ─────────────────────────────────────────
@@ -64,109 +203,62 @@ async function getClient() {
   return browserClient;
 }
 
-export class SupabaseMenuRepository implements MenuRepository {
-  /**
-   * Fetches menu settings from the RPC envelope.
-   * Falls back to safe defaults on any failure.
-   */
-  async getSettings(): Promise<MenuSettings> {
-    try {
-      const client = await getClient();
-      const { data, error } = await client.rpc("get_public_menu");
+// ─── Request-level Caching ─────────────────────────────────────
+const getSnapshotFromServer = cache(async () => {
+  const client = await getClient();
+  const { data: rawPayload, error } = await client.rpc("get_public_menu");
 
-      if (error) {
-        console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
-        return this.defaultSettings();
-      }
-
-      if (!isValidEnvelope(data)) {
-        console.error("[RPC VALIDATION ERROR] get_public_menu returned invalid envelope shape");
-        return this.defaultSettings();
-      }
-
-      return {
-        menuMode: (data.settings.menuMode || "standard") as "standard" | "ipad",
-        publicationStatus: data.settings.publicationStatus || "published",
-        maintenanceMessage: data.settings.maintenanceMessage || null,
-      };
-    } catch (err) {
-      console.error("[UNEXPECTED ERROR] getSettings failed:", err);
-      return this.defaultSettings();
-    }
+  if (error) {
+    console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
+    throw new Error("Failed to load menu data. Please try again later.");
   }
 
-  /**
-   * Fetches menu categories from the RPC envelope.
-   * Distinguishes between:
-   * - Valid unpublished state (envelope.categories is []) → returns []
-   * - RPC/database failure (error or invalid envelope) → throws Error
-   */
+  // Perform complete payload validation and normalization.
+  // Throws a controlled data-format error if malformed.
+  const snapshot = validateAndNormalizePayload(rawPayload);
+
+  // Apply public storage CDN URLs to all normalized images
+  const getUrl = (path: string | null) => {
+    if (!path) return null;
+    if (path.startsWith("http")) return path;
+    return client.storage.from("menu-products").getPublicUrl(path).data.publicUrl;
+  };
+
+  snapshot.categories.forEach((cat) => {
+    cat.items.forEach((item) => {
+      item.image = getUrl(item.image);
+      item.sizes.forEach((sz) => {
+        sz.image = getUrl(sz.image);
+      });
+    });
+  });
+
+  return snapshot;
+});
+
+export class SupabaseMenuRepository implements MenuRepository {
+  private async loadPublicMenuSnapshot() {
+    return await getSnapshotFromServer();
+  }
+
+  async getSettings(): Promise<MenuSettings> {
+    const snapshot = await this.loadPublicMenuSnapshot();
+    return snapshot.settings;
+  }
+
   async getCategories(): Promise<MenuCategory[]> {
-    const client = await getClient();
-
-    const { data: rawPayload, error } = await client.rpc("get_public_menu");
-
-    // RPC or database failure → throw (caller should show error state)
-    if (error) {
-      console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
-      throw new Error("Failed to load menu data. Please try again later.");
-    }
-
-    // Validate envelope structure before normalization
-    if (!isValidEnvelope(rawPayload)) {
-      console.error("[RPC VALIDATION ERROR] get_public_menu returned invalid envelope shape:", typeof rawPayload);
-      throw new Error("Menu data format is invalid. Please contact support.");
-    }
-
-    // Valid unpublished response → return empty array (not an error)
-    if (rawPayload.settings.publicationStatus !== "published") {
-      return [];
-    }
-
-    const getUrl = (path: string | null) => {
-      if (!path) return null;
-      if (path.startsWith("http")) return path;
-      return client.storage.from("menu-products").getPublicUrl(path).data.publicUrl;
-    };
-
-    return rawPayload.categories.map((cat) => ({
-      id: cat.id,
-      slug: cat.id,
-      name: cat.display_name,
-      displayName: cat.display_name,
-      arabicName: cat.arabic_name,
-      description: cat.description,
-      visibility: cat.visibility_mode as "standard" | "ipad",
-      items: (cat.items || []).map((prod) => ({
-        id: prod.id,
-        num: prod.menu_code,
-        name: prod.name,
-        arabicName: prod.arabic_name,
-        category: cat.id,
-        image: getUrl(prod.image),
-        dairyMilk: prod.dairy_milk,
-        sizes: (prod.sizes || []).map((v) => ({
-          id: v.id,
-          label: v.size_label,
-          code: v.size_code,
-          price: Number(v.price),
-          calories: v.calories,
-          calorieNote: v.calorie_note,
-          oz: v.oz ? Number(v.oz) : null,
-          image: getUrl(v.image),
-        })),
-      })),
-    }));
+    const snapshot = await this.loadPublicMenuSnapshot();
+    return snapshot.categories;
   }
 
   async getCategoryBySlug(slug: string): Promise<MenuCategory | null> {
-    const categories = await this.getCategories();
-    return categories.find((cat) => cat.slug === slug) || null;
+    const snapshot = await this.loadPublicMenuSnapshot();
+    return snapshot.categories.find((cat) => cat.slug === slug) || null;
   }
 
   async getCategoryById(id: string): Promise<MenuCategory | null> {
-    const categories = await this.getCategories();
-    return categories.find((cat) => cat.id === id) || null;
+    const snapshot = await this.loadPublicMenuSnapshot();
+    return snapshot.categories.find((cat) => cat.id === id) || null;
   }
 
   async getProductsByCategory(categoryId: string): Promise<MenuItem[]> {
@@ -175,19 +267,11 @@ export class SupabaseMenuRepository implements MenuRepository {
   }
 
   async getProductById(id: string): Promise<MenuItem | null> {
-    const categories = await this.getCategories();
-    for (const cat of categories) {
+    const snapshot = await this.loadPublicMenuSnapshot();
+    for (const cat of snapshot.categories) {
       const item = cat.items.find((p) => p.id === id);
       if (item) return item;
     }
     return null;
-  }
-
-  private defaultSettings(): MenuSettings {
-    return {
-      menuMode: "standard",
-      publicationStatus: "published",
-      maintenanceMessage: null,
-    };
   }
 }

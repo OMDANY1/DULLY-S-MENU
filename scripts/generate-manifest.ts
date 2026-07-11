@@ -19,7 +19,7 @@ interface ManifestEntry {
   variants: Record<string, string>;
 }
 
-/** Read all known product IDs from menu.ts for validation */
+/** Read all known product IDs from menu.ts for validation, failing loudly on error */
 function getKnownProductIds(): Set<string> {
   const ids = new Set<string>();
   try {
@@ -30,25 +30,31 @@ function getKnownProductIds(): Set<string> {
     while ((match = idPattern.exec(content)) !== null) {
       ids.add(match[1]);
     }
-  } catch {
-    console.warn("[WARN] Could not read menu data file for product ID validation.");
+  } catch (err: any) {
+    console.error(`\n❌ [ERROR] Failed to read menu data file: ${err.message}\n`);
+    process.exit(1);
   }
+
+  if (ids.size === 0) {
+    console.error(`\n❌ [ERROR] No product IDs found in menu data file: ${MENU_DATA_FILE}\n`);
+    process.exit(1);
+  }
+
   return ids;
 }
 
 export function generateManifest() {
   const manifest: Record<string, ManifestEntry> = {};
-  const duplicates: string[] = [];
-  const unknownIds: string[] = [];
+  const crossSourceDuplicates: string[] = [];
 
   for (const { dir, webPrefix } of SOURCE_DIRS) {
     if (!fs.existsSync(dir)) {
-      console.log(`[INFO] Source directory not found, skipping: ${dir}`);
       continue;
     }
 
     // Deterministic sort: read and sort files alphabetically
     const files = fs.readdirSync(dir).sort();
+    const mappedInThisDir = new Map<string, string>();
 
     for (const file of files) {
       const ext = path.extname(file).toLowerCase();
@@ -56,35 +62,44 @@ export function generateManifest() {
 
       const basename = path.basename(file, ext);
       const sizeMatch = basename.match(SIZE_PATTERN);
+      const isVariant = !!sizeMatch;
+      const sizeCode = sizeMatch ? sizeMatch[1].toLowerCase() : "default";
+      const productId = sizeMatch ? basename.replace(SIZE_PATTERN, "") : basename;
 
-      if (sizeMatch) {
-        // Size-variant asset
-        const sizeCode = sizeMatch[1].toLowerCase();
-        const productId = basename.replace(SIZE_PATTERN, "");
-        const webPath = `${webPrefix}/${file}`;
+      const logicalKey = `${productId}:${sizeCode}`;
+      const filePath = path.join(dir, file);
+      const webPath = `${webPrefix}/${file}`;
 
-        if (!manifest[productId]) {
-          manifest[productId] = { default: null, variants: {} };
-        }
+      // 1. Same-source directory duplicate logical key: FAIL LOUDLY
+      if (mappedInThisDir.has(logicalKey)) {
+        const conflictingPath = mappedInThisDir.get(logicalKey)!;
+        console.error(`\n❌ [ERROR] SAME-SOURCE DUPLICATE DETECTED:`);
+        console.error(`  Product ID:  ${productId}`);
+        console.error(`  Logical Key: ${sizeCode}`);
+        console.error(`  Conflict 1:  ${conflictingPath}`);
+        console.error(`  Conflict 2:  ${filePath}\n`);
+        process.exit(1);
+      }
+      mappedInThisDir.set(logicalKey, filePath);
 
-        // Duplicate detection: warn if this variant already exists from a higher-priority source
+      // 2. Cross-source duplicate: apply explicit priority (first dir wins)
+      if (!manifest[productId]) {
+        manifest[productId] = { default: null, variants: {} };
+      }
+
+      if (isVariant) {
         if (manifest[productId].variants[sizeCode]) {
-          duplicates.push(`DUPLICATE VARIANT: ${productId}/${sizeCode} — kept "${manifest[productId].variants[sizeCode]}", ignoring "${webPath}"`);
+          crossSourceDuplicates.push(
+            `Shadowed variant: ${productId}/${sizeCode} — kept "${manifest[productId].variants[sizeCode]}", ignoring "${webPath}"`
+          );
         } else {
           manifest[productId].variants[sizeCode] = webPath;
         }
       } else {
-        // Default asset
-        const productId = basename;
-        const webPath = `${webPrefix}/${file}`;
-
-        if (!manifest[productId]) {
-          manifest[productId] = { default: null, variants: {} };
-        }
-
-        // Duplicate detection: warn if default already exists from a higher-priority source
         if (manifest[productId].default !== null) {
-          duplicates.push(`DUPLICATE DEFAULT: ${productId} — kept "${manifest[productId].default}", ignoring "${webPath}"`);
+          crossSourceDuplicates.push(
+            `Shadowed default: ${productId} — kept "${manifest[productId].default}", ignoring "${webPath}"`
+          );
         } else {
           manifest[productId].default = webPath;
         }
@@ -92,21 +107,28 @@ export function generateManifest() {
     }
   }
 
-  // Unknown product ID validation
+  // 3. Unknown product ID validation against official static menu data: FAIL LOUDLY
   const knownIds = getKnownProductIds();
-  if (knownIds.size > 0) {
-    for (const assetProductId of Object.keys(manifest)) {
-      if (!knownIds.has(assetProductId)) {
-        unknownIds.push(assetProductId);
-      }
+  const unknownIds: string[] = [];
+  for (const assetProductId of Object.keys(manifest)) {
+    if (!knownIds.has(assetProductId)) {
+      unknownIds.push(assetProductId);
     }
+  }
+
+  if (unknownIds.length > 0) {
+    console.error(`\n❌ [ERROR] UNKNOWN PRODUCT IDs DETECTED (${unknownIds.length}):`);
+    for (const uid of unknownIds) {
+      console.error(`  Asset product ID "${uid}" not found in menu.ts`);
+    }
+    console.error("");
+    process.exit(1);
   }
 
   // Sort manifest keys deterministically for stable output
   const sortedKeys = Object.keys(manifest).sort();
   const sortedManifest: Record<string, ManifestEntry> = {};
   for (const key of sortedKeys) {
-    // Also sort variant keys
     const entry = manifest[key];
     const sortedVariants: Record<string, string> = {};
     for (const vk of Object.keys(entry.variants).sort()) {
@@ -115,11 +137,10 @@ export function generateManifest() {
     sortedManifest[key] = { default: entry.default, variants: sortedVariants };
   }
 
-  // Generate output
+  // Generate output without dynamic runtime timestamps to prevent git diff noise
   const content = `// DULLY'S PRODUCT ASSET MANIFEST
 // Automatically generated by scripts/generate-manifest.ts
 // Do not modify manually.
-// Generated at: ${new Date().toISOString()}
 
 export interface ManifestAsset {
   default: string | null;
@@ -141,22 +162,11 @@ export const productAssetManifest: Record<string, ManifestAsset> = ${JSON.string
   console.log(`  Size variants: ${totalVariants}`);
   console.log(`  Products with null default image: ${nullDefaults}`);
 
-  if (duplicates.length > 0) {
-    console.warn(`\n⚠ DUPLICATES DETECTED (${duplicates.length}):`);
-    for (const d of duplicates) {
-      console.warn(`  ${d}`);
+  if (crossSourceDuplicates.length > 0) {
+    console.log(`\nℹ Cross-source shadowing warnings (${crossSourceDuplicates.length}):`);
+    for (const d of crossSourceDuplicates) {
+      console.log(`  ${d}`);
     }
-  }
-
-  if (unknownIds.length > 0) {
-    console.warn(`\n⚠ UNKNOWN PRODUCT IDs (${unknownIds.length}) — assets found for products not in menu.ts:`);
-    for (const uid of unknownIds) {
-      console.warn(`  ${uid}`);
-    }
-  }
-
-  if (totalProducts === 0) {
-    console.warn("\n⚠ No product assets found. Manifest is empty.");
   }
 
   console.log("");
