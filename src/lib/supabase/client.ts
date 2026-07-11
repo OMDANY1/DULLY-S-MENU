@@ -3,20 +3,24 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-url.supabase.co";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder-anon-key";
 
-// Custom cookie storage adapter for client-server auth sync
+// Custom cookie storage adapter with robust URL encoding/decoding
 const cookieStorage = {
   getItem: (key: string) => {
     if (typeof document === "undefined") return null;
     const name = key + "=";
-    const decodedCookie = decodeURIComponent(document.cookie);
-    const ca = decodedCookie.split(";");
+    const ca = document.cookie.split(";");
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i];
       while (c.charAt(0) === " ") {
         c = c.substring(1);
       }
       if (c.indexOf(name) === 0) {
-        return c.substring(name.length, c.length);
+        // Decode only the target cookie value to prevent parsing corruption
+        try {
+          return decodeURIComponent(c.substring(name.length, c.length));
+        } catch (e) {
+          return null;
+        }
       }
     }
     return null;
@@ -27,7 +31,8 @@ const cookieStorage = {
     const d = new Date();
     d.setTime(d.getTime() + 7 * 24 * 60 * 60 * 1000);
     const expires = "expires=" + d.toUTCString();
-    document.cookie = `${key}=${value};${expires};path=/;SameSite=Lax;Secure`;
+    // Encode the value to conform with HTTP cookie standards (avoiding raw double quotes/brackets)
+    document.cookie = `${key}=${encodeURIComponent(value)};${expires};path=/;SameSite=Lax;Secure`;
   },
   removeItem: (key: string) => {
     if (typeof document === "undefined") return;

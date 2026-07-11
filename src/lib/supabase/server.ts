@@ -7,11 +7,20 @@ export async function createServerSupabaseClient() {
   
   const cookieStore = await cookies();
 
-  // Read-only server storage adapter
+  // Read-only server storage adapter with robust URL decoding fallback
   const serverStorage = {
     getItem: (key: string) => {
       const cookie = cookieStore.get(key);
-      return cookie ? cookie.value : null;
+      if (!cookie) return null;
+      const val = cookie.value;
+      if (val.startsWith("%")) {
+        try {
+          return decodeURIComponent(val);
+        } catch (e) {
+          return val;
+        }
+      }
+      return val;
     },
     setItem: () => {},
     removeItem: () => {}
