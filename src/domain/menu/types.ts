@@ -29,6 +29,7 @@ export interface MenuCategory {
   description: string;
   items: MenuItem[];
   visibility: "standard" | "ipad";
+  heroImage: string | null;
 }
 
 export interface MenuSettings {

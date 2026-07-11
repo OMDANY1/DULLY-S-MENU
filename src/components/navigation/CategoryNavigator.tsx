@@ -18,6 +18,7 @@ const fallbackCategories: MenuCategory[] = menuCategories.map((cat) => ({
   arabicName: cat.arabicName,
   description: cat.description,
   visibility: cat.visibility || "standard",
+  heroImage: null,
   items: cat.items.map((item) => {
     const assetInfo = productAssetManifest[item.id] || { default: null, variants: {} };
     return {

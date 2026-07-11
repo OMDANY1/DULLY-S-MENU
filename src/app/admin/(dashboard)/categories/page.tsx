@@ -13,11 +13,33 @@ export default async function AdminCategoriesPage() {
       const client = await createServerSupabaseClient();
       const { data, error } = await client
         .from("menu_categories")
-        .select("*")
+        .select(`
+          *,
+          menu_category_assets(storage_path, asset_type, is_active)
+        `)
         .order("display_order", { ascending: true });
 
       if (data && !error) {
-        categories = data;
+        categories = data.map((cat: any) => {
+          const heroAsset = cat.menu_category_assets?.find(
+            (a: any) => a.asset_type === "hero" && a.is_active
+          );
+          let heroUrl = null;
+          if (heroAsset && heroAsset.storage_path) {
+            heroUrl = client.storage.from("menu-products").getPublicUrl(heroAsset.storage_path).data.publicUrl;
+          }
+          return {
+            id: cat.id,
+            display_name: cat.display_name,
+            name: cat.display_name,
+            arabic_name: cat.arabic_name,
+            description: cat.description,
+            visibility_mode: cat.visibility_mode,
+            is_active: cat.is_active,
+            hero_image: heroUrl,
+            storage_path: heroAsset ? heroAsset.storage_path : null,
+          };
+        });
       }
     } catch (err) {
       console.error("Error loading categories for admin:", err);

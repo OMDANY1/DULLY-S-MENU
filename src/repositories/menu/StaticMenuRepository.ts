@@ -46,6 +46,7 @@ export class StaticMenuRepository implements MenuRepository {
         description: cat.description,
         items: cat.items.map((item) => this.mapItem(item, cat.id)),
         visibility: (cat.visibility || "standard") as "standard" | "ipad",
+        heroImage: null,
       }));
   }
 
@@ -69,6 +70,7 @@ export class StaticMenuRepository implements MenuRepository {
       description: cat.description,
       items: cat.items.map((item) => this.mapItem(item, cat.id)),
       visibility: (cat.visibility || "standard") as "standard" | "ipad",
+      heroImage: null,
     };
   }
 

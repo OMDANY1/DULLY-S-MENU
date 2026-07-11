@@ -263,3 +263,204 @@ export async function removeProductImage(
     return { success: false, error: err.message || "An unexpected error occurred" };
   }
 }
+
+export async function uploadCategoryHeroImage(
+  categoryId: string,
+  formData: FormData
+): Promise<ActionResult<any>> {
+  try {
+    await requireAdmin();
+
+    const file = formData.get("file") as File;
+    if (!file) {
+      return { success: false, error: "No file provided in form upload" };
+    }
+
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return { success: false, error: `Invalid image type: ${file.type}. Allowed: PNG, WebP, AVIF, JPEG` };
+    }
+
+    const ext = MIME_TO_EXT[file.type];
+    if (!ext) {
+      return { success: false, error: `Unsupported image MIME type: ${file.type}` };
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      return { success: false, error: "File exceeds maximum size limits (10MB)" };
+    }
+
+    const client = await createServerSupabaseClient();
+
+    // Verify category exists
+    const { data: category, error: catError } = await client
+      .from("menu_categories")
+      .select("id, display_name")
+      .eq("id", categoryId)
+      .maybeSingle();
+
+    if (catError) {
+      return { success: false, error: `Category query failed: ${catError.message}` };
+    }
+    if (!category) {
+      return { success: false, error: `Category with ID ${categoryId} does not exist.` };
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const uuid = crypto.randomUUID();
+    const storagePath = `categories/${categoryId}/hero/${uuid}.${ext}`;
+
+    // Query existing category hero asset
+    const { data: existingAsset, error: fetchError } = await client
+      .from("menu_category_assets")
+      .select("id, storage_path")
+      .eq("category_id", categoryId)
+      .eq("asset_type", "hero")
+      .maybeSingle();
+
+    if (fetchError) {
+      return { success: false, error: `Failed to query existing category asset: ${fetchError.message}` };
+    }
+
+    // Upload to Supabase Storage
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from("menu-products")
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      return { success: false, error: `Upload failed: ${uploadError.message}` };
+    }
+
+    let dbResult;
+    if (existingAsset) {
+      const { data, error: dbError } = await supabaseAdmin
+        .from("menu_category_assets")
+        .update({
+          storage_path: storagePath,
+          file_type: file.type,
+          file_size: file.size,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingAsset.id)
+        .select()
+        .single();
+
+      if (dbError) {
+        const { error: cleanupError } = await supabaseAdmin.storage.from("menu-products").remove([storagePath]);
+        if (cleanupError) {
+          console.error(`[CATEGORY HERO ORPHAN WARNING] Failed to clean up newly uploaded file after DB update failure. categoryId=${categoryId}, storagePath=${storagePath}, operation=upload_cleanup, error=${cleanupError.message}`);
+        }
+        return { success: false, error: `Database asset update failed: ${dbError.message}` };
+      }
+      dbResult = data;
+    } else {
+      const { data, error: dbError } = await supabaseAdmin
+        .from("menu_category_assets")
+        .insert({
+          category_id: categoryId,
+          asset_type: "hero",
+          storage_path: storagePath,
+          file_type: file.type,
+          file_size: file.size,
+        })
+        .select()
+        .single();
+
+      if (dbError) {
+        const { error: cleanupError } = await supabaseAdmin.storage.from("menu-products").remove([storagePath]);
+        if (cleanupError) {
+          console.error(`[CATEGORY HERO ORPHAN WARNING] Failed to clean up newly uploaded file after DB insert failure. categoryId=${categoryId}, storagePath=${storagePath}, operation=upload_cleanup, error=${cleanupError.message}`);
+        }
+        return { success: false, error: `Database asset insert failed: ${dbError.message}` };
+      }
+      dbResult = data;
+    }
+
+    if (existingAsset) {
+      const { error: removeOldError } = await supabaseAdmin.storage.from("menu-products").remove([existingAsset.storage_path]);
+      if (removeOldError) {
+        console.warn(`[CATEGORY HERO ORPHAN WARNING] Failed to delete old replaced storage asset. categoryId=${categoryId}, oldStoragePath=${existingAsset.storage_path}, newStoragePath=${storagePath}, operation=delete_replaced, error=${removeOldError.message}`);
+      }
+    }
+
+    revalidateTag("menu", "default");
+    revalidateTag("menu:categories", "default");
+    revalidateTag(`menu:category:${categoryId}`, "default");
+    revalidatePath("/", "layout");
+    revalidatePath(`/menu/${categoryId}`, "page");
+
+    return { success: true, data: dbResult };
+  } catch (err: any) {
+    return { success: false, error: err.message || "An unexpected error occurred" };
+  }
+}
+
+export async function removeCategoryHeroImage(
+  categoryId: string
+): Promise<ActionResult<any>> {
+  try {
+    await requireAdmin();
+
+    const client = await createServerSupabaseClient();
+
+    // Verify category exists
+    const { data: category, error: catError } = await client
+      .from("menu_categories")
+      .select("id")
+      .eq("id", categoryId)
+      .maybeSingle();
+
+    if (catError) {
+      return { success: false, error: `Category query failed: ${catError.message}` };
+    }
+    if (!category) {
+      return { success: false, error: `Category with ID ${categoryId} does not exist.` };
+    }
+
+    // Query existing asset
+    const { data: asset, error: queryError } = await client
+      .from("menu_category_assets")
+      .select("id, storage_path")
+      .eq("category_id", categoryId)
+      .eq("asset_type", "hero")
+      .maybeSingle();
+
+    if (queryError) {
+      return { success: false, error: `Failed to query existing category asset: ${queryError.message}` };
+    }
+    if (!asset) {
+      return { success: false, error: "Category hero asset not found or already deleted" };
+    }
+
+    // Delete database relation first
+    const { error: dbError } = await supabaseAdmin
+      .from("menu_category_assets")
+      .delete()
+      .eq("id", asset.id);
+
+    if (dbError) {
+      return { success: false, error: `Failed to remove database asset row: ${dbError.message}` };
+    }
+
+    // Remove from storage
+    const { error: storageRemoveError } = await supabaseAdmin.storage.from("menu-products").remove([asset.storage_path]);
+    if (storageRemoveError) {
+      console.error(`[CATEGORY HERO ORPHAN WARNING] Failed to delete storage asset after database record deletion. categoryId=${categoryId}, oldStoragePath=${asset.storage_path}, operation=delete_removed_asset, error=${storageRemoveError.message}`);
+    }
+
+    revalidateTag("menu", "default");
+    revalidateTag("menu:categories", "default");
+    revalidateTag(`menu:category:${categoryId}`, "default");
+    revalidatePath("/", "layout");
+    revalidatePath(`/menu/${categoryId}`, "page");
+
+    return { success: true, data: asset.id };
+  } catch (err: any) {
+    return { success: false, error: err.message || "An unexpected error occurred" };
+  }
+}

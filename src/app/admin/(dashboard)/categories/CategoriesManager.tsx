@@ -1,13 +1,16 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { createCategory, updateCategory, reorderCategories } from "@/actions/admin/categories";
+import { uploadCategoryHeroImage, removeCategoryHeroImage } from "@/actions/admin/assets";
 
 interface CategoriesManagerProps {
   categories: any[];
 }
 
 export default function CategoriesManager({ categories: initialCategories }: CategoriesManagerProps) {
+  const router = useRouter();
   const [categories, setCategories] = useState(initialCategories);
   const [isPending, startTransition] = useTransition();
 
@@ -99,6 +102,80 @@ export default function CategoriesManager({ categories: initialCategories }: Cat
       } else {
         setFormError(res.error);
         if (res.fieldErrors) setFieldErrors(res.fieldErrors);
+      }
+    });
+  };
+
+  // CATEGORY HERO VISUAL UPLOADER STATES & HANDLERS
+  const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
+  const [uploadMsgs, setUploadMsgs] = useState<Record<string, string | null>>({});
+  const [uploadErrs, setUploadErrs] = useState<Record<string, string | null>>({});
+
+  const handleFileChange = (catId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFiles((prev) => ({ ...prev, [catId]: e.target.files![0] }));
+    }
+  };
+
+  const handleUploadHero = async (catId: string) => {
+    const file = selectedFiles[catId];
+    if (!file) return;
+
+    setUploadMsgs((prev) => ({ ...prev, [catId]: "Uploading hero..." }));
+    setUploadErrs((prev) => ({ ...prev, [catId]: null }));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    startTransition(async () => {
+      const res = await uploadCategoryHeroImage(catId, formData);
+      if (res.success) {
+        setUploadMsgs((prev) => ({ ...prev, [catId]: "Hero visual uploaded successfully!" }));
+        setSelectedFiles((prev) => ({ ...prev, [catId]: null }));
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://ylnpmujtjkgrpxxbtjej.supabase.co";
+        const publicUrl = `${supabaseUrl}/storage/v1/object/public/menu-products/${res.data.storage_path}`;
+        setCategories((prevList) =>
+          prevList.map((c) =>
+            c.id === catId
+              ? {
+                  ...c,
+                  hero_image: publicUrl,
+                  storage_path: res.data.storage_path,
+                }
+              : c
+          )
+        );
+        router.refresh();
+      } else {
+        setUploadMsgs((prev) => ({ ...prev, [catId]: null }));
+        setUploadErrs((prev) => ({ ...prev, [catId]: res.error }));
+      }
+    });
+  };
+
+  const handleRemoveHero = async (catId: string) => {
+    setUploadMsgs((prev) => ({ ...prev, [catId]: "Removing hero..." }));
+    setUploadErrs((prev) => ({ ...prev, [catId]: null }));
+
+    startTransition(async () => {
+      const res = await removeCategoryHeroImage(catId);
+      if (res.success) {
+        setUploadMsgs((prev) => ({ ...prev, [catId]: "Hero visual removed successfully!" }));
+        setCategories((prevList) =>
+          prevList.map((c) =>
+            c.id === catId
+              ? {
+                  ...c,
+                  hero_image: null,
+                  storage_path: null,
+                }
+              : c
+          )
+        );
+        router.refresh();
+      } else {
+        setUploadMsgs((prev) => ({ ...prev, [catId]: null }));
+        setUploadErrs((prev) => ({ ...prev, [catId]: res.error }));
       }
     });
   };
@@ -217,6 +294,74 @@ export default function CategoriesManager({ categories: initialCategories }: Cat
                               <option value="ipad">iPad Mode</option>
                             </select>
                           </div>
+                        </div>
+
+                        {/* CATEGORY HERO VISUAL SECTION */}
+                        <div className="md:col-span-2 border-t border-white/5 pt-4 space-y-3">
+                          <label className="font-condensed text-[10px] text-white/40 uppercase tracking-widest block font-bold">
+                            Category Hero Visual
+                          </label>
+
+                          {/* Preview display */}
+                          {cat.hero_image ? (
+                            <div className="space-y-3">
+                              <div className="relative border border-white/5 bg-black p-3 flex items-center justify-center h-36 select-none max-w-sm">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={cat.hero_image}
+                                  alt={editNameEn}
+                                  className="h-full object-contain filter drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)]"
+                                />
+                              </div>
+                              <div className="text-[9px] font-condensed tracking-widest text-white/40 uppercase break-all">
+                                Path: {cat.storage_path}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveHero(cat.id)}
+                                disabled={isPending}
+                                className="w-full max-w-sm border border-crimson/20 text-crimson hover:bg-crimson/10 font-condensed text-[9px] font-bold uppercase tracking-[0.2em] p-2 transition-colors duration-300 cursor-pointer"
+                              >
+                                Remove Hero Image
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="text-[9px] font-condensed tracking-widest text-white/40 uppercase py-2">
+                              No Hero Visual Configured
+                            </div>
+                          )}
+
+                          {/* File upload inputs */}
+                          <div className="flex flex-col space-y-2 max-w-sm pt-2">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleFileChange(cat.id, e)}
+                              className="text-[9px] font-condensed text-white/40 border border-white/10 p-1 bg-black focus:outline-none"
+                            />
+                            {selectedFiles[cat.id] && (
+                              <button
+                                type="button"
+                                onClick={() => handleUploadHero(cat.id)}
+                                disabled={isPending}
+                                className="bg-crimson text-white hover:bg-red-700 font-condensed text-[9px] font-bold uppercase tracking-[0.2em] p-2 transition-colors duration-300 cursor-pointer"
+                              >
+                                Upload / Replace Hero
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Status feedback messages */}
+                          {uploadMsgs[cat.id] && (
+                            <div className="text-[9px] font-condensed text-emerald-400 tracking-wider uppercase mt-1">
+                              {uploadMsgs[cat.id]}
+                            </div>
+                          )}
+                          {uploadErrs[cat.id] && (
+                            <div className="text-[9px] font-condensed text-crimson tracking-wider uppercase mt-1">
+                              {uploadErrs[cat.id]}
+                            </div>
+                          )}
                         </div>
                         <div className="md:col-span-2 flex justify-end space-x-3">
                           <button

@@ -33,6 +33,7 @@ interface RpcCategory {
   arabic_name: string;
   description: string;
   visibility_mode: string;
+  hero_image: string | null;
   items: RpcProduct[];
 }
 
@@ -114,10 +115,11 @@ function validateAndNormalizePayload(data: unknown): { settings: MenuSettings; c
     const displayName = assertString(cat.display_name, `${cPath}.display_name`);
     const arabicName = assertString(cat.arabic_name, `${cPath}.arabic_name`);
     const description = assertString(cat.description, `${cPath}.description`);
+    const heroImageRaw = assertStringOrNull(cat.hero_image, `${cPath}.hero_image`);
     
     const visibilityMode = cat.visibility_mode;
     if (visibilityMode !== "standard" && visibilityMode !== "ipad") {
-      throw new Error(`Data format error: Invalid visibility_mode "${visibilityMode}" at ${cPath}`);
+      throw new Error("Data format error: Invalid visibility_mode");
     }
 
     if (!Array.isArray(cat.items)) {
@@ -189,6 +191,7 @@ function validateAndNormalizePayload(data: unknown): { settings: MenuSettings; c
       description,
       items,
       visibility: visibilityMode,
+      heroImage: heroImageRaw,
     };
   });
 
@@ -225,6 +228,7 @@ const getSnapshotFromServer = cache(async () => {
   };
 
   snapshot.categories.forEach((cat) => {
+    cat.heroImage = getUrl(cat.heroImage);
     cat.items.forEach((item) => {
       item.image = getUrl(item.image);
       item.sizes.forEach((sz) => {
