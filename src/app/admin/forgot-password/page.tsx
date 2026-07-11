@@ -1,55 +1,38 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { supabase } from "@/lib/supabase/client";
 
-export default function AdminLogin() {
+export default function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
-  const handleLogin = async (e: FormEvent) => {
+  const handleResetRequest = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    setMessage(null);
     setLoading(true);
 
     try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Trigger Supabase Auth password recovery
+      const redirectToUrl = `${window.location.origin}/admin/reset-password`;
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectToUrl,
       });
 
-      if (authError) {
-        throw new Error(authError.message);
+      if (resetError) {
+        throw new Error(resetError.message);
       }
 
-      // Check if user has admin role in database
-      const { data: profile, error: profileError } = await supabase
-        .from("admin_profiles")
-        .select("role, is_active")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
-
-      if (profileError || !profile) {
-        throw new Error("Access denied: missing administrative profile");
-      }
-
-      if (!profile.is_active || profile.role !== "admin") {
-        throw new Error("Access denied: inactive or insufficient privileges");
-      }
-
-      // Redirect to admin area
-      router.push("/admin");
-      router.refresh();
+      setMessage("Password recovery email has been sent. Please check your inbox and click the reset link.");
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.");
+    } finally {
       setLoading(false);
-      await supabase.auth.signOut();
     }
   };
 
@@ -68,14 +51,20 @@ export default function AdminLogin() {
             className="object-contain mb-3"
           />
           <span className="font-condensed text-[16px] font-bold tracking-[0.25em] uppercase text-white">
-            DULLY&apos;S ADMIN PORTAL
+            RECOVER PASSWORD
           </span>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleResetRequest} className="space-y-6">
           {error && (
             <div className="p-3 bg-crimson/10 border border-crimson/25 text-crimson text-[11px] font-condensed tracking-wider uppercase">
               {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="p-3 bg-green-500/10 border border-green-500/25 text-green-400 text-[11px] font-condensed tracking-wider uppercase">
+              {message}
             </div>
           )}
 
@@ -85,25 +74,12 @@ export default function AdminLogin() {
             </label>
             <input
               type="email"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="bg-black border border-white/10 p-3 text-[13px] text-white focus:outline-none focus:border-crimson transition-colors duration-300 font-condensed tracking-wider"
-              placeholder="admin@dullys.com"
-            />
-          </div>
-
-          <div className="flex flex-col space-y-1.5">
-            <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">
-              Secret Key Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="bg-black border border-white/10 p-3 text-[13px] text-white focus:outline-none focus:border-crimson transition-colors duration-300 font-condensed tracking-wider"
-              placeholder="••••••••"
+              placeholder="emadadelgd@gmail.com"
+              disabled={loading}
             />
           </div>
 
@@ -112,16 +88,16 @@ export default function AdminLogin() {
             disabled={loading}
             className="w-full bg-crimson hover:bg-red-700 text-white font-condensed text-[12px] font-bold uppercase tracking-[0.2em] p-3.5 transition-colors duration-300 disabled:opacity-50 cursor-pointer"
           >
-            {loading ? "AUTHENTICATING..." : "AUTHORIZE ACCESS"}
+            {loading ? "SENDING..." : "SEND RECOVERY LINK"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <Link
-            href="/admin/forgot-password"
+            href="/admin/login"
             className="font-condensed text-[10px] uppercase tracking-widest text-white/40 hover:text-white transition-colors duration-300"
           >
-            [ FORGOT PASSWORD? ]
+            [ RETURN TO LOGIN ]
           </Link>
         </div>
       </div>
