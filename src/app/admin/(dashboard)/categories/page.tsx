@@ -19,7 +19,12 @@ export default async function AdminCategoriesPage() {
         `)
         .order("display_order", { ascending: true });
 
-      if (data && !error) {
+      if (error) {
+        console.error("[DATABASE QUERY FAILURE] admin categories load failed:", error.message, error.details);
+        throw new Error(`Failed to load categories: ${error.message}`);
+      }
+
+      if (data) {
         categories = data.map((cat: any) => {
           const heroAsset = cat.menu_category_assets?.find(
             (a: any) => a.asset_type === "hero" && a.is_active
