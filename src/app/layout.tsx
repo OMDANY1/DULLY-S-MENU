@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Barlow_Condensed, Tajawal } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/layout/SmoothScroll";
+import CustomCursor from "@/components/ui/CustomCursor";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -24,9 +25,9 @@ const tajawal = Tajawal({
 });
 
 export const metadata: Metadata = {
-  title: "DULLY'S — Premium Asian Beverage Immersive Digital Menu",
-  description: "Experience the premium Asian beverage brand DULLY'S. Immerse yourself in our Japanese-inspired visual ritual menu featuring premium hot teas, rich lattes, cold boba tea, and volcanic snow ice altars.",
-  keywords: ["Dully's", "Boba Tea", "Matcha Latte", "Hojicha", "Japanese Tea", "Snow Ice", "Premium Beverages"],
+  title: "DULLY'S — Digital Menu 2026",
+  description: "Explore the contemporary beverage selection from DULLY'S, featuring hot tea, tea lattes, iced tea, boba milk, and snow ice.",
+  keywords: ["Dully's", "Boba Tea", "Matcha Latte", "Hojicha", "Japanese Tea", "Snow Ice", "Beverage Menu"],
 };
 
 export default function RootLayout({
@@ -41,6 +42,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-crimson selection:text-white">
         <SmoothScroll>
+          <CustomCursor />
           {children}
         </SmoothScroll>
       </body>

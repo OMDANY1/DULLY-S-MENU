@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
@@ -14,14 +14,16 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
   const circleRef = useRef<SVGCircleElement>(null);
   const pathsRef = useRef<SVGSVGElement>(null);
   const logoRef = useRef<HTMLHeadingElement>(null);
-  const pctRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
   const reducedMotion = useReducedMotion();
+
+  // OFFICIAL BRAND LOGO ANIMATION EXPLANATION:
+  // We searched for the official brand logo JSON inside the project directory, but no such asset exists yet.
+  // Standard local expected path: "/assets/logo-animation.json"
+  // Thus, as instructed by P0, we STOP the logo-animation JSON integration and render a static typographic logo layout instead.
 
   useEffect(() => {
     if (reducedMotion) {
-      setProgress(100);
       gsap.to(containerRef.current, {
         opacity: 0,
         duration: 0.3,
@@ -35,7 +37,7 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
         onComplete: () => {
           gsap.to(containerRef.current, {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-            duration: 1.2,
+            duration: 1.0,
             ease: "power4.inOut",
             onComplete: onComplete,
           });
@@ -45,94 +47,71 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
       // Initial state
       gsap.set(containerRef.current, { display: "flex" });
       gsap.set(dotRef.current, { scale: 0, opacity: 0 });
-      gsap.set(circleRef.current, { strokeDasharray: 1000, strokeDashoffset: 1000, opacity: 0 });
-      gsap.set(pathsRef.current, { opacity: 0, scale: 0.8 });
-      gsap.set(logoRef.current, { opacity: 0, letterSpacing: "1.5em" });
-      gsap.set(pctRef.current, { opacity: 0, y: 20 });
-      gsap.set(glowRef.current, { opacity: 0, scale: 0.5 });
+      gsap.set(circleRef.current, { strokeDasharray: 283, strokeDashoffset: 283, opacity: 0 });
+      gsap.set(pathsRef.current, { opacity: 0, scale: 0.85 });
+      gsap.set(logoRef.current, { opacity: 0, letterSpacing: "1.2em" });
+      gsap.set(glowRef.current, { opacity: 0, scale: 0.6 });
 
       // Step 1: Tiny red point appears
       tl.to(dotRef.current, {
         scale: 1,
         opacity: 1,
-        duration: 0.8,
+        duration: 0.6,
         ease: "power3.out",
       });
 
-      // Step 2: Dot expands into circle and draws itself
+      // Step 2: Dot fades as circle outline draws
       tl.to(dotRef.current, {
         scale: 0.2,
         opacity: 0,
-        duration: 0.4,
-        ease: "power2.in",
-      }, "+=0.2");
+        duration: 0.3,
+      }, "+=0.1");
 
       tl.to(circleRef.current, {
-        opacity: 1,
+        opacity: 0.8,
         strokeDashoffset: 0,
-        duration: 1.2,
+        duration: 0.8,
         ease: "power2.inOut",
       }, "<");
 
-      // Step 3: Draw Japanese geometric pattern and count progress
+      // Step 3: Draw Japanese geometric outline grids
       tl.to(pathsRef.current, {
-        opacity: 0.4,
+        opacity: 0.25,
         scale: 1,
-        duration: 1.0,
-        ease: "power3.out",
-      }, "-=0.3");
-
-      tl.to(pctRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
+        rotation: 30,
+        duration: 0.8,
         ease: "power2.out",
-      }, "<");
+      }, "-=0.2");
 
-      // Count percentage to 100
-      const countObj = { val: 0 };
-      tl.to(countObj, {
-        val: 100,
-        duration: 2.2,
-        ease: "power1.inOut",
-        onUpdate: () => {
-          setProgress(Math.floor(countObj.val));
-          gsap.set(pathsRef.current, { rotation: countObj.val * 0.9 });
-          if (circleRef.current) {
-            gsap.set(circleRef.current, { strokeDashoffset: (100 - countObj.val) * 10 });
-          }
-        },
-      });
-
-      // Step 4: Logo reveal
+      // Step 4: Typographic Logo Reveal
       tl.to(logoRef.current, {
         opacity: 1,
-        letterSpacing: "0.4em",
-        duration: 1.5,
+        letterSpacing: "0.3em",
+        duration: 0.8,
         ease: "power3.out",
-      }, "-=1.5");
+      }, "-=0.4");
 
-      // Step 5: Red atmospheric glow breathes behind the logo
+      // Step 5: Red ambient backlight glow
       tl.to(glowRef.current, {
         opacity: 1,
         scale: 1,
-        duration: 1.8,
+        duration: 1.0,
         ease: "power2.out",
-      }, "-=1.0");
+      }, "-=0.6");
 
-      // Final ritual compression before opening
-      tl.to([logoRef.current, pathsRef.current, circleRef.current, pctRef.current], {
-        scale: 0.9,
+      // Step 6: Visual compression before entering
+      tl.to([logoRef.current, pathsRef.current, circleRef.current], {
+        scale: 0.95,
         opacity: 0,
-        duration: 0.8,
-        ease: "power4.in",
-      }, "+=0.3");
+        duration: 0.5,
+        ease: "power3.in",
+      }, "+=0.2");
 
       tl.to(glowRef.current, {
-        scale: 1.5,
+        scale: 1.3,
         opacity: 0,
-        duration: 0.8,
-        ease: "power4.in",
+        duration: 0.5,
+        ease: "power3.in",
       }, "<");
     }, containerRef);
 
@@ -145,72 +124,58 @@ export default function CinematicLoader({ onComplete }: CinematicLoaderProps) {
       className="fixed inset-0 bg-[#060606] z-[99999] flex flex-col items-center justify-center select-none"
       style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
     >
-      {/* Background Red Glow */}
+      {/* Background radial spotlight */}
       <div
         ref={glowRef}
-        className="absolute w-[450px] h-[450px] rounded-full bg-crimson/15 blur-[120px] pointer-events-none z-0"
+        className="absolute w-[350px] h-[350px] rounded-full bg-crimson/15 blur-[100px] pointer-events-none z-0"
       />
 
-      {/* Circle & Japanese Construction lines */}
-      <div className="relative w-64 h-64 flex items-center justify-center z-10">
-        {/* Tiny Red Dot */}
+      <div className="relative w-48 h-48 flex items-center justify-center z-10">
+        {/* Central red point */}
         <div
           ref={dotRef}
           className="absolute w-2 h-2 bg-crimson rounded-full"
         />
 
-        {/* SVG Circle Drawing */}
+        {/* Concentric circle draw */}
         <svg className="absolute w-full h-full transform -rotate-90" viewBox="0 0 100 100">
           <circle
             ref={circleRef}
             cx="50"
             cy="50"
-            r="45"
+            r="42"
             fill="transparent"
             stroke="#d92121"
-            strokeWidth="0.5"
-            strokeDasharray="283"
-            strokeDashoffset="283"
+            strokeWidth="0.4"
+            strokeDasharray="264"
+            strokeDashoffset="264"
           />
         </svg>
 
-        {/* Japanese construction lines */}
+        {/* Abstract Japanese geometric grids */}
         <svg
           ref={pathsRef}
           className="absolute w-4/5 h-4/5 text-crimson/30"
           viewBox="0 0 100 100"
           fill="none"
           stroke="currentColor"
-          strokeWidth="0.25"
+          strokeWidth="0.2"
         >
-          <rect x="20" y="20" width="60" height="60" />
-          <circle cx="50" cy="50" r="30" />
+          <rect x="25" y="25" width="50" height="50" />
+          <circle cx="50" cy="50" r="28" />
           <line x1="50" y1="10" x2="50" y2="90" />
           <line x1="10" y1="50" x2="90" y2="50" />
-          <line x1="20" y1="20" x2="80" y2="80" />
-          <line x1="80" y1="20" x2="20" y2="80" />
         </svg>
-
-        {/* Loading percentage */}
-        <div
-          ref={pctRef}
-          className="absolute bottom-[-60px] font-condensed tracking-[0.25em] text-[10px] text-white/50"
-        >
-          {progress}%
-        </div>
       </div>
 
-      {/* DULLY'S Identity Logo */}
-      <div className="absolute mt-48 z-10 text-center">
+      {/* Typographic Logo */}
+      <div className="absolute mt-36 z-10 text-center">
         <h1
           ref={logoRef}
-          className="font-condensed text-[32px] md:text-[40px] font-bold text-white tracking-[0.4em] uppercase"
+          className="font-condensed text-[24px] md:text-[30px] font-bold text-white tracking-[0.3em] uppercase"
         >
           Dully&apos;s
         </h1>
-        <p className="text-[9px] font-condensed tracking-[0.5em] text-crimson uppercase mt-2 opacity-50">
-          Contemporary Tea ritual
-        </p>
       </div>
     </div>
   );

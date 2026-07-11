@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useParams, notFound } from "next/navigation";
 import gsap from "gsap";
 import { menuCategories } from "@/data/menu";
-import CustomCursor from "@/components/ui/CustomCursor";
+import { isCategoryVisible } from "@/config/menuConfig";
 import CategoryNavigator from "@/components/navigation/CategoryNavigator";
 import BackHomeButton from "@/components/navigation/BackHomeButton";
 import ProductChapter from "@/components/menu/ProductChapter";
@@ -14,9 +14,9 @@ export default function CategoryPage() {
   const params = useParams();
   const categoryId = params?.category as string;
 
-  // Find the category in normalized database
+  // Find the category in normalized database and check visibility
   const category = menuCategories.find((cat) => cat.id === categoryId);
-  if (!category) {
+  if (!category || !isCategoryVisible(category)) {
     notFound();
   }
 
@@ -121,14 +121,13 @@ export default function CategoryPage() {
       ref={containerRef}
       className="relative min-h-screen bg-background overflow-x-hidden flex flex-col justify-between p-6 md:p-12 select-none"
     >
-      {/* Custom Cursor System */}
-      <CustomCursor />
+
 
       {/* Floating Navigator menu overlay */}
       <CategoryNavigator />
 
       {/* Background Atmosphere */}
-      <Atmosphere profile={category.id as any} />
+      <Atmosphere profile={category.id as "hot-tea"} />
 
       {/* TOP HEADER BAR */}
       <header className="relative w-full z-20 flex items-center justify-between pb-8">
@@ -136,7 +135,7 @@ export default function CategoryPage() {
         <div className="flex items-center space-x-2">
           {/* Decorative small logo symbol */}
           <span className="font-condensed text-[12px] font-bold tracking-[0.2em] uppercase text-white/40">
-            Dully&apos;s Altar
+            MENU 2026
           </span>
         </div>
       </header>
@@ -193,13 +192,13 @@ export default function CategoryPage() {
         ref={productsRef}
         className="relative z-10 w-full max-w-6xl mx-auto py-12 px-2 md:px-6"
       >
-        <ProductChapter products={category.items} />
+        <ProductChapter products={category.items} categoryId={category.id} />
       </section>
 
       {/* FOOTER BAR */}
       <footer className="relative w-full z-20 pt-16 flex items-center justify-between text-white/30 text-[9px] font-condensed tracking-[0.2em] uppercase mt-auto">
         <div>
-          <span>Dully&apos;s Digital Altar Experience</span>
+          <span>Dully&apos;s Digital Menu Experience</span>
         </div>
         <div className="flex items-center space-x-4">
           <span className="text-crimson font-bold">DULLY&apos;S</span>

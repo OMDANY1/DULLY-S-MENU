@@ -20,6 +20,9 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       wheelMultiplier: 0.9,
     });
 
+    // Save to window for page-specific stop/start control
+    (window as unknown as { lenis?: Lenis }).lenis = lenis;
+
     // Synchronize Lenis with GSAP ScrollTrigger
     lenis.on("scroll", () => {
       ScrollTrigger.update();
@@ -43,6 +46,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       lenis.destroy();
       gsap.ticker.remove(tick);
       window.removeEventListener("resize", handleResize);
+      delete (window as unknown as { lenis?: Lenis }).lenis;
     };
   }, []);
 
