@@ -3,7 +3,7 @@ import { getMenuRepository } from "@/repositories/menu/factory";
 import CategoryClientPage from "./CategoryClientPage";
 import { isCategoryVisible } from "@/config/menuConfig";
 
-export const revalidate = 3600; // Cache pages for 1 hour by default
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{

@@ -294,7 +294,7 @@ export async function uploadCategoryHeroImage(
     // Verify category exists
     const { data: category, error: catError } = await client
       .from("menu_categories")
-      .select("id, display_name")
+      .select("id, slug, display_name")
       .eq("id", categoryId)
       .maybeSingle();
 
@@ -388,11 +388,12 @@ export async function uploadCategoryHeroImage(
       }
     }
 
+    const targetSlug = category?.slug || categoryId;
     revalidateTag("menu", "default");
     revalidateTag("menu:categories", "default");
-    revalidateTag(`menu:category:${categoryId}`, "default");
+    revalidateTag(`menu:category:${targetSlug}`, "default");
     revalidatePath("/", "layout");
-    revalidatePath(`/menu/${categoryId}`, "page");
+    revalidatePath(`/menu/${targetSlug}`, "page");
 
     return { success: true, data: dbResult };
   } catch (err: any) {
@@ -411,7 +412,7 @@ export async function removeCategoryHeroImage(
     // Verify category exists
     const { data: category, error: catError } = await client
       .from("menu_categories")
-      .select("id")
+      .select("id, slug")
       .eq("id", categoryId)
       .maybeSingle();
 
@@ -453,11 +454,12 @@ export async function removeCategoryHeroImage(
       console.error(`[CATEGORY HERO ORPHAN WARNING] Failed to delete storage asset after database record deletion. categoryId=${categoryId}, oldStoragePath=${asset.storage_path}, operation=delete_removed_asset, error=${storageRemoveError.message}`);
     }
 
+    const targetSlug = category?.slug || categoryId;
     revalidateTag("menu", "default");
     revalidateTag("menu:categories", "default");
-    revalidateTag(`menu:category:${categoryId}`, "default");
+    revalidateTag(`menu:category:${targetSlug}`, "default");
     revalidatePath("/", "layout");
-    revalidatePath(`/menu/${categoryId}`, "page");
+    revalidatePath(`/menu/${targetSlug}`, "page");
 
     return { success: true, data: asset.id };
   } catch (err: any) {
