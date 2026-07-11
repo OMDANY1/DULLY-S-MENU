@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { MenuItem } from "@/data/menu";
+import React from "react";
+import { MenuItem } from "@/domain/menu/types";
 import {
   ProductVisual,
   ProductIdentity,
@@ -11,6 +11,7 @@ import {
 import ProductSizeSelector from "./ProductSizeSelector";
 import ArchFrame, { getArchFamily } from "@/components/ui/ArchFrame";
 import StoneStage from "@/components/ui/StoneStage";
+import ProductScene from "./ProductScene";
 
 interface ProductChapterProps {
   products: MenuItem[];
@@ -31,9 +32,6 @@ interface Chapter {
 }
 
 export default function ProductChapter({ products, categoryId }: ProductChapterProps) {
-  // Size selection map tracking selected size index by product ID
-  const [sizesMap, setSizesMap] = useState<Record<string, number>>({});
-
   // Partition products into visual chapters
   const partitionProducts = (): Chapter[] => {
     const list = [...products];
@@ -90,96 +88,104 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
           // ==========================================
           case "MONUMENT": {
             const p = ch.items[0];
-            const sizeIdx = sizesMap[p.id] ?? 0;
-            const size = p.sizes[sizeIdx];
 
             return (
-              <div key={key} className="w-full">
-                {/* Desktop Scene: Monumental off-center editorial */}
-                <div className="hidden md:flex relative w-full min-h-[85svh] flex-row items-center justify-between px-8 overflow-hidden">
-                  {/* Background Huge Crop Letter */}
-                  <div className="absolute inset-0 flex items-center justify-start opacity-[0.03] select-none pointer-events-none z-0">
-                    <span className="text-[28vw] font-condensed font-black tracking-widest text-white uppercase leading-none">
-                      {p.name.split(" ")[0]}
-                    </span>
-                  </div>
+              <ProductScene key={key} product={p}>
+                {(scene) => (
+                  <div className="w-full">
+                    {/* Desktop Scene: Monumental off-center editorial */}
+                    <div className="hidden md:flex relative w-full min-h-[85svh] flex-row items-center justify-between px-8 overflow-hidden">
+                      {/* Background Huge Crop Letter */}
+                      <div className="absolute inset-0 flex items-center justify-start opacity-[0.03] select-none pointer-events-none z-0">
+                        <span className="text-[28vw] font-condensed font-black tracking-widest text-white uppercase leading-none">
+                          {p.name.split(" ")[0]}
+                        </span>
+                      </div>
 
-                  {/* Chapter-owned architecture and grounds */}
-                  <div className="absolute inset-y-0 right-10 w-1/2 flex items-center justify-center z-10 pointer-events-none">
-                    <div className="w-[110%] h-[85%] scale-[1.1] opacity-75">
-                      <ArchFrame family={getArchFamily(p.category)} />
+                      {/* Chapter-owned architecture and grounds */}
+                      <div className="absolute inset-y-0 right-10 w-1/2 flex items-center justify-center z-10 pointer-events-none">
+                        <div className="w-[110%] h-[85%] scale-[1.1] opacity-75">
+                          <ArchFrame family={getArchFamily(p.category)} />
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-4 right-8 w-1/2 h-36 z-10 pointer-events-none">
+                        <StoneStage variant="monolith" />
+                      </div>
+
+                      {/* Left Side: Edge Metadata arrangement */}
+                      <div className="relative z-20 w-1/3 flex flex-col items-start justify-center pr-6 h-full">
+                        <ProductIdentity
+                          num={p.num}
+                          name={p.name}
+                          arabicName={p.arabicName}
+                          align="left"
+                        />
+
+                        {/* Technical details roll block */}
+                        <div className="mt-8 pt-6 border-t border-crimson/20 w-36 flex flex-col items-start space-y-3">
+                          <ProductPrice price={scene.displayedSize.price} align="left" size="large" />
+                          <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="left" />
+                        </div>
+
+                        <div className="mt-12">
+                          <ProductSizeSelector
+                            sizes={p.sizes}
+                            selectedIdx={scene.requestedIdx}
+                            onChange={scene.requestSizeChange}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Right Side: Oversized Hero Product Visual */}
+                      <div className="relative z-20 w-3/5 flex items-center justify-center h-full">
+                        <ProductVisual
+                          product={p}
+                          resolvedSrc={scene.resolvedSrc}
+                          imageError={scene.imageError}
+                          curtainRef={scene.curtainRef}
+                          imgRef={scene.imgRef}
+                          imageClass="w-[clamp(320px,34vw,660px)] h-[65vh] select-none"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Mobile Scene: Single structured narrative view */}
+                    <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
+                      <div className="relative w-full h-[48svh] flex items-center justify-center">
+                        <div className="absolute inset-0 scale-[0.9] opacity-40">
+                          <ArchFrame family={getArchFamily(p.category)} />
+                        </div>
+                        <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
+                          <StoneStage variant="slab" />
+                        </div>
+                        <ProductVisual
+                          product={p}
+                          resolvedSrc={scene.resolvedSrc}
+                          imageError={scene.imageError}
+                          curtainRef={scene.curtainRef}
+                          imgRef={scene.imgRef}
+                          imageClass="w-[72vw] h-[40svh]"
+                        />
+                      </div>
+                      <div className="w-full text-center mt-6 flex flex-col items-center">
+                        <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                        <div className="mt-3 flex items-center space-x-6">
+                          <ProductPrice price={scene.displayedSize.price} align="center" />
+                          <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                        </div>
+                        <div className="mt-5">
+                          <ProductSizeSelector
+                            sizes={p.sizes}
+                            selectedIdx={scene.requestedIdx}
+                            onChange={scene.requestSizeChange}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="absolute bottom-4 right-8 w-1/2 h-36 z-10 pointer-events-none">
-                    <StoneStage variant="monolith" />
-                  </div>
-
-                  {/* Left Side: Edge Metadata arrangement */}
-                  <div className="relative z-20 w-1/3 flex flex-col items-start justify-center pr-6 h-full">
-                    <ProductIdentity
-                      num={p.num}
-                      name={p.name}
-                      arabicName={p.arabicName}
-                      align="left"
-                    />
-
-                    {/* Technical details roll block */}
-                    <div className="mt-8 pt-6 border-t border-crimson/20 w-36 flex flex-col items-start space-y-3">
-                      <ProductPrice price={size.price} align="left" size="large" />
-                      <ProductCalories calories={size.calories} calorieNote={size.calorieNote} align="left" />
-                    </div>
-
-                    <div className="mt-12">
-                      <ProductSizeSelector
-                        sizes={p.sizes}
-                        selectedIdx={sizeIdx}
-                        onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Right Side: Oversized Hero Product Visual */}
-                  <div className="relative z-20 w-3/5 flex items-center justify-center h-full">
-                    <ProductVisual
-                      product={p}
-                      sizeLabel={size.label}
-                      imageClass="w-[clamp(320px,34vw,660px)] h-[65vh] select-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Mobile Scene: Single structured narrative view */}
-                <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
-                  <div className="relative w-full h-[48svh] flex items-center justify-center">
-                    <div className="absolute inset-0 scale-[0.9] opacity-40">
-                      <ArchFrame family={getArchFamily(p.category)} />
-                    </div>
-                    <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
-                      <StoneStage variant="slab" />
-                    </div>
-                    <ProductVisual
-                      product={p}
-                      sizeLabel={size.label}
-                      imageClass="w-[72vw] h-[40svh]"
-                    />
-                  </div>
-                  <div className="w-full text-center mt-6 flex flex-col items-center">
-                    <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                    <div className="mt-3 flex items-center space-x-6">
-                      <ProductPrice price={size.price} align="center" />
-                      <ProductCalories calories={size.calories} calorieNote={size.calorieNote} align="center" />
-                    </div>
-                    <div className="mt-5">
-                      <ProductSizeSelector
-                        sizes={p.sizes}
-                        selectedIdx={sizeIdx}
-                        onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                )}
+              </ProductScene>
             );
           }
 
@@ -188,10 +194,6 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
           // ==========================================
           case "DUO_TENSION": {
             const [p1, p2] = ch.items;
-            const sizeIdx1 = sizesMap[p1.id] ?? 0;
-            const size1 = p1.sizes[sizeIdx1];
-            const sizeIdx2 = sizesMap[p2.id] ?? 0;
-            const size2 = p2.sizes[sizeIdx2];
 
             return (
               <div key={key} className="w-full">
@@ -202,104 +204,129 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
 
                   {/* Left Column: Product A (Lower mass, large) */}
                   <div className="relative w-[48%] flex flex-row items-center justify-start mt-20 z-20">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-[1.05] opacity-50 pointer-events-none">
-                        <ArchFrame family={getArchFamily(p1.category)} />
-                      </div>
-                      <div className="absolute bottom-4 left-4 w-4/5 h-20 opacity-80 pointer-events-none">
-                        <StoneStage variant="slab" />
-                      </div>
-                      <ProductVisual
-                        product={p1}
-                        sizeLabel={size1.label}
-                        imageClass="w-[clamp(260px,27vw,500px)] h-[50vh]"
-                      />
-                    </div>
+                    <ProductScene product={p1}>
+                      {(scene1) => (
+                        <>
+                          <div className="relative">
+                            <div className="absolute inset-0 scale-[1.05] opacity-50 pointer-events-none">
+                              <ArchFrame family={getArchFamily(p1.category)} />
+                            </div>
+                            <div className="absolute bottom-4 left-4 w-4/5 h-20 opacity-80 pointer-events-none">
+                              <StoneStage variant="slab" />
+                            </div>
+                            <ProductVisual
+                              product={p1}
+                              resolvedSrc={scene1.resolvedSrc}
+                              imageError={scene1.imageError}
+                              curtainRef={scene1.curtainRef}
+                              imgRef={scene1.imgRef}
+                              imageClass="w-[clamp(260px,27vw,500px)] h-[50vh]"
+                            />
+                          </div>
 
-                    {/* Metadata right of image */}
-                    <div className="ml-8 flex flex-col items-start max-w-[200px]">
-                      <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
-                      <div className="mt-4 flex flex-col items-start space-y-1">
-                        <ProductPrice price={size1.price} align="left" />
-                        <ProductCalories calories={size1.calories} calorieNote={size1.calorieNote} align="left" />
-                      </div>
-                      <div className="mt-6">
-                        <ProductSizeSelector
-                          sizes={p1.sizes}
-                          selectedIdx={sizeIdx1}
-                          onChange={(idx) => setSizesMap(prev => ({ ...prev, [p1.id]: idx }))}
-                        />
-                      </div>
-                    </div>
+                          {/* Metadata right of image */}
+                          <div className="ml-8 flex flex-col items-start max-w-[200px]">
+                            <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
+                            <div className="mt-4 flex flex-col items-start space-y-1">
+                              <ProductPrice price={scene1.displayedSize.price} align="left" />
+                              <ProductCalories calories={scene1.displayedSize.calories} calorieNote={scene1.displayedSize.calorieNote} align="left" />
+                            </div>
+                            <div className="mt-6">
+                              <ProductSizeSelector
+                                sizes={p1.sizes}
+                                selectedIdx={scene1.requestedIdx}
+                                onChange={scene1.requestSizeChange}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </ProductScene>
                   </div>
 
                   {/* Right Column: Product B (Higher mass, smaller) */}
                   <div className="relative w-[48%] flex flex-row-reverse items-center justify-start mb-20 z-20">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-[1.05] opacity-50 pointer-events-none">
-                        <ArchFrame family={getArchFamily(p2.category)} />
-                      </div>
-                      <div className="absolute bottom-4 right-4 w-4/5 h-20 opacity-80 pointer-events-none">
-                        <StoneStage variant="fractured" />
-                      </div>
-                      <ProductVisual
-                        product={p2}
-                        sizeLabel={size2.label}
-                        imageClass="w-[clamp(220px,22vw,420px)] h-[44vh]"
-                      />
-                    </div>
+                    <ProductScene product={p2}>
+                      {(scene2) => (
+                        <>
+                          <div className="relative">
+                            <div className="absolute inset-0 scale-[1.05] opacity-50 pointer-events-none">
+                              <ArchFrame family={getArchFamily(p2.category)} />
+                            </div>
+                            <div className="absolute bottom-4 right-4 w-4/5 h-20 opacity-80 pointer-events-none">
+                              <StoneStage variant="fractured" />
+                            </div>
+                            <ProductVisual
+                              product={p2}
+                              resolvedSrc={scene2.resolvedSrc}
+                              imageError={scene2.imageError}
+                              curtainRef={scene2.curtainRef}
+                              imgRef={scene2.imgRef}
+                              imageClass="w-[clamp(220px,22vw,420px)] h-[44vh]"
+                            />
+                          </div>
 
-                    {/* Metadata left of image */}
-                    <div className="mr-8 flex flex-col items-end text-right max-w-[200px]">
-                      <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
-                      <div className="mt-4 flex flex-col items-end space-y-1">
-                        <ProductPrice price={size2.price} align="right" />
-                        <ProductCalories calories={size2.calories} calorieNote={size2.calorieNote} align="right" />
-                      </div>
-                      <div className="mt-6">
-                        <ProductSizeSelector
-                          sizes={p2.sizes}
-                          selectedIdx={sizeIdx2}
-                          onChange={(idx) => setSizesMap(prev => ({ ...prev, [p2.id]: idx }))}
-                        />
-                      </div>
-                    </div>
+                          {/* Metadata left of image */}
+                          <div className="mr-8 flex flex-col items-end text-right max-w-[200px]">
+                            <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
+                            <div className="mt-4 flex flex-col items-end space-y-1">
+                              <ProductPrice price={scene2.displayedSize.price} align="right" />
+                              <ProductCalories calories={scene2.displayedSize.calories} calorieNote={scene2.displayedSize.calorieNote} align="right" />
+                            </div>
+                            <div className="mt-6">
+                              <ProductSizeSelector
+                                sizes={p2.sizes}
+                                selectedIdx={scene2.requestedIdx}
+                                onChange={scene2.requestSizeChange}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </ProductScene>
                   </div>
                 </div>
 
                 {/* Mobile Scene: Two sequential narratives */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
-                  {[p1, p2].map((p, idx) => {
-                    const localIdx = idx === 0 ? sizeIdx1 : sizeIdx2;
-                    const localSize = p.sizes[localIdx];
-                    return (
-                      <div key={p.id} className="flex flex-col items-center min-h-[75svh] justify-center px-4">
-                        <div className="relative w-full h-[45svh] flex items-center justify-center">
-                          <div className="absolute inset-0 scale-[0.9] opacity-40">
-                            <ArchFrame family={getArchFamily(p.category)} />
-                          </div>
-                          <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
-                            <StoneStage variant="slab" />
-                          </div>
-                          <ProductVisual product={p} sizeLabel={localSize.label} imageClass="w-[68vw] h-[38svh]" />
-                        </div>
-                        <div className="w-full text-center mt-6 flex flex-col items-center">
-                          <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                          <div className="mt-2 flex items-center space-x-6">
-                            <ProductPrice price={localSize.price} align="center" />
-                            <ProductCalories calories={localSize.calories} calorieNote={localSize.calorieNote} align="center" />
-                          </div>
-                          <div className="mt-4">
-                            <ProductSizeSelector
-                              sizes={p.sizes}
-                              selectedIdx={localIdx}
-                              onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
+                  {[p1, p2].map((p) => (
+                    <ProductScene key={p.id} product={p}>
+                      {(scene) => (
+                        <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
+                          <div className="relative w-full h-[45svh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[0.9] opacity-40">
+                              <ArchFrame family={getArchFamily(p.category)} />
+                            </div>
+                            <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
+                              <StoneStage variant="slab" />
+                            </div>
+                            <ProductVisual
+                              product={p}
+                              resolvedSrc={scene.resolvedSrc}
+                              imageError={scene.imageError}
+                              curtainRef={scene.curtainRef}
+                              imgRef={scene.imgRef}
+                              imageClass="w-[68vw] h-[38svh]"
                             />
                           </div>
+                          <div className="w-full text-center mt-6 flex flex-col items-center">
+                            <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                            <div className="mt-2 flex items-center space-x-6">
+                              <ProductPrice price={scene.displayedSize.price} align="center" />
+                              <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p.sizes}
+                                selectedIdx={scene.requestedIdx}
+                                onChange={scene.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </ProductScene>
+                  ))}
                 </div>
               </div>
             );
@@ -310,12 +337,6 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
           // ==========================================
           case "TRIPTYCH_ARCHES": {
             const [p1, p2, p3] = ch.items;
-            const sizeIdx1 = sizesMap[p1.id] ?? 0;
-            const size1 = p1.sizes[sizeIdx1];
-            const sizeIdx2 = sizesMap[p2.id] ?? 0;
-            const size2 = p2.sizes[sizeIdx2];
-            const sizeIdx3 = sizesMap[p3.id] ?? 0;
-            const size3 = p3.sizes[sizeIdx3];
 
             return (
               <div key={key} className="w-full">
@@ -326,93 +347,112 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                   <div className="flex-1 grid grid-cols-3 gap-6 items-end relative z-20 w-full mt-8">
                     
                     {/* Left Arch Portal */}
-                    <div className="flex flex-col items-center mb-10">
-                      <div className="relative w-full h-[50vh] flex items-center justify-center">
-                        {/* Architectural nested portal frame */}
-                        <div className="absolute inset-0 scale-[1.02] opacity-50">
-                          <ArchFrame family={getArchFamily(p1.category)} />
+                    <ProductScene product={p1}>
+                      {(scene1) => (
+                        <div className="flex flex-col items-center mb-10">
+                          <div className="relative w-full h-[50vh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[1.02] opacity-50">
+                              <ArchFrame family={getArchFamily(p1.category)} />
+                            </div>
+                            <div className="absolute w-[180px] h-[180px] rounded-full bg-crimson/5 blur-[50px] pointer-events-none" />
+                            <ProductVisual
+                              product={p1}
+                              resolvedSrc={scene1.resolvedSrc}
+                              imageError={scene1.imageError}
+                              curtainRef={scene1.curtainRef}
+                              imgRef={scene1.imgRef}
+                              imageClass="w-[clamp(210px,20vw,360px)] h-[42vh]"
+                            />
+                          </div>
+                          <div className="text-center mt-6">
+                            <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="center" />
+                            <div className="mt-3 flex items-center justify-center space-x-4">
+                              <ProductPrice price={scene1.displayedSize.price} align="center" />
+                              <ProductCalories calories={scene1.displayedSize.calories} calorieNote={scene1.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p1.sizes}
+                                selectedIdx={scene1.requestedIdx}
+                                onChange={scene1.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        {/* Portal back glow */}
-                        <div className="absolute w-[180px] h-[180px] rounded-full bg-crimson/5 blur-[50px] pointer-events-none" />
-                        <ProductVisual
-                          product={p1}
-                          sizeLabel={size1.label}
-                          imageClass="w-[clamp(210px,20vw,360px)] h-[42vh]"
-                        />
-                      </div>
-                      <div className="text-center mt-6">
-                        <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="center" />
-                        <div className="mt-3 flex items-center justify-center space-x-4">
-                          <ProductPrice price={size1.price} align="center" />
-                          <ProductCalories calories={size1.calories} calorieNote={size1.calorieNote} align="center" />
-                        </div>
-                        <div className="mt-4">
-                          <ProductSizeSelector
-                            sizes={p1.sizes}
-                            selectedIdx={sizeIdx1}
-                            onChange={(idx) => setSizesMap(prev => ({ ...prev, [p1.id]: idx }))}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      )}
+                    </ProductScene>
 
                     {/* Center Arch Portal (Dominant center portal) */}
-                    <div className="flex flex-col items-center mb-0">
-                      <div className="relative w-full h-[58vh] flex items-center justify-center">
-                        <div className="absolute inset-0 scale-[1.08] opacity-75">
-                          <ArchFrame family={getArchFamily(p2.category)} />
+                    <ProductScene product={p2}>
+                      {(scene2) => (
+                        <div className="flex flex-col items-center mb-0">
+                          <div className="relative w-full h-[58vh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[1.08] opacity-75">
+                              <ArchFrame family={getArchFamily(p2.category)} />
+                            </div>
+                            <div className="absolute w-[240px] h-[240px] rounded-full bg-crimson/10 blur-[60px] pointer-events-none" />
+                            <ProductVisual
+                              product={p2}
+                              resolvedSrc={scene2.resolvedSrc}
+                              imageError={scene2.imageError}
+                              curtainRef={scene2.curtainRef}
+                              imgRef={scene2.imgRef}
+                              imageClass="w-[clamp(280px,25vw,460px)] h-[50vh]"
+                            />
+                          </div>
+                          <div className="text-center mt-8">
+                            <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="center" />
+                            <div className="mt-3 flex items-center justify-center space-x-6">
+                              <ProductPrice price={scene2.displayedSize.price} align="center" size="large" />
+                              <ProductCalories calories={scene2.displayedSize.calories} calorieNote={scene2.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-5">
+                              <ProductSizeSelector
+                                sizes={p2.sizes}
+                                selectedIdx={scene2.requestedIdx}
+                                onChange={scene2.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="absolute w-[240px] h-[240px] rounded-full bg-crimson/10 blur-[60px] pointer-events-none" />
-                        <ProductVisual
-                          product={p2}
-                          sizeLabel={size2.label}
-                          imageClass="w-[clamp(280px,25vw,460px)] h-[50vh]"
-                        />
-                      </div>
-                      <div className="text-center mt-8">
-                        <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="center" />
-                        <div className="mt-3 flex items-center justify-center space-x-6">
-                          <ProductPrice price={size2.price} align="center" size="large" />
-                          <ProductCalories calories={size2.calories} calorieNote={size2.calorieNote} align="center" />
-                        </div>
-                        <div className="mt-5">
-                          <ProductSizeSelector
-                            sizes={p2.sizes}
-                            selectedIdx={sizeIdx2}
-                            onChange={(idx) => setSizesMap(prev => ({ ...prev, [p2.id]: idx }))}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      )}
+                    </ProductScene>
 
                     {/* Right Arch Portal */}
-                    <div className="flex flex-col items-center mb-16">
-                      <div className="relative w-full h-[50vh] flex items-center justify-center">
-                        <div className="absolute inset-0 scale-[1.02] opacity-50">
-                          <ArchFrame family={getArchFamily(p3.category)} />
+                    <ProductScene product={p3}>
+                      {(scene3) => (
+                        <div className="flex flex-col items-center mb-16">
+                          <div className="relative w-full h-[50vh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[1.02] opacity-50">
+                              <ArchFrame family={getArchFamily(p3.category)} />
+                            </div>
+                            <div className="absolute w-[180px] h-[180px] rounded-full bg-crimson/5 blur-[50px] pointer-events-none" />
+                            <ProductVisual
+                              product={p3}
+                              resolvedSrc={scene3.resolvedSrc}
+                              imageError={scene3.imageError}
+                              curtainRef={scene3.curtainRef}
+                              imgRef={scene3.imgRef}
+                              imageClass="w-[clamp(210px,20vw,360px)] h-[42vh]"
+                            />
+                          </div>
+                          <div className="text-center mt-6">
+                            <ProductIdentity num={p3.num} name={p3.name} arabicName={p3.arabicName} align="center" />
+                            <div className="mt-3 flex items-center justify-center space-x-4">
+                              <ProductPrice price={scene3.displayedSize.price} align="center" />
+                              <ProductCalories calories={scene3.displayedSize.calories} calorieNote={scene3.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p3.sizes}
+                                selectedIdx={scene3.requestedIdx}
+                                onChange={scene3.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                        <div className="absolute w-[180px] h-[180px] rounded-full bg-crimson/5 blur-[50px] pointer-events-none" />
-                        <ProductVisual
-                          product={p3}
-                          sizeLabel={size3.label}
-                          imageClass="w-[clamp(210px,20vw,360px)] h-[42vh]"
-                        />
-                      </div>
-                      <div className="text-center mt-6">
-                        <ProductIdentity num={p3.num} name={p3.name} arabicName={p3.arabicName} align="center" />
-                        <div className="mt-3 flex items-center justify-center space-x-4">
-                          <ProductPrice price={size3.price} align="center" />
-                          <ProductCalories calories={size3.calories} calorieNote={size3.calorieNote} align="center" />
-                        </div>
-                        <div className="mt-4">
-                          <ProductSizeSelector
-                            sizes={p3.sizes}
-                            selectedIdx={sizeIdx3}
-                            onChange={(idx) => setSizesMap(prev => ({ ...prev, [p3.id]: idx }))}
-                          />
-                        </div>
-                      </div>
-                    </div>
+                      )}
+                    </ProductScene>
 
                   </div>
 
@@ -424,37 +464,44 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
 
                 {/* Mobile Scene: Three sequential narratives */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
-                  {[p1, p2, p3].map((p, idx) => {
-                    const localIdx = idx === 0 ? sizeIdx1 : idx === 1 ? sizeIdx2 : sizeIdx3;
-                    const localSize = p.sizes[localIdx];
-                    return (
-                      <div key={p.id} className="flex flex-col items-center min-h-[75svh] justify-center px-4">
-                        <div className="relative w-full h-[45svh] flex items-center justify-center">
-                          <div className="absolute inset-0 scale-[0.9] opacity-40">
-                            <ArchFrame family={getArchFamily(p.category)} />
-                          </div>
-                          <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
-                            <StoneStage variant="slab" />
-                          </div>
-                          <ProductVisual product={p} sizeLabel={localSize.label} imageClass="w-[68vw] h-[38svh]" />
-                        </div>
-                        <div className="w-full text-center mt-6 flex flex-col items-center">
-                          <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                          <div className="mt-2 flex items-center space-x-6">
-                            <ProductPrice price={localSize.price} align="center" />
-                            <ProductCalories calories={localSize.calories} calorieNote={localSize.calorieNote} align="center" />
-                          </div>
-                          <div className="mt-4">
-                            <ProductSizeSelector
-                              sizes={p.sizes}
-                              selectedIdx={localIdx}
-                              onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
+                  {[p1, p2, p3].map((p) => (
+                    <ProductScene key={p.id} product={p}>
+                      {(scene) => (
+                        <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
+                          <div className="relative w-full h-[45svh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[0.9] opacity-40">
+                              <ArchFrame family={getArchFamily(p.category)} />
+                            </div>
+                            <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
+                              <StoneStage variant="slab" />
+                            </div>
+                            <ProductVisual
+                              product={p}
+                              resolvedSrc={scene.resolvedSrc}
+                              imageError={scene.imageError}
+                              curtainRef={scene.curtainRef}
+                              imgRef={scene.imgRef}
+                              imageClass="w-[68vw] h-[38svh]"
                             />
                           </div>
+                          <div className="w-full text-center mt-6 flex flex-col items-center">
+                            <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                            <div className="mt-2 flex items-center space-x-6">
+                              <ProductPrice price={scene.displayedSize.price} align="center" />
+                              <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p.sizes}
+                                selectedIdx={scene.requestedIdx}
+                                onChange={scene.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </ProductScene>
+                  ))}
                 </div>
               </div>
             );
@@ -465,10 +512,6 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
           // ==========================================
           case "OFFSET_EDITORIAL": {
             const [p1, p2] = ch.items;
-            const sizeIdx1 = sizesMap[p1.id] ?? 0;
-            const size1 = p1.sizes[sizeIdx1];
-            const sizeIdx2 = sizesMap[p2.id] ?? 0;
-            const size2 = p2.sizes[sizeIdx2];
 
             return (
               <div key={key} className="w-full">
@@ -477,104 +520,129 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                   
                   {/* Left Column: Product A (Visual giant) */}
                   <div className="relative w-[55%] flex flex-col items-start z-20">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-[1.05] opacity-60 pointer-events-none">
-                        <ArchFrame family={getArchFamily(p1.category)} />
-                      </div>
-                      <div className="absolute bottom-2 left-6 w-[85%] h-24 opacity-80 pointer-events-none">
-                        <StoneStage variant="monolith" />
-                      </div>
-                      <ProductVisual
-                        product={p1}
-                        sizeLabel={size1.label}
-                        imageClass="w-[clamp(360px,38vw,720px)] h-[62vh]"
-                      />
-                    </div>
+                    <ProductScene product={p1}>
+                      {(scene1) => (
+                        <>
+                          <div className="relative">
+                            <div className="absolute inset-0 scale-[1.05] opacity-60 pointer-events-none">
+                              <ArchFrame family={getArchFamily(p1.category)} />
+                            </div>
+                            <div className="absolute bottom-2 left-6 w-[85%] h-24 opacity-80 pointer-events-none">
+                              <StoneStage variant="monolith" />
+                            </div>
+                            <ProductVisual
+                              product={p1}
+                              resolvedSrc={scene1.resolvedSrc}
+                              imageError={scene1.imageError}
+                              curtainRef={scene1.curtainRef}
+                              imgRef={scene1.imgRef}
+                              imageClass="w-[clamp(360px,38vw,720px)] h-[62vh]"
+                            />
+                          </div>
 
-                    {/* Metadata anchored in negative bottom left space */}
-                    <div className="mt-8 flex flex-row items-end space-x-12">
-                      <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
-                      <div className="flex flex-col items-start justify-end pb-1 space-y-1">
-                        <ProductPrice price={size1.price} align="left" />
-                        <ProductCalories calories={size1.calories} calorieNote={size1.calorieNote} align="left" />
-                      </div>
-                      <div className="pb-1">
-                        <ProductSizeSelector
-                          sizes={p1.sizes}
-                          selectedIdx={sizeIdx1}
-                          onChange={(idx) => setSizesMap(prev => ({ ...prev, [p1.id]: idx }))}
-                        />
-                      </div>
-                    </div>
+                          {/* Metadata anchored in negative bottom left space */}
+                          <div className="mt-8 flex flex-row items-end space-x-12">
+                            <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
+                            <div className="flex flex-col items-start justify-end pb-1 space-y-1">
+                              <ProductPrice price={scene1.displayedSize.price} align="left" />
+                              <ProductCalories calories={scene1.displayedSize.calories} calorieNote={scene1.displayedSize.calorieNote} align="left" />
+                            </div>
+                            <div className="pb-1">
+                              <ProductSizeSelector
+                                sizes={p1.sizes}
+                                selectedIdx={scene1.requestedIdx}
+                                onChange={scene1.requestSizeChange}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </ProductScene>
                   </div>
 
                   {/* Right Column: Product B (Small edge product) */}
                   <div className="relative w-[38%] flex flex-col items-end justify-center z-20 pr-4 mt-28">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-[0.98] opacity-35 pointer-events-none">
-                        <ArchFrame family={getArchFamily(p2.category)} />
-                      </div>
-                      <div className="absolute bottom-0 w-[90%] h-14 opacity-50 pointer-events-none">
-                        <StoneStage variant="low-rock" />
-                      </div>
-                      <ProductVisual
-                        product={p2}
-                        sizeLabel={size2.label}
-                        imageClass="w-[clamp(210px,19vw,340px)] h-[38vh]"
-                      />
-                    </div>
-                    
-                    <div className="mt-6 text-right flex flex-col items-end">
-                      <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
-                      <div className="mt-3 flex items-center space-x-4">
-                        <ProductPrice price={size2.price} align="right" />
-                        <ProductCalories calories={size2.calories} calorieNote={size2.calorieNote} align="right" />
-                      </div>
-                      <div className="mt-4">
-                        <ProductSizeSelector
-                          sizes={p2.sizes}
-                          selectedIdx={sizeIdx2}
-                          onChange={(idx) => setSizesMap(prev => ({ ...prev, [p2.id]: idx }))}
-                        />
-                      </div>
-                    </div>
+                    <ProductScene product={p2}>
+                      {(scene2) => (
+                        <>
+                          <div className="relative">
+                            <div className="absolute inset-0 scale-[0.98] opacity-35 pointer-events-none">
+                              <ArchFrame family={getArchFamily(p2.category)} />
+                            </div>
+                            <div className="absolute bottom-0 w-[90%] h-14 opacity-50 pointer-events-none">
+                              <StoneStage variant="low-rock" />
+                            </div>
+                            <ProductVisual
+                              product={p2}
+                              resolvedSrc={scene2.resolvedSrc}
+                              imageError={scene2.imageError}
+                              curtainRef={scene2.curtainRef}
+                              imgRef={scene2.imgRef}
+                              imageClass="w-[clamp(210px,19vw,340px)] h-[38vh]"
+                            />
+                          </div>
+                          
+                          <div className="mt-6 text-right flex flex-col items-end">
+                            <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
+                            <div className="mt-3 flex items-center space-x-4">
+                              <ProductPrice price={scene2.displayedSize.price} align="right" />
+                              <ProductCalories calories={scene2.displayedSize.calories} calorieNote={scene2.displayedSize.calorieNote} align="right" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p2.sizes}
+                                selectedIdx={scene2.requestedIdx}
+                                onChange={scene2.requestSizeChange}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </ProductScene>
                   </div>
 
                 </div>
 
                 {/* Mobile Scene: Two sequential narratives */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
-                  {[p1, p2].map((p, idx) => {
-                    const localIdx = idx === 0 ? sizeIdx1 : sizeIdx2;
-                    const localSize = p.sizes[localIdx];
-                    return (
-                      <div key={p.id} className="flex flex-col items-center min-h-[75svh] justify-center px-4">
-                        <div className="relative w-full h-[45svh] flex items-center justify-center">
-                          <div className="absolute inset-0 scale-[0.9] opacity-40">
-                            <ArchFrame family={getArchFamily(p.category)} />
-                          </div>
-                          <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
-                            <StoneStage variant="slab" />
-                          </div>
-                          <ProductVisual product={p} sizeLabel={localSize.label} imageClass="w-[68vw] h-[38svh]" />
-                        </div>
-                        <div className="w-full text-center mt-6 flex flex-col items-center">
-                          <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                          <div className="mt-2 flex items-center space-x-6">
-                            <ProductPrice price={localSize.price} align="center" />
-                            <ProductCalories calories={localSize.calories} calorieNote={localSize.calorieNote} align="center" />
-                          </div>
-                          <div className="mt-4">
-                            <ProductSizeSelector
-                              sizes={p.sizes}
-                              selectedIdx={localIdx}
-                              onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
+                  {[p1, p2].map((p) => (
+                    <ProductScene key={p.id} product={p}>
+                      {(scene) => (
+                        <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
+                          <div className="relative w-full h-[45svh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[0.9] opacity-40">
+                              <ArchFrame family={getArchFamily(p.category)} />
+                            </div>
+                            <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
+                              <StoneStage variant="slab" />
+                            </div>
+                            <ProductVisual
+                              product={p}
+                              resolvedSrc={scene.resolvedSrc}
+                              imageError={scene.imageError}
+                              curtainRef={scene.curtainRef}
+                              imgRef={scene.imgRef}
+                              imageClass="w-[68vw] h-[38svh]"
                             />
                           </div>
+                          <div className="w-full text-center mt-6 flex flex-col items-center">
+                            <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                            <div className="mt-2 flex items-center space-x-6">
+                              <ProductPrice price={scene.displayedSize.price} align="center" />
+                              <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p.sizes}
+                                selectedIdx={scene.requestedIdx}
+                                onChange={scene.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </ProductScene>
+                  ))}
                 </div>
               </div>
             );
@@ -585,10 +653,6 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
           // ==========================================
           case "TYPOGRAPHIC_SPLIT": {
             const [p1, p2] = ch.items;
-            const sizeIdx1 = sizesMap[p1.id] ?? 0;
-            const size1 = p1.sizes[sizeIdx1];
-            const sizeIdx2 = sizesMap[p2.id] ?? 0;
-            const size2 = p2.sizes[sizeIdx2];
 
             return (
               <div key={key} className="w-full">
@@ -607,105 +671,130 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
 
                   {/* Left product overlapping the letters */}
                   <div className="relative w-[46%] flex flex-col items-start z-10 mt-12">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-[1.04] opacity-50">
-                        <ArchFrame family={getArchFamily(p1.category)} />
-                      </div>
-                      <div className="absolute bottom-2 w-4/5 h-20 opacity-70">
-                        <StoneStage variant="slab" />
-                      </div>
-                      <ProductVisual
-                        product={p1}
-                        sizeLabel={size1.label}
-                        imageClass="w-[clamp(240px,25vw,460px)] h-[48vh] z-10"
-                      />
-                    </div>
-                    
-                    {/* Metadata aligned left */}
-                    <div className="mt-6 flex flex-row items-end space-x-6">
-                      <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
-                      <div className="flex flex-col items-start pb-1">
-                        <ProductPrice price={size1.price} align="left" />
-                        <ProductCalories calories={size1.calories} calorieNote={size1.calorieNote} align="left" />
-                      </div>
-                      <div className="pb-1">
-                        <ProductSizeSelector
-                          sizes={p1.sizes}
-                          selectedIdx={sizeIdx1}
-                          onChange={(idx) => setSizesMap(prev => ({ ...prev, [p1.id]: idx }))}
-                        />
-                      </div>
-                    </div>
+                    <ProductScene product={p1}>
+                      {(scene1) => (
+                        <>
+                          <div className="relative">
+                            <div className="absolute inset-0 scale-[1.04] opacity-50">
+                              <ArchFrame family={getArchFamily(p1.category)} />
+                            </div>
+                            <div className="absolute bottom-2 w-4/5 h-20 opacity-70">
+                              <StoneStage variant="slab" />
+                            </div>
+                            <ProductVisual
+                              product={p1}
+                              resolvedSrc={scene1.resolvedSrc}
+                              imageError={scene1.imageError}
+                              curtainRef={scene1.curtainRef}
+                              imgRef={scene1.imgRef}
+                              imageClass="w-[clamp(240px,25vw,460px)] h-[48vh] z-10"
+                            />
+                          </div>
+                          
+                          {/* Metadata aligned left */}
+                          <div className="mt-6 flex flex-row items-end space-x-6">
+                            <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
+                            <div className="flex flex-col items-start pb-1">
+                              <ProductPrice price={scene1.displayedSize.price} align="left" />
+                              <ProductCalories calories={scene1.displayedSize.calories} calorieNote={scene1.displayedSize.calorieNote} align="left" />
+                            </div>
+                            <div className="pb-1">
+                              <ProductSizeSelector
+                                sizes={p1.sizes}
+                                selectedIdx={scene1.requestedIdx}
+                                onChange={scene1.requestSizeChange}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </ProductScene>
                   </div>
 
                   {/* Right product overlapping letters */}
                   <div className="relative w-[46%] flex flex-col items-end z-10 mb-12">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-[1.04] opacity-50">
-                        <ArchFrame family={getArchFamily(p2.category)} />
-                      </div>
-                      <div className="absolute bottom-2 right-4 w-4/5 h-20 opacity-70">
-                        <StoneStage variant="fractured" />
-                      </div>
-                      <ProductVisual
-                        product={p2}
-                        sizeLabel={size2.label}
-                        imageClass="w-[clamp(240px,25vw,460px)] h-[48vh] z-10"
-                      />
-                    </div>
+                    <ProductScene product={p2}>
+                      {(scene2) => (
+                        <>
+                          <div className="relative">
+                            <div className="absolute inset-0 scale-[1.04] opacity-50">
+                              <ArchFrame family={getArchFamily(p2.category)} />
+                            </div>
+                            <div className="absolute bottom-2 right-4 w-4/5 h-20 opacity-70">
+                              <StoneStage variant="fractured" />
+                            </div>
+                            <ProductVisual
+                              product={p2}
+                              resolvedSrc={scene2.resolvedSrc}
+                              imageError={scene2.imageError}
+                              curtainRef={scene2.curtainRef}
+                              imgRef={scene2.imgRef}
+                              imageClass="w-[clamp(240px,25vw,460px)] h-[48vh] z-10"
+                            />
+                          </div>
 
-                    {/* Metadata aligned right */}
-                    <div className="mt-6 flex flex-row-reverse items-end space-x-reverse space-x-6">
-                      <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
-                      <div className="flex flex-col items-end pb-1">
-                        <ProductPrice price={size2.price} align="right" />
-                        <ProductCalories calories={size2.calories} calorieNote={size2.calorieNote} align="right" />
-                      </div>
-                      <div className="pb-1">
-                        <ProductSizeSelector
-                          sizes={p2.sizes}
-                          selectedIdx={sizeIdx2}
-                          onChange={(idx) => setSizesMap(prev => ({ ...prev, [p2.id]: idx }))}
-                        />
-                      </div>
-                    </div>
+                          {/* Metadata aligned right */}
+                          <div className="mt-6 flex flex-row-reverse items-end space-x-reverse space-x-6">
+                            <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
+                            <div className="flex flex-col items-end pb-1">
+                              <ProductPrice price={scene2.displayedSize.price} align="right" />
+                              <ProductCalories calories={scene2.displayedSize.calories} calorieNote={scene2.displayedSize.calorieNote} align="right" />
+                            </div>
+                            <div className="pb-1">
+                              <ProductSizeSelector
+                                sizes={p2.sizes}
+                                selectedIdx={scene2.requestedIdx}
+                                onChange={scene2.requestSizeChange}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </ProductScene>
                   </div>
 
                 </div>
 
                 {/* Mobile Scene */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
-                  {[p1, p2].map((p, idx) => {
-                    const localIdx = idx === 0 ? sizeIdx1 : sizeIdx2;
-                    const localSize = p.sizes[localIdx];
-                    return (
-                      <div key={p.id} className="flex flex-col items-center min-h-[75svh] justify-center px-4">
-                        <div className="relative w-full h-[45svh] flex items-center justify-center">
-                          <div className="absolute inset-0 scale-[0.9] opacity-40">
-                            <ArchFrame family={getArchFamily(p.category)} />
-                          </div>
-                          <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
-                            <StoneStage variant="slab" />
-                          </div>
-                          <ProductVisual product={p} sizeLabel={localSize.label} imageClass="w-[68vw] h-[38svh]" />
-                        </div>
-                        <div className="w-full text-center mt-6 flex flex-col items-center">
-                          <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                          <div className="mt-2 flex items-center space-x-6">
-                            <ProductPrice price={localSize.price} align="center" />
-                            <ProductCalories calories={localSize.calories} calorieNote={localSize.calorieNote} align="center" />
-                          </div>
-                          <div className="mt-4">
-                            <ProductSizeSelector
-                              sizes={p.sizes}
-                              selectedIdx={localIdx}
-                              onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
+                  {[p1, p2].map((p) => (
+                    <ProductScene key={p.id} product={p}>
+                      {(scene) => (
+                        <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
+                          <div className="relative w-full h-[45svh] flex items-center justify-center">
+                            <div className="absolute inset-0 scale-[0.9] opacity-40">
+                              <ArchFrame family={getArchFamily(p.category)} />
+                            </div>
+                            <div className="absolute bottom-0 w-4/5 h-16 opacity-60">
+                              <StoneStage variant="slab" />
+                            </div>
+                            <ProductVisual
+                              product={p}
+                              resolvedSrc={scene.resolvedSrc}
+                              imageError={scene.imageError}
+                              curtainRef={scene.curtainRef}
+                              imgRef={scene.imgRef}
+                              imageClass="w-[68vw] h-[38svh]"
                             />
                           </div>
+                          <div className="w-full text-center mt-6 flex flex-col items-center">
+                            <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                            <div className="mt-2 flex items-center space-x-6">
+                              <ProductPrice price={scene.displayedSize.price} align="center" />
+                              <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                            </div>
+                            <div className="mt-4">
+                              <ProductSizeSelector
+                                sizes={p.sizes}
+                                selectedIdx={scene.requestedIdx}
+                                onChange={scene.requestSizeChange}
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )}
+                    </ProductScene>
+                  ))}
                 </div>
               </div>
             );
@@ -716,99 +805,107 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
           // ==========================================
           case "FULL_BLEED": {
             const p = ch.items[0];
-            const sizeIdx = sizesMap[p.id] ?? 0;
-            const size = p.sizes[sizeIdx];
 
             return (
-              <div key={key} className="w-full">
-                {/* Desktop Scene: Full viewport bleed */}
-                <div className="hidden md:flex relative w-full h-[95svh] items-center justify-center overflow-hidden">
-                  
-                  {/* Huge crop arch overlay */}
-                  <div className="absolute inset-x-0 top-0 bottom-0 flex items-center justify-center opacity-30 pointer-events-none scale-[1.3] z-10">
-                    <ArchFrame family={getArchFamily(p.category)} />
-                  </div>
+              <ProductScene key={key} product={p}>
+                {(scene) => (
+                  <div className="w-full">
+                    {/* Desktop Scene: Full viewport bleed */}
+                    <div className="hidden md:flex relative w-full h-[95svh] items-center justify-center overflow-hidden">
+                      
+                      {/* Huge crop arch overlay */}
+                      <div className="absolute inset-x-0 top-0 bottom-0 flex items-center justify-center opacity-30 pointer-events-none scale-[1.3] z-10">
+                        <ArchFrame family={getArchFamily(p.category)} />
+                      </div>
 
-                  {/* Volcanic Stage extending past screen borders */}
-                  <div className="absolute bottom-0 inset-x-0 h-40 scale-x-125 pointer-events-none z-15 opacity-80">
-                    <StoneStage variant="wide-platform" />
-                  </div>
+                      {/* Volcanic Stage extending past screen borders */}
+                      <div className="absolute bottom-0 inset-x-0 h-40 scale-x-125 pointer-events-none z-15 opacity-80">
+                        <StoneStage variant="wide-platform" />
+                      </div>
 
-                  {/* Gigantic visual occupying 55vw */}
-                  <div className="relative z-20 flex items-center justify-center">
-                    <ProductVisual
-                      product={p}
-                      sizeLabel={size.label}
-                      imageClass="w-[clamp(420px,50vw,900px)] h-[75vh]"
-                    />
-                  </div>
+                      {/* Gigantic visual occupying 55vw */}
+                      <div className="relative z-20 flex items-center justify-center">
+                        <ProductVisual
+                          product={p}
+                          resolvedSrc={scene.resolvedSrc}
+                          imageError={scene.imageError}
+                          curtainRef={scene.curtainRef}
+                          imgRef={scene.imgRef}
+                          imageClass="w-[clamp(420px,50vw,900px)] h-[75vh]"
+                        />
+                      </div>
 
-                  {/* Corner Anchored Metadata */}
-                  {/* Top Left: English Identity */}
-                  <div className="absolute top-8 left-8 z-35 text-left select-none">
-                    <span className="font-condensed text-[11px] text-crimson tracking-[0.25em] uppercase font-bold block mb-1">
-                      {p.num ? p.num.padStart(2, "0") : "00"}
-                    </span>
-                    <h3 className="font-condensed text-[24px] font-black text-white tracking-[0.15em] uppercase leading-tight">
-                      {p.name}
-                    </h3>
-                  </div>
+                      {/* Corner Anchored Metadata */}
+                      {/* Top Left: English Identity */}
+                      <div className="absolute top-8 left-8 z-35 text-left select-none">
+                        <span className="font-condensed text-[11px] text-crimson tracking-[0.25em] uppercase font-bold block mb-1">
+                          {p.num ? p.num.padStart(2, "0") : "00"}
+                        </span>
+                        <h3 className="font-condensed text-[24px] font-black text-white tracking-[0.15em] uppercase leading-tight">
+                          {p.name}
+                        </h3>
+                      </div>
 
-                  {/* Top Right: Arabic Identity */}
-                  <div className="absolute top-8 right-8 z-35 text-right select-none" dir="rtl">
-                    <span className="font-arabic text-[18px] text-crimson font-medium leading-none">
-                      {p.arabicName}
-                    </span>
-                  </div>
+                      {/* Top Right: Arabic Identity */}
+                      <div className="absolute top-8 right-8 z-35 text-right select-none" dir="rtl">
+                        <span className="font-arabic text-[18px] text-crimson font-medium leading-none">
+                          {p.arabicName}
+                        </span>
+                      </div>
 
-                  {/* Bottom Left: Size control */}
-                  <div className="absolute bottom-8 left-8 z-35">
-                    <ProductSizeSelector
-                      sizes={p.sizes}
-                      selectedIdx={sizeIdx}
-                      onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
-                    />
-                  </div>
+                      {/* Bottom Left: Size control */}
+                      <div className="absolute bottom-8 left-8 z-35">
+                        <ProductSizeSelector
+                          sizes={p.sizes}
+                          selectedIdx={scene.requestedIdx}
+                          onChange={scene.requestSizeChange}
+                        />
+                      </div>
 
-                  {/* Bottom Right: Price / Calories specification */}
-                  <div className="absolute bottom-8 right-8 z-35 flex flex-col items-end space-y-1 select-none">
-                    <ProductPrice price={size.price} align="right" size="large" />
-                    <ProductCalories calories={size.calories} calorieNote={size.calorieNote} align="right" />
-                  </div>
+                      {/* Bottom Right: Price / Calories specification */}
+                      <div className="absolute bottom-8 right-8 z-35 flex flex-col items-end space-y-1 select-none">
+                        <ProductPrice price={scene.displayedSize.price} align="right" size="large" />
+                        <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="right" />
+                      </div>
 
-                </div>
-
-                {/* Mobile Scene */}
-                <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
-                  <div className="relative w-full h-[48svh] flex items-center justify-center">
-                    <div className="absolute inset-0 scale-[0.9] opacity-40">
-                      <ArchFrame family={getArchFamily(p.category)} />
                     </div>
-                    <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
-                      <StoneStage variant="slab" />
+
+                    {/* Mobile Scene */}
+                    <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
+                      <div className="relative w-full h-[48svh] flex items-center justify-center">
+                        <div className="absolute inset-0 scale-[0.9] opacity-40">
+                          <ArchFrame family={getArchFamily(p.category)} />
+                        </div>
+                        <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
+                          <StoneStage variant="slab" />
+                        </div>
+                        <ProductVisual
+                          product={p}
+                          resolvedSrc={scene.resolvedSrc}
+                          imageError={scene.imageError}
+                          curtainRef={scene.curtainRef}
+                          imgRef={scene.imgRef}
+                          imageClass="w-[72vw] h-[40svh]"
+                        />
+                      </div>
+                      <div className="w-full text-center mt-6 flex flex-col items-center">
+                        <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                        <div className="mt-3 flex items-center space-x-6">
+                          <ProductPrice price={scene.displayedSize.price} align="center" />
+                          <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                        </div>
+                        <div className="mt-5">
+                          <ProductSizeSelector
+                            sizes={p.sizes}
+                            selectedIdx={scene.requestedIdx}
+                            onChange={scene.requestSizeChange}
+                          />
+                        </div>
+                      </div>
                     </div>
-                    <ProductVisual
-                      product={p}
-                      sizeLabel={size.label}
-                      imageClass="w-[72vw] h-[40svh]"
-                    />
                   </div>
-                  <div className="w-full text-center mt-6 flex flex-col items-center">
-                    <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                    <div className="mt-3 flex items-center space-x-6">
-                      <ProductPrice price={size.price} align="center" />
-                      <ProductCalories calories={size.calories} calorieNote={size.calorieNote} align="center" />
-                    </div>
-                    <div className="mt-5">
-                      <ProductSizeSelector
-                        sizes={p.sizes}
-                        selectedIdx={sizeIdx}
-                        onChange={(idx) => setSizesMap(prev => ({ ...prev, [p.id]: idx }))}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+                )}
+              </ProductScene>
             );
           }
 

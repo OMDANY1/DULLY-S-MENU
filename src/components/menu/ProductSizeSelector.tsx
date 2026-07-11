@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
-import { MenuSize } from "@/data/menu";
+import { MenuSize } from "@/domain/menu/types";
 
 interface ProductSizeSelectorProps {
   sizes: MenuSize[];

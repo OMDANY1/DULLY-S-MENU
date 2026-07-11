@@ -1,80 +1,36 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import gsap from "gsap";
-import { MenuItem } from "@/data/menu";
+import { MenuItem } from "@/domain/menu/types";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { getProductAssetCandidates } from "@/lib/productAssets";
-import { imageCurtain } from "@/lib/motion";
 import ProductSizeSelector from "./ProductSizeSelector";
+import ProductScene, { SizeTransitionState } from "./ProductScene";
 
 // ==========================================
-// 1. PRODUCT VISUAL PRIMITIVE
+// 1. PRODUCT VISUAL PRIMITIVE (Pure View)
 // ==========================================
 interface ProductVisualProps {
   product: MenuItem;
-  sizeLabel: string;
+  resolvedSrc: string;
+  imageError: boolean;
+  curtainRef: React.RefObject<HTMLDivElement | null>;
+  imgRef: React.RefObject<HTMLImageElement | null>;
   imageClass?: string;
 }
 
-export function ProductVisual({ product, sizeLabel, imageClass = "" }: ProductVisualProps) {
-  const [resolvedSrc, setResolvedSrc] = useState<string>("");
-  const [imageError, setImageError] = useState(false);
+export function ProductVisual({
+  product,
+  resolvedSrc,
+  imageError,
+  curtainRef,
+  imgRef,
+  imageClass = "",
+}: ProductVisualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const curtainRef = useRef<HTMLDivElement>(null);
-  const imgRef = useRef<HTMLImageElement>(null);
   const reducedMotion = useReducedMotion();
 
-  // Load and resolve size-specific candidates sequentially with curtain sweep
-  useEffect(() => {
-    let active = true;
-    const candidates = getProductAssetCandidates(product.id, sizeLabel);
-    let idx = 0;
-
-    const tryLoadNext = () => {
-      if (idx >= candidates.length) {
-        if (active) setImageError(true);
-        return;
-      }
-
-      const candidatePath = candidates[idx];
-      const img = new Image();
-      img.onload = () => {
-        if (!active) return;
-
-        // Perform premium curtain sweep transition on size swap
-        if (imgRef.current && curtainRef.current && resolvedSrc && !reducedMotion) {
-          imageCurtain(
-            curtainRef.current,
-            imgRef.current,
-            () => {
-              if (active) {
-                setResolvedSrc(candidatePath);
-                setImageError(false);
-              }
-            }
-          );
-        } else {
-          setResolvedSrc(candidatePath);
-          setImageError(false);
-        }
-      };
-
-      img.onerror = () => {
-        idx++;
-        tryLoadNext();
-      };
-      img.src = candidatePath;
-    };
-
-    tryLoadNext();
-
-    return () => {
-      active = false;
-    };
-  }, [product.id, sizeLabel, resolvedSrc, reducedMotion]);
-
-  // Pointer Parallax quickTo
+  // Pointer Parallax quickTo (presentation-only)
   useEffect(() => {
     const container = containerRef.current;
     if (!container || reducedMotion) return;
@@ -128,7 +84,7 @@ export function ProductVisual({ product, sizeLabel, imageClass = "" }: ProductVi
       />
 
       {imageError ? (
-        /* Restrained missing-asset locator (No generic rotating targets) */
+        /* Restrained missing-asset locator */
         <div className="relative w-36 h-36 flex flex-col items-center justify-center border-l border-crimson/30 px-4">
           <div className="w-[1px] h-12 bg-crimson mb-2" />
           <span className="font-condensed text-[9px] uppercase tracking-[0.25em] text-white/30 text-center leading-normal">
@@ -281,44 +237,48 @@ interface ProductStageProps {
 }
 
 export default function ProductStage({ product }: ProductStageProps) {
-  const [sizeIdx, setSizeIdx] = useState(0);
-  const selectedSize = product.sizes[sizeIdx];
-
   return (
-    <div className="relative w-full flex flex-col items-center select-none">
-      {/* Product Image Stage (No background containers or borders) */}
-      <ProductVisual
-        product={product}
-        sizeLabel={selectedSize.label}
-        imageClass="w-48 h-48 md:w-56 md:h-56"
-      />
-
-      {/* Identity block */}
-      <div className="relative w-full text-center mt-6 z-10 flex flex-col items-center">
-        <ProductIdentity
-          num={product.num}
-          name={product.name}
-          arabicName={product.arabicName}
-          align="center"
-        />
-
-        {/* Price / Calories block */}
-        <div className="h-12 mt-2 flex flex-col justify-end overflow-hidden">
-          <ProductPrice price={selectedSize.price} align="center" />
-          <ProductCalories
-            calories={selectedSize.calories}
-            calorieNote={selectedSize.calorieNote}
-            align="center"
+    <ProductScene product={product}>
+      {(scene: SizeTransitionState) => (
+        <div className="relative w-full flex flex-col items-center select-none">
+          {/* Product Image Stage (No background containers or borders) */}
+          <ProductVisual
+            product={product}
+            resolvedSrc={scene.resolvedSrc}
+            imageError={scene.imageError}
+            curtainRef={scene.curtainRef}
+            imgRef={scene.imgRef}
+            imageClass="w-48 h-48 md:w-56 md:h-56"
           />
-        </div>
 
-        {/* Sizes Selector */}
-        <ProductSizeSelector
-          sizes={product.sizes}
-          selectedIdx={sizeIdx}
-          onChange={setSizeIdx}
-        />
-      </div>
-    </div>
+          {/* Identity block */}
+          <div className="relative w-full text-center mt-6 z-10 flex flex-col items-center">
+            <ProductIdentity
+              num={product.num}
+              name={product.name}
+              arabicName={product.arabicName}
+              align="center"
+            />
+
+            {/* Price / Calories block */}
+            <div className="h-12 mt-2 flex flex-col justify-end overflow-hidden">
+              <ProductPrice price={scene.displayedSize.price} align="center" />
+              <ProductCalories
+                calories={scene.displayedSize.calories}
+                calorieNote={scene.displayedSize.calorieNote}
+                align="center"
+              />
+            </div>
+
+            {/* Sizes Selector */}
+            <ProductSizeSelector
+              sizes={product.sizes}
+              selectedIdx={scene.requestedIdx}
+              onChange={scene.requestSizeChange}
+            />
+          </div>
+        </div>
+      )}
+    </ProductScene>
   );
 }

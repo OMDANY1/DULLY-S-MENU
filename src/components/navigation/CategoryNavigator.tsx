@@ -5,9 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import gsap from "gsap";
 import { menuCategories } from "@/data/menu";
+import { MenuCategory } from "@/domain/menu/types";
 import { getVisibleCategories } from "@/config/menuConfig";
 
-export default function CategoryNavigator() {
+interface CategoryNavigatorProps {
+  categories?: MenuCategory[];
+}
+
+export default function CategoryNavigator({ categories: propsCategories }: CategoryNavigatorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const menuBtnRef = useRef<HTMLButtonElement>(null);
@@ -17,7 +22,8 @@ export default function CategoryNavigator() {
   const glyphRef = useRef<SVGSVGElement>(null);
 
   // Filter categories through business mode helper
-  const visibleCategories = getVisibleCategories(menuCategories);
+  const rawCategories = propsCategories || menuCategories;
+  const visibleCategories = getVisibleCategories(rawCategories);
 
   useEffect(() => {
     const overlay = overlayRef.current;
@@ -26,77 +32,81 @@ export default function CategoryNavigator() {
     const glyph = glyphRef.current;
     if (!overlay || !line) return;
 
-    if (isOpen) {
-      // Suspend global scrolling when menu is open
-      const globalLenis = (window as unknown as { lenis?: { stop: () => void } }).lenis;
-      if (globalLenis) globalLenis.stop();
+    const ctx = gsap.context(() => {
+      if (isOpen) {
+        // Suspend global scrolling when menu is open
+        const globalLenis = (window as unknown as { lenis?: { stop: () => void } }).lenis;
+        if (globalLenis) globalLenis.stop();
 
-      // Open with clip-path wipe
-      gsap.to(overlay, {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        duration: 0.7,
-        ease: "power3.inOut",
-      });
+        // Open with clip-path wipe
+        gsap.to(overlay, {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          duration: 0.7,
+          ease: "power3.inOut",
+        });
 
-      // Draw vertical key line
-      gsap.fromTo(line, 
-        { scaleY: 0 }, 
-        { scaleY: 1, duration: 0.8, ease: "power2.inOut", transformOrigin: "top" }
-      );
-
-      // Stagger items with line assembly & masks
-      items.forEach((item, idx) => {
-        if (!item) return;
-        const text = item.querySelector(".nav-link-text");
-        const sub = item.querySelector(".nav-sub-text");
-        const bar = item.querySelector(".nav-accent-bar");
-
-        gsap.killTweensOf([text, sub, bar]);
-        
-        gsap.fromTo(text,
-          { yPercent: 100, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.2 + idx * 0.04 }
+        // Draw vertical key line
+        gsap.fromTo(line, 
+          { scaleY: 0 }, 
+          { scaleY: 1, duration: 0.8, ease: "power2.inOut", transformOrigin: "top" }
         );
-        gsap.fromTo(sub,
-          { y: 5, opacity: 0 },
-          { y: 0, opacity: 0.4, duration: 0.4, ease: "power2.out", delay: 0.35 + idx * 0.04 }
-        );
-        gsap.fromTo(bar,
-          { scaleX: 0 },
-          { scaleX: 1, duration: 0.4, ease: "power1.out", delay: 0.25 + idx * 0.04, transformOrigin: "left" }
-        );
-      });
 
-      // Rotate and draw background geometry glyph
-      if (glyph) {
-        gsap.fromTo(glyph,
-          { rotation: -60, scale: 0.9, opacity: 0 },
-          { rotation: 0, scale: 1, opacity: 0.15, duration: 1.0, ease: "power2.out", delay: 0.25 }
-        );
+        // Stagger items with line assembly & masks
+        items.forEach((item, idx) => {
+          if (!item) return;
+          const text = item.querySelector(".nav-link-text");
+          const sub = item.querySelector(".nav-sub-text");
+          const bar = item.querySelector(".nav-accent-bar");
+
+          gsap.killTweensOf([text, sub, bar]);
+          
+          gsap.fromTo(text,
+            { yPercent: 100, opacity: 0 },
+            { yPercent: 0, opacity: 1, duration: 0.5, ease: "power2.out", delay: 0.2 + idx * 0.04 }
+          );
+          gsap.fromTo(sub,
+            { y: 5, opacity: 0 },
+            { y: 0, opacity: 0.4, duration: 0.4, ease: "power2.out", delay: 0.35 + idx * 0.04 }
+          );
+          gsap.fromTo(bar,
+            { scaleX: 0 },
+            { scaleX: 1, duration: 0.4, ease: "power1.out", delay: 0.25 + idx * 0.04, transformOrigin: "left" }
+          );
+        });
+
+        // Rotate and draw background geometry glyph
+        if (glyph) {
+          gsap.fromTo(glyph,
+            { rotation: -60, scale: 0.9, opacity: 0 },
+            { rotation: 0, scale: 1, opacity: 0.15, duration: 1.0, ease: "power2.out", delay: 0.25 }
+          );
+        }
+      } else {
+        // Re-enable global scrolling
+        const globalLenis = (window as unknown as { lenis?: { start: () => void } }).lenis;
+        if (globalLenis) globalLenis.start();
+
+        // Animate items out
+        items.forEach((item) => {
+          if (!item) return;
+          const text = item.querySelector(".nav-link-text");
+          const sub = item.querySelector(".nav-sub-text");
+          const bar = item.querySelector(".nav-accent-bar");
+          gsap.to([text, sub], { opacity: 0, y: -5, duration: 0.25, ease: "power2.in" });
+          gsap.to(bar, { scaleX: 0, duration: 0.2, ease: "power1.in", transformOrigin: "right" });
+        });
+
+        // Close with clip-path wipe
+        gsap.to(overlay, {
+          clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
+          duration: 0.6,
+          ease: "power3.inOut",
+          delay: 0.15,
+        });
       }
-    } else {
-      // Re-enable global scrolling
-      const globalLenis = (window as unknown as { lenis?: { start: () => void } }).lenis;
-      if (globalLenis) globalLenis.start();
+    });
 
-      // Animate items out
-      items.forEach((item) => {
-        if (!item) return;
-        const text = item.querySelector(".nav-link-text");
-        const sub = item.querySelector(".nav-sub-text");
-        const bar = item.querySelector(".nav-accent-bar");
-        gsap.to([text, sub], { opacity: 0, y: -5, duration: 0.25, ease: "power2.in" });
-        gsap.to(bar, { scaleX: 0, duration: 0.2, ease: "power1.in", transformOrigin: "right" });
-      });
-
-      // Close with clip-path wipe
-      gsap.to(overlay, {
-        clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-        duration: 0.6,
-        ease: "power3.inOut",
-        delay: 0.15,
-      });
-    }
+    return () => ctx.revert();
   }, [isOpen]);
 
   useEffect(() => {

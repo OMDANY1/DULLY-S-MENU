@@ -117,24 +117,28 @@ export default function ArchFrame({ family, active = true }: ArchFrameProps) {
 
     const items = [p1, p2, p3].filter(Boolean) as SVGPathElement[];
 
-    items.forEach((path) => {
-      const length = path.getTotalLength();
-      gsap.set(path, {
-        strokeDasharray: length,
-        strokeDashoffset: length,
-      });
-    });
-
-    if (active) {
-      items.forEach((path, idx) => {
-        gsap.to(path, {
-          strokeDashoffset: 0,
-          duration: 1.5 + idx * 0.4,
-          ease: "power2.inOut",
-          delay: 0.15 + idx * 0.1,
+    const ctx = gsap.context(() => {
+      items.forEach((path) => {
+        const length = path.getTotalLength();
+        gsap.set(path, {
+          strokeDasharray: length,
+          strokeDashoffset: length,
         });
       });
-    }
+
+      if (active) {
+        items.forEach((path, idx) => {
+          gsap.to(path, {
+            strokeDashoffset: 0,
+            duration: 1.5 + idx * 0.4,
+            ease: "power2.inOut",
+            delay: 0.15 + idx * 0.1,
+          });
+        });
+      }
+    });
+
+    return () => ctx.revert();
   }, [active, family]);
 
   return (
