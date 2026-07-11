@@ -25,6 +25,9 @@ export default function ForgotPassword() {
       });
 
       if (resetError) {
+        if (resetError.status === 429 || resetError.message.toLowerCase().includes("rate limit")) {
+          throw new Error("Email rate limit exceeded. Please wait a few minutes before trying again or use the bootstrap access script.");
+        }
         throw new Error(resetError.message);
       }
 
