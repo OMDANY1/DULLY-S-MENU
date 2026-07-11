@@ -141,6 +141,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
   const descRef = useRef<HTMLParagraphElement>(null);
   const bgWrapperRef = useRef<HTMLDivElement>(null);
   const focalRef = useRef<HTMLDivElement>(null);
+  const heroImageRef = useRef<HTMLDivElement>(null);
 
   // Transition handler (Departure Phase)
   const transitionTo = useCallback((newIdx: number) => {
@@ -157,6 +158,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
     const desc = descRef.current;
     const bg = bgWrapperRef.current;
     const focal = focalRef.current;
+    const heroImage = heroImageRef.current;
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -191,6 +193,16 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
       duration: 0.5,
       ease: "power2.inOut",
     }, "<");
+
+    if (heroImage) {
+      tl.to(heroImage, {
+        opacity: 0,
+        y: -20,
+        scale: 0.95,
+        duration: 0.4,
+        ease: "power3.in",
+      }, "<");
+    }
   }, [activeIdx]);
 
   // Stagger reveal on category entry (Arrival Phase)
@@ -202,6 +214,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
     const desc = descRef.current;
     const bg = bgWrapperRef.current;
     const focal = focalRef.current;
+    const heroImage = heroImageRef.current;
 
     // Kill any active timelines
     if (masterTransitionRef.current) {
@@ -223,6 +236,13 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
       scale: 1.06,
       opacity: 0.25,
     });
+    if (heroImage) {
+      gsap.set(heroImage, {
+        opacity: 0,
+        y: 20,
+        scale: 1.05,
+      });
+    }
 
     // 3. ARRIVAL PHASE Timeline
     const arrivalTimeline = gsap.timeline({
@@ -294,6 +314,16 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
       duration: 0.65,
       ease: "power2.out",
     }, "-=0.5");
+
+    if (heroImage) {
+      arrivalTimeline.to(heroImage, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.8,
+        ease: "power3.out",
+      }, "-=0.6");
+    }
 
     return () => {
       arrivalTimeline.kill();
@@ -413,8 +443,8 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
               ))}
             </div>
 
-            {/* Central / Right: Massive Composition Title */}
-            <div className="col-span-1 md:col-span-8 flex flex-col items-center md:items-start text-center md:text-left relative h-full justify-center">
+            {/* Central Content Zone: Massive Composition Title */}
+            <div className="col-span-1 md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left relative h-full justify-center">
               <div className="overflow-hidden h-5 mb-2">
                 <span className="font-condensed text-[11px] text-crimson tracking-[0.2em] font-bold block uppercase">
                   CHAPTER {(activeIdx + 1).toString().padStart(2, "0")}
@@ -462,6 +492,23 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
                   ─────────────→
                 </span>
               </Link>
+            </div>
+
+            {/* Right Visual Zone: Category Hero Image */}
+            <div 
+              ref={heroImageRef}
+              className="col-span-1 md:col-span-4 flex items-center justify-center relative w-full h-[25vh] md:h-[40vh] px-4 md:px-0"
+            >
+              {activeCategory.heroImage && (
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={activeCategory.heroImage}
+                    alt={activeCategory.displayName}
+                    className="max-w-full max-h-full object-contain filter brightness-[0.95] contrast-[1.02]"
+                  />
+                </div>
+              )}
             </div>
 
           </section>
