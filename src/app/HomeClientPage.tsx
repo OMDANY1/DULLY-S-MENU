@@ -11,6 +11,7 @@ import CinematicLoader from "@/components/ui/CinematicLoader";
 import CategoryNavigator from "@/components/navigation/CategoryNavigator";
 import Atmosphere from "@/components/effects/Atmosphere";
 import ArchFrame from "@/components/ui/ArchFrame";
+import Header from "@/components/navigation/Header";
 
 // ==========================================
 // CATEGORY FOCAL VISUAL COMPONENT
@@ -380,20 +381,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
           </div>
 
           {/* Header Bar */}
-          <header className="relative z-20 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <svg className="w-8 h-8 text-crimson" viewBox="0 0 100 100" fill="currentColor">
-                <circle cx="50" cy="50" r="44" fill="none" stroke="currentColor" strokeWidth="2.5" />
-                <path d="M 30,50 L 50,22 L 70,50 L 50,78 Z" fill="currentColor" />
-              </svg>
-              <span className="font-condensed text-[16px] font-bold tracking-[0.25em] uppercase text-white">
-                Dully&apos;s
-              </span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8 text-white/35 text-[9px] font-condensed tracking-[0.2em] uppercase">
-              <span>MENU 2026</span>
-            </div>
-          </header>
+          <Header />
 
           {/* Category Hero Composition Area */}
           <section className="relative z-20 flex-1 grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-12">

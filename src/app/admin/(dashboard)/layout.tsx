@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin/auth";
 import Link from "next/link";
 import LogoutButton from "./LogoutButton";
-import Image from "next/image";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export default async function AdminDashboardLayout({
   children,
@@ -23,13 +23,7 @@ export default async function AdminDashboardLayout({
         <div className="space-y-12">
           {/* Logo Brand Header */}
           <div className="flex items-center space-x-3">
-            <Image
-              src="/brand/dullys-logo.png"
-              alt="DULLY'S"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
+            <BrandLogo size={24} />
             <span className="font-condensed text-[14px] font-bold tracking-[0.2em] uppercase text-white">
               Dully&apos;s CMS
             </span>

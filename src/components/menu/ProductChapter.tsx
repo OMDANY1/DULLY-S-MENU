@@ -341,18 +341,21 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
             return (
               <div key={key} className="w-full">
                 {/* Desktop Scene */}
-                <div className="hidden md:flex flex-col relative w-full min-h-[90svh] justify-between px-2 py-8 overflow-hidden">
+                <div className="hidden md:flex flex-col relative w-full max-w-6xl mx-auto min-h-[70vh] justify-center px-4 py-8 overflow-hidden">
                   
                   {/* Main horizontal triptych row */}
-                  <div className="flex-1 grid grid-cols-3 gap-6 items-end relative z-20 w-full mt-8">
+                  <div className="grid grid-cols-3 gap-8 items-end relative z-20 w-full mt-4 max-w-5xl mx-auto">
                     
                     {/* Left Arch Portal */}
                     <ProductScene product={p1}>
                       {(scene1) => (
-                        <div className="flex flex-col items-center mb-10">
-                          <div className="relative w-full h-[50vh] flex items-center justify-center">
+                        <div className="flex flex-col items-center mb-6">
+                          <div className="relative w-full h-[38vh] flex items-center justify-center">
                             <div className="absolute inset-0 scale-[1.02] opacity-50">
                               <ArchFrame family={getArchFamily(p1.category)} />
+                            </div>
+                            <div className="absolute bottom-2 w-4/5 h-16 opacity-75 pointer-events-none">
+                              <StoneStage variant="slab" />
                             </div>
                             <div className="absolute w-[180px] h-[180px] rounded-full bg-crimson/5 blur-[50px] pointer-events-none" />
                             <ProductVisual
@@ -361,7 +364,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                               imageError={scene1.imageError}
                               curtainRef={scene1.curtainRef}
                               imgRef={scene1.imgRef}
-                              imageClass="w-[clamp(210px,20vw,360px)] h-[42vh]"
+                              imageClass="w-[clamp(180px,16vw,300px)] h-[32vh]"
                             />
                           </div>
                           <div className="text-center mt-6">
@@ -385,10 +388,13 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                     {/* Center Arch Portal (Dominant center portal) */}
                     <ProductScene product={p2}>
                       {(scene2) => (
-                        <div className="flex flex-col items-center mb-0">
-                          <div className="relative w-full h-[58vh] flex items-center justify-center">
+                        <div className="flex flex-col items-center mb-6">
+                          <div className="relative w-full h-[46vh] flex items-center justify-center">
                             <div className="absolute inset-0 scale-[1.08] opacity-75">
                               <ArchFrame family={getArchFamily(p2.category)} />
+                            </div>
+                            <div className="absolute bottom-2 w-4/5 h-16 opacity-90 pointer-events-none">
+                              <StoneStage variant="low-rock" />
                             </div>
                             <div className="absolute w-[240px] h-[240px] rounded-full bg-crimson/10 blur-[60px] pointer-events-none" />
                             <ProductVisual
@@ -397,7 +403,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                               imageError={scene2.imageError}
                               curtainRef={scene2.curtainRef}
                               imgRef={scene2.imgRef}
-                              imageClass="w-[clamp(280px,25vw,460px)] h-[50vh]"
+                              imageClass="w-[clamp(240px,22vw,400px)] h-[40vh]"
                             />
                           </div>
                           <div className="text-center mt-8">
@@ -421,10 +427,13 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                     {/* Right Arch Portal */}
                     <ProductScene product={p3}>
                       {(scene3) => (
-                        <div className="flex flex-col items-center mb-16">
-                          <div className="relative w-full h-[50vh] flex items-center justify-center">
+                        <div className="flex flex-col items-center mb-6">
+                          <div className="relative w-full h-[38vh] flex items-center justify-center">
                             <div className="absolute inset-0 scale-[1.02] opacity-50">
                               <ArchFrame family={getArchFamily(p3.category)} />
+                            </div>
+                            <div className="absolute bottom-2 w-4/5 h-16 opacity-75 pointer-events-none">
+                              <StoneStage variant="fractured" />
                             </div>
                             <div className="absolute w-[180px] h-[180px] rounded-full bg-crimson/5 blur-[50px] pointer-events-none" />
                             <ProductVisual
@@ -433,7 +442,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                               imageError={scene3.imageError}
                               curtainRef={scene3.curtainRef}
                               imgRef={scene3.imgRef}
-                              imageClass="w-[clamp(210px,20vw,360px)] h-[42vh]"
+                              imageClass="w-[clamp(180px,16vw,300px)] h-[32vh]"
                             />
                           </div>
                           <div className="text-center mt-6">
@@ -454,11 +463,6 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                       )}
                     </ProductScene>
 
-                  </div>
-
-                  {/* Connected Horizontal ground terrain at bottom */}
-                  <div className="absolute bottom-28 inset-x-8 h-20 pointer-events-none z-10 opacity-70">
-                    <StoneStage variant="wide-platform" />
                   </div>
                 </div>
 
@@ -657,23 +661,23 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
             return (
               <div key={key} className="w-full">
                 {/* Desktop Scene */}
-                <div className="hidden md:flex relative w-full min-h-[85svh] items-center justify-between px-8 overflow-hidden">
+                <div className="hidden md:flex relative w-full min-h-[80vh] items-center justify-between px-8 overflow-hidden">
                   
                   {/* Giant physical text background that products pass through */}
-                  <div className="absolute inset-x-0 top-1/3 flex justify-between px-12 pointer-events-none select-none z-0">
-                    <span className="text-[18vw] font-condensed font-black tracking-widest text-crimson/[0.04] leading-none uppercase">
+                  <div aria-hidden="true" className="absolute inset-x-0 top-1/4 flex justify-between px-12 pointer-events-none select-none z-0">
+                    <span className="text-[18vw] font-condensed font-black tracking-widest text-crimson/[0.015] leading-none uppercase">
                       TEA
                     </span>
-                    <span className="text-[18vw] font-condensed font-black tracking-widest text-crimson/[0.04] leading-none uppercase">
+                    <span className="text-[18vw] font-condensed font-black tracking-widest text-crimson/[0.015] leading-none uppercase">
                       LATTE
                     </span>
                   </div>
 
                   {/* Left product overlapping the letters */}
-                  <div className="relative w-[46%] flex flex-col items-start z-10 mt-12">
+                  <div className="relative w-[46%] flex flex-col items-start z-10 mt-6">
                     <ProductScene product={p1}>
                       {(scene1) => (
-                        <>
+                        <div className="flex flex-col items-start w-full">
                           <div className="relative">
                             <div className="absolute inset-0 scale-[1.04] opacity-50">
                               <ArchFrame family={getArchFamily(p1.category)} />
@@ -687,35 +691,33 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                               imageError={scene1.imageError}
                               curtainRef={scene1.curtainRef}
                               imgRef={scene1.imgRef}
-                              imageClass="w-[clamp(240px,25vw,460px)] h-[48vh] z-10"
+                              imageClass="w-[clamp(220px,24vw,440px)] h-[44vh] z-10"
                             />
                           </div>
                           
-                          {/* Metadata aligned left */}
-                          <div className="mt-6 flex flex-row items-end space-x-6">
+                          {/* Metadata stacked vertically under the visual */}
+                          <div className="mt-6 flex flex-col items-start w-full max-w-[340px] space-y-4">
                             <ProductIdentity num={p1.num} name={p1.name} arabicName={p1.arabicName} align="left" />
-                            <div className="flex flex-col items-start pb-1">
+                            <div className="flex items-center space-x-6">
                               <ProductPrice price={scene1.displayedSize.price} align="left" />
                               <ProductCalories calories={scene1.displayedSize.calories} calorieNote={scene1.displayedSize.calorieNote} align="left" />
                             </div>
-                            <div className="pb-1">
-                              <ProductSizeSelector
-                                sizes={p1.sizes}
-                                selectedIdx={scene1.requestedIdx}
-                                onChange={scene1.requestSizeChange}
-                              />
-                            </div>
+                            <ProductSizeSelector
+                              sizes={p1.sizes}
+                              selectedIdx={scene1.requestedIdx}
+                              onChange={scene1.requestSizeChange}
+                            />
                           </div>
-                        </>
+                        </div>
                       )}
                     </ProductScene>
                   </div>
 
                   {/* Right product overlapping letters */}
-                  <div className="relative w-[46%] flex flex-col items-end z-10 mb-12">
+                  <div className="relative w-[46%] flex flex-col items-end z-10 mb-6">
                     <ProductScene product={p2}>
                       {(scene2) => (
-                        <>
+                        <div className="flex flex-col items-end w-full">
                           <div className="relative">
                             <div className="absolute inset-0 scale-[1.04] opacity-50">
                               <ArchFrame family={getArchFamily(p2.category)} />
@@ -729,30 +731,27 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                               imageError={scene2.imageError}
                               curtainRef={scene2.curtainRef}
                               imgRef={scene2.imgRef}
-                              imageClass="w-[clamp(240px,25vw,460px)] h-[48vh] z-10"
+                              imageClass="w-[clamp(220px,24vw,440px)] h-[44vh] z-10"
                             />
                           </div>
 
-                          {/* Metadata aligned right */}
-                          <div className="mt-6 flex flex-row-reverse items-end space-x-reverse space-x-6">
+                          {/* Metadata stacked vertically under the visual (aligned right) */}
+                          <div className="mt-6 flex flex-col items-end w-full max-w-[340px] space-y-4 text-right">
                             <ProductIdentity num={p2.num} name={p2.name} arabicName={p2.arabicName} align="right" />
-                            <div className="flex flex-col items-end pb-1">
+                            <div className="flex items-center space-x-6 space-x-reverse">
                               <ProductPrice price={scene2.displayedSize.price} align="right" />
                               <ProductCalories calories={scene2.displayedSize.calories} calorieNote={scene2.displayedSize.calorieNote} align="right" />
                             </div>
-                            <div className="pb-1">
-                              <ProductSizeSelector
-                                sizes={p2.sizes}
-                                selectedIdx={scene2.requestedIdx}
-                                onChange={scene2.requestSizeChange}
-                              />
-                            </div>
+                            <ProductSizeSelector
+                              sizes={p2.sizes}
+                              selectedIdx={scene2.requestedIdx}
+                              onChange={scene2.requestSizeChange}
+                            />
                           </div>
-                        </>
+                        </div>
                       )}
                     </ProductScene>
                   </div>
-
                 </div>
 
                 {/* Mobile Scene */}

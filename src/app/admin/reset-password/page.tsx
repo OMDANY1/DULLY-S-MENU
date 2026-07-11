@@ -2,7 +2,7 @@
 
 import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import BrandLogo from "@/components/ui/BrandLogo";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 
@@ -78,13 +78,7 @@ export default function ResetPassword() {
 
       <div className="w-full max-w-md bg-charcoal/30 border border-white/5 p-8 relative z-10">
         <div className="flex flex-col items-center mb-8">
-          <Image
-            src="/brand/dullys-logo.png"
-            alt="DULLY'S"
-            width={48}
-            height={48}
-            className="object-contain mb-3"
-          />
+          <BrandLogo size={48} className="mb-3" />
           <span className="font-condensed text-[16px] font-bold tracking-[0.25em] uppercase text-white">
             SET NEW PASSWORD
           </span>

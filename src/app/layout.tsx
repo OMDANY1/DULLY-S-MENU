@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter, Barlow_Condensed, Tajawal } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/layout/SmoothScroll";
-import CustomCursor from "@/components/ui/CustomCursor";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -69,7 +68,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-background text-foreground selection:bg-crimson selection:text-white">
         <SmoothScroll>
-          <CustomCursor />
           {children}
         </SmoothScroll>
       </body>

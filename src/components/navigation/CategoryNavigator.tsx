@@ -8,6 +8,7 @@ import { menuCategories } from "@/data/menu";
 import { MenuCategory } from "@/domain/menu/types";
 import { getVisibleCategories } from "@/config/menuConfig";
 import { productAssetManifest } from "@/data/productAssetManifest";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 const fallbackCategories: MenuCategory[] = menuCategories.map((cat) => ({
   id: cat.id,
@@ -50,6 +51,14 @@ interface CategoryNavigatorProps {
 export default function CategoryNavigator({ categories: propsCategories }: CategoryNavigatorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // Close menu during render if route changes, conforming to React practices
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsOpen(false);
+  }
+
   const menuBtnRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -144,12 +153,28 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
     return () => ctx.revert();
   }, [isOpen]);
 
+  // Lock body scroll and register keyboard listener
   useEffect(() => {
     if (isOpen) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsOpen(false);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
     }
-  }, [pathname, isOpen]);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+
 
   return (
     <>
@@ -173,9 +198,17 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
       {/* Cinematic Sidebar Overlay Drawer */}
       <div
         ref={overlayRef}
-        className="fixed inset-0 bg-[#060606]/98 z-[998] flex items-center justify-center p-8 select-none"
+        className="fixed inset-0 bg-[#060606]/98 z-[998] flex items-center justify-center p-8 select-none max-w-full overflow-hidden"
         style={{ clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }}
       >
+        {/* Branding in top-left of the overlay */}
+        <div className="absolute top-8 left-8 flex items-center space-x-3 pointer-events-none">
+          <BrandLogo size={36} />
+          <span className="font-condensed text-[14px] font-bold tracking-[0.2em] uppercase text-white">
+            DULLY&apos;S
+          </span>
+        </div>
+
         {/* Background Grid Lines */}
         <div className="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-5">
           {Array.from({ length: 11 }).map((_, idx) => (

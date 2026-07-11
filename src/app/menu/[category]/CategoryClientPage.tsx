@@ -4,9 +4,9 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { MenuCategory } from "@/domain/menu/types";
 import CategoryNavigator from "@/components/navigation/CategoryNavigator";
-import BackHomeButton from "@/components/navigation/BackHomeButton";
 import ProductChapter from "@/components/menu/ProductChapter";
 import Atmosphere from "@/components/effects/Atmosphere";
+import Header from "@/components/navigation/Header";
 
 interface CategoryClientPageProps {
   category: MenuCategory;
@@ -122,15 +122,7 @@ export default function CategoryClientPage({ category, categories }: CategoryCli
       <Atmosphere profile={category.id as "hot-tea"} />
 
       {/* TOP HEADER BAR */}
-      <header className="relative w-full z-20 flex items-center justify-between pb-8">
-        <BackHomeButton />
-        <div className="flex items-center space-x-2">
-          {/* Decorative small logo symbol */}
-          <span className="font-condensed text-[12px] font-bold tracking-[0.2em] uppercase text-white/40">
-            MENU 2026
-          </span>
-        </div>
-      </header>
+      <Header showBackLabel={true} />
 
       {/* EDITORIAL HERO OPENING */}
       <section className="relative z-10 w-full max-w-6xl mx-auto pt-8 md:pt-16 pb-12 text-center flex flex-col items-center">
