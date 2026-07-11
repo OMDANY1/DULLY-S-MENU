@@ -33,9 +33,11 @@ export default function ProductsManager({ categories, initialProducts }: Product
   const filteredProducts = products.filter((p) => p.category_id === selectedCatId);
 
   // Sync products state if props change
-  useEffect(() => {
+  const [prevInitialProducts, setPrevInitialProducts] = useState(initialProducts);
+  if (initialProducts !== prevInitialProducts) {
+    setPrevInitialProducts(initialProducts);
     setProducts(initialProducts);
-  }, [initialProducts]);
+  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();

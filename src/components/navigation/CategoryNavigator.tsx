@@ -7,6 +7,40 @@ import gsap from "gsap";
 import { menuCategories } from "@/data/menu";
 import { MenuCategory } from "@/domain/menu/types";
 import { getVisibleCategories } from "@/config/menuConfig";
+import { productAssetManifest } from "@/data/productAssetManifest";
+
+const fallbackCategories: MenuCategory[] = menuCategories.map((cat) => ({
+  id: cat.id,
+  name: cat.name,
+  displayName: cat.displayName,
+  arabicName: cat.arabicName,
+  description: cat.description,
+  visibility: cat.visibility || "standard",
+  items: cat.items.map((item) => {
+    const assetInfo = productAssetManifest[item.id] || { default: null, variants: {} };
+    return {
+      id: item.id,
+      num: item.num,
+      name: item.name,
+      arabicName: item.arabicName,
+      category: cat.id,
+      image: assetInfo.default,
+      dairyMilk: item.dairyMilk,
+      sizes: item.sizes.map((sz) => {
+        const sizeCode = sz.label.toLowerCase().replace(/\s+/g, "");
+        return {
+          label: sz.label,
+          code: sizeCode,
+          price: sz.price,
+          calories: sz.calories,
+          calorieNote: sz.calorieNote,
+          oz: sz.oz,
+          image: assetInfo.variants[sizeCode] || null,
+        };
+      }),
+    };
+  }),
+}));
 
 interface CategoryNavigatorProps {
   categories?: MenuCategory[];
@@ -22,7 +56,7 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
   const glyphRef = useRef<SVGSVGElement>(null);
 
   // Filter categories through business mode helper
-  const rawCategories = propsCategories || menuCategories;
+  const rawCategories = propsCategories || fallbackCategories;
   const visibleCategories = getVisibleCategories(rawCategories);
 
   useEffect(() => {

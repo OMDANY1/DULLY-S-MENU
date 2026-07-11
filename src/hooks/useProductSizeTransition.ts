@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { MenuItem, MenuSize } from "@/domain/menu/types";
-import { getProductAssetCandidates } from "@/lib/productAssets";
 import { imageCurtain } from "@/lib/motion";
 import { useReducedMotion } from "./useReducedMotion";
 
@@ -37,125 +36,119 @@ export function useProductSizeTransition(
   const currentAssetRef = useRef<string>("");
   const activePreloadUrlRef = useRef<string>("");
   const transitionTimelineRef = useRef<gsap.core.Timeline | null>(null);
-  const activePreloadRequestRef = useRef<boolean>(true);
 
   const requestSizeChange = (idx: number) => {
     if (idx === requestedIdx) return;
     setRequestedIdx(idx);
   };
 
-  // Reset indices if product changes
-  useEffect(() => {
+  // Reset state during render if product changes
+  const [prevProductId, setPrevProductId] = useState(product.id);
+  if (product.id !== prevProductId) {
+    setPrevProductId(product.id);
     setRequestedIdx(initialSizeIdx);
     setDisplayedIdx(initialSizeIdx);
     setResolvedSrc("");
     setImageError(false);
     setIsTransitioning(false);
+  }
+
+  // Handle ref cleanup inside useEffect to satisfy ref lint rules
+  useEffect(() => {
     currentAssetRef.current = "";
     activePreloadUrlRef.current = "";
-    activePreloadRequestRef.current = true;
     if (transitionTimelineRef.current) {
       transitionTimelineRef.current.kill();
       transitionTimelineRef.current = null;
     }
-  }, [product.id, initialSizeIdx]);
+  }, [product.id]);
 
   useEffect(() => {
     let active = true;
-    activePreloadRequestRef.current = active;
     const requestedSize = product.sizes[requestedIdx];
-    const candidates = getProductAssetCandidates(product.id, requestedSize.label);
     
-    // Resolve which candidate to load sequentially
-    let candidateIdx = 0;
+    // Resolution order: requestedSize.image -> product.image -> fallback (null / "")
+    const targetAsset = requestedSize?.image || product.image || "";
 
-    const tryLoadNext = () => {
-      if (!active) return;
-      if (candidateIdx >= candidates.length) {
-        setImageError(true);
-        setIsTransitioning(false);
-        return;
-      }
+    // If the target path is already displayed, just update metadata and indices
+    if (targetAsset === currentAssetRef.current) {
+      setDisplayedIdx(requestedIdx);
+      setIsTransitioning(false);
+      return;
+    }
 
-      const targetPath = candidates[candidateIdx];
+    activePreloadUrlRef.current = targetAsset;
 
-      // If the target path is already displayed, just update metadata and indices
-      if (targetPath === currentAssetRef.current) {
+    const performTransition = (srcToSet: string, hasError: boolean) => {
+      const performWipeSwap = () => {
+        if (!active) return;
         setDisplayedIdx(requestedIdx);
-        setImageError(false);
+        setResolvedSrc(srcToSet);
+        currentAssetRef.current = srcToSet;
+        setImageError(hasError);
+      };
+
+      // Play curtain transition if we have elements, an existing asset, and reduced motion is off
+      if (
+        imgRef.current &&
+        curtainRef.current &&
+        currentAssetRef.current &&
+        !reducedMotion
+      ) {
+        setIsTransitioning(true);
+
+        if (transitionTimelineRef.current) {
+          transitionTimelineRef.current.kill();
+        }
+
+        const tl = imageCurtain(
+          curtainRef.current,
+          imgRef.current,
+          performWipeSwap,
+          {
+            onComplete: () => {
+              if (active) setIsTransitioning(false);
+            },
+          }
+        );
+        
+        transitionTimelineRef.current = tl;
+      } else {
+        // Swap instantly for first render or reduced motion
+        performWipeSwap();
         setIsTransitioning(false);
-        return;
       }
+    };
 
-      // Track active preloaded URL
-      activePreloadUrlRef.current = targetPath;
-
+    if (!targetAsset) {
+      // Transition immediately to empty image state
+      performTransition("", true);
+    } else {
+      // Preload image
       const img = new Image();
       img.onload = () => {
-        if (!active || activePreloadUrlRef.current !== targetPath) return;
-
-        const performWipeSwap = () => {
-          if (!active) return;
-          setDisplayedIdx(requestedIdx);
-          setResolvedSrc(targetPath);
-          currentAssetRef.current = targetPath;
-          setImageError(false);
-        };
-
-        // If the elements exist and we have a current image, do the curtain transition
-        if (
-          imgRef.current &&
-          curtainRef.current &&
-          currentAssetRef.current &&
-          !reducedMotion
-        ) {
-          setIsTransitioning(true);
-
-          // Kill any active running size timelines
-          if (transitionTimelineRef.current) {
-            transitionTimelineRef.current.kill();
-          }
-
-          const tl = imageCurtain(
-            curtainRef.current,
-            imgRef.current,
-            performWipeSwap,
-            {
-              onComplete: () => {
-                if (active) setIsTransitioning(false);
-              },
-            }
-          );
-          
-          transitionTimelineRef.current = tl;
-        } else {
-          // Instantly swap for first render or reduced motion
-          performWipeSwap();
-          setIsTransitioning(false);
-        }
+        if (!active || activePreloadUrlRef.current !== targetAsset) return;
+        performTransition(targetAsset, false);
       };
 
       img.onerror = () => {
-        candidateIdx++;
-        tryLoadNext();
+        if (!active || activePreloadUrlRef.current !== targetAsset) return;
+        console.warn(`[IMAGE PRELOAD FAILURE] Failed to load target image: ${targetAsset}`);
+        performTransition("", true);
       };
 
-      img.src = targetPath;
-    };
-
-    tryLoadNext();
+      img.src = targetAsset;
+    }
 
     return () => {
       active = false;
-      activePreloadRequestRef.current = false;
-      // Kill timelines on unmount
       if (transitionTimelineRef.current) {
         transitionTimelineRef.current.kill();
       }
     };
-  }, [product.id, requestedIdx, reducedMotion]);
+  }, [product.id, requestedIdx, reducedMotion, product.image, product.sizes]);
 
-  const displayedSize = product.sizes[displayedIdx];
+  const displayedSize = product.sizes[displayedIdx] || product.sizes[0];
 
   return {
     product,
