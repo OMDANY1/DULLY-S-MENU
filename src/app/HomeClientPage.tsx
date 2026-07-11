@@ -444,7 +444,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
             </div>
 
             {/* Central Content Zone: Massive Composition Title */}
-            <div className="col-span-1 md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left relative h-full justify-center">
+            <div className="col-span-1 md:col-span-6 flex flex-col items-center md:items-start text-center md:text-left relative md:h-full justify-center">
               <div className="overflow-hidden h-5 mb-2">
                 <span className="font-condensed text-[11px] text-crimson tracking-[0.2em] font-bold block uppercase">
                   CHAPTER {(activeIdx + 1).toString().padStart(2, "0")}
