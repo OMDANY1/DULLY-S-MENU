@@ -29,6 +29,7 @@ async function seed() {
       .from("menu_categories")
       .upsert({
         id: cat.id,
+        slug: cat.id,
         display_name: cat.displayName,
         arabic_name: cat.arabicName,
         description: cat.description,
