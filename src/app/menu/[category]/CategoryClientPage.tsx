@@ -176,14 +176,16 @@ export default function CategoryClientPage({ category, categories }: CategoryCli
 
         {/* Cinematic Category Hero Image */}
         {category.heroImage && (
-          <div className="relative w-full max-w-4xl h-[30vh] md:h-[45vh] mt-8 mb-4 border border-white/5 bg-charcoal/5 overflow-hidden select-none flex items-center justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={category.heroImage}
-              alt={category.displayName}
-              className="w-full h-full object-cover filter brightness-[0.85] contrast-[1.05]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50 pointer-events-none" />
+          <div className="w-full max-w-4xl mx-auto mt-8 mb-4 select-none flex items-center justify-center px-4 md:px-6">
+            <div className="relative w-full max-w-lg md:max-w-2xl h-[30vh] md:h-[40vh] flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={category.heroImage}
+                alt={category.displayName}
+                className="max-w-full max-h-full object-contain filter brightness-[0.9] contrast-[1.02]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-background/30 via-transparent to-background/30 pointer-events-none" />
+            </div>
           </div>
         )}
       </section>
