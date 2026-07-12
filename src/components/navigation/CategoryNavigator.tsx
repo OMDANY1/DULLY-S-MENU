@@ -47,9 +47,15 @@ const fallbackCategories: MenuCategory[] = menuCategories.map((cat) => ({
 
 interface CategoryNavigatorProps {
   categories?: MenuCategory[];
+  activeIndex?: number;
+  onSelectCategory?: (index: number) => void;
 }
 
-export default function CategoryNavigator({ categories: propsCategories }: CategoryNavigatorProps) {
+export default function CategoryNavigator({ 
+  categories: propsCategories,
+  activeIndex,
+  onSelectCategory,
+}: CategoryNavigatorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -207,18 +213,21 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
         style={{ clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)" }}
       >
         {/* Branding in top-left of the overlay */}
-        <div 
-          className="absolute flex items-center space-x-3 pointer-events-none"
+        <Link 
+          href="/"
+          onClick={() => setIsOpen(false)}
+          className="absolute flex items-center space-x-3 cursor-pointer z-20 focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson"
           style={{
             top: "max(var(--site-gutter-top), env(safe-area-inset-top))",
             left: "max(var(--site-gutter-x), env(safe-area-inset-left))",
           }}
+          data-cursor-text="HOME"
         >
           <BrandLogo size={36} />
           <span className="font-condensed text-[14px] font-bold tracking-[0.2em] uppercase text-white">
             DULLY&apos;S
           </span>
-        </div>
+        </Link>
 
         {/* Background Grid Lines */}
         <div className="absolute inset-0 grid grid-cols-12 pointer-events-none opacity-5">
@@ -254,7 +263,9 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
           {/* Categories List */}
           <nav className="flex flex-col justify-center space-y-6 md:space-y-7 pl-8 md:pl-16 w-full overflow-y-auto">
             {visibleCategories.map((cat, idx) => {
-              const isActive = pathname === `/menu/${cat.slug}`;
+              const isActive = onSelectCategory 
+                ? activeIndex === idx 
+                : pathname === `/menu/${cat.slug}`;
               return (
                 <div
                   key={cat.slug}
@@ -272,17 +283,34 @@ export default function CategoryNavigator({ categories: propsCategories }: Categ
                   {/* Category Link */}
                   <div className="relative overflow-hidden flex flex-col">
                     <div className="overflow-hidden">
-                      <Link
-                        href={`/menu/${cat.slug}`}
-                        className="interactive-hover block nav-link-text opacity-0 transform translate-y-full"
-                        data-cursor-text="VIEW"
-                      >
-                        <span className={`font-condensed text-[22px] md:text-[32px] font-bold uppercase tracking-[0.12em] transition-colors duration-300 block hover:text-crimson ${
-                          isActive ? "text-crimson" : "text-white"
-                        }`}>
-                          {cat.displayName}
-                        </span>
-                      </Link>
+                      {onSelectCategory ? (
+                        <button
+                          onClick={() => {
+                            onSelectCategory(idx);
+                            setIsOpen(false);
+                          }}
+                          className="interactive-hover block nav-link-text opacity-0 transform translate-y-full text-left focus:outline-none"
+                          data-cursor-text="VIEW"
+                        >
+                          <span className={`font-condensed text-[22px] md:text-[32px] font-bold uppercase tracking-[0.12em] transition-colors duration-300 block hover:text-crimson ${
+                            isActive ? "text-crimson" : "text-white"
+                          }`}>
+                            {cat.displayName}
+                          </span>
+                        </button>
+                      ) : (
+                        <Link
+                          href={`/menu/${cat.slug}`}
+                          className="interactive-hover block nav-link-text opacity-0 transform translate-y-full"
+                          data-cursor-text="VIEW"
+                        >
+                          <span className={`font-condensed text-[22px] md:text-[32px] font-bold uppercase tracking-[0.12em] transition-colors duration-300 block hover:text-crimson ${
+                            isActive ? "text-crimson" : "text-white"
+                          }`}>
+                            {cat.displayName}
+                          </span>
+                        </Link>
+                      )}
                     </div>
                     <span
                       dir="rtl"

@@ -12,6 +12,7 @@ import CategoryNavigator from "@/components/navigation/CategoryNavigator";
 import Atmosphere from "@/components/effects/Atmosphere";
 import ArchFrame from "@/components/ui/ArchFrame";
 import Header from "@/components/navigation/Header";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 // ==========================================
 // CATEGORY FOCAL VISUAL COMPONENT
@@ -121,13 +122,17 @@ interface HomeClientPageProps {
 }
 
 export default function HomeClientPage({ categories: rawCategories }: HomeClientPageProps) {
-  const [loading, setLoading] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      const hasLoaded = sessionStorage.getItem("dullys_loaded");
-      return !hasLoaded;
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Avoid hydration mismatch by checking sessionStorage in useEffect
+  useEffect(() => {
+    const hasLoaded = sessionStorage.getItem("dullys_loaded");
+    if (hasLoaded) {
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
     }
-    return true;
-  });
+  }, []);
 
   const [activeIdx, setActiveIdx] = useState(0);
   const isTransitioningRef = useRef(false);
@@ -142,6 +147,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
   const bgWrapperRef = useRef<HTMLDivElement>(null);
   const focalRef = useRef<HTMLDivElement>(null);
   const heroImageRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
   // Transition handler (Departure Phase)
   const transitionTo = useCallback((newIdx: number) => {
@@ -169,41 +175,61 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
     masterTransitionRef.current = tl;
 
-    // 1. DEPARTURE PHASE: Retract coordinates, compress, and clip-reveal out
-    tl.to([title, arTitle, desc], {
-      clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
-      y: -35,
-      opacity: 0,
-      duration: 0.4,
-      ease: "power3.in",
-      stagger: 0.05,
-    });
-
-    tl.to(focal, {
-      scale: 0.88,
-      opacity: 0,
-      filter: "blur(12px)",
-      duration: 0.45,
-      ease: "power2.in",
-    }, "<");
-
-    tl.to(bg, {
-      scale: 0.95,
-      opacity: 0.15,
-      duration: 0.5,
-      ease: "power2.inOut",
-    }, "<");
-
-    if (heroImage) {
-      tl.to(heroImage, {
+    if (reducedMotion) {
+      tl.to([title, arTitle, desc], {
         opacity: 0,
-        y: -20,
-        scale: 0.95,
-        duration: 0.4,
-        ease: "power3.in",
+        duration: 0.15,
+        ease: "power2.out",
+      });
+      if (heroImage) {
+        tl.to(heroImage, {
+          opacity: 0,
+          duration: 0.15,
+          ease: "power2.out",
+        }, "<");
+      }
+      tl.to(bg, {
+        opacity: 0.2,
+        duration: 0.15,
+        ease: "power2.out",
       }, "<");
+    } else {
+      // 1. DEPARTURE PHASE: Retract coordinates, compress, and clip-reveal out
+      tl.to([title, arTitle, desc], {
+        clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+        y: -15,
+        opacity: 0,
+        duration: 0.2,
+        ease: "power3.in",
+        stagger: 0.02,
+      });
+
+      tl.to(focal, {
+        scale: 0.94,
+        opacity: 0,
+        filter: "blur(6px)",
+        duration: 0.22,
+        ease: "power2.in",
+      }, "<");
+
+      tl.to(bg, {
+        scale: 0.98,
+        opacity: 0.2,
+        duration: 0.25,
+        ease: "power2.inOut",
+      }, "<");
+
+      if (heroImage) {
+        tl.to(heroImage, {
+          opacity: 0,
+          y: -10,
+          scale: 0.98,
+          duration: 0.22,
+          ease: "power3.in",
+        }, "<");
+      }
     }
-  }, [activeIdx]);
+  }, [activeIdx, reducedMotion]);
 
   // Stagger reveal on category entry (Arrival Phase)
   useEffect(() => {
@@ -222,26 +248,40 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
     }
 
     // Reset initial states for arrival
-    gsap.set([title, arTitle, desc], {
-      clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
-      y: 40,
-      opacity: 0,
-    });
-    gsap.set(focal, {
-      scale: 1.1,
-      opacity: 0,
-      filter: "blur(15px)",
-    });
-    gsap.set(bg, {
-      scale: 1.06,
-      opacity: 0.25,
-    });
-    if (heroImage) {
-      gsap.set(heroImage, {
+    if (reducedMotion) {
+      gsap.set([title, arTitle, desc], {
         opacity: 0,
-        y: 20,
-        scale: 1.05,
       });
+      gsap.set(bg, {
+        opacity: 0.25,
+      });
+      if (heroImage) {
+        gsap.set(heroImage, {
+          opacity: 0,
+        });
+      }
+    } else {
+      gsap.set([title, arTitle, desc], {
+        clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+        y: 20,
+        opacity: 0,
+      });
+      gsap.set(focal, {
+        scale: 1.05,
+        opacity: 0,
+        filter: "blur(8px)",
+      });
+      gsap.set(bg, {
+        scale: 1.03,
+        opacity: 0.25,
+      });
+      if (heroImage) {
+        gsap.set(heroImage, {
+          opacity: 0,
+          y: 15,
+          scale: 1.02,
+        });
+      }
     }
 
     // 3. ARRIVAL PHASE Timeline
@@ -255,80 +295,102 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
     masterTransitionRef.current = arrivalTimeline;
 
-    arrivalTimeline.to(bg, {
-      scale: 1,
-      opacity: 1,
-      duration: 0.8,
-      ease: "power3.out",
-    });
-
-    if (focal) {
-      const paths = focal.querySelectorAll("path, line, circle, rect, polygon");
-      paths.forEach((path: any) => {
-        try {
-          const length = path.getTotalLength ? path.getTotalLength() : 350;
-          gsap.set(path, {
-            strokeDasharray: length,
-            strokeDashoffset: length,
-          });
-          arrivalTimeline.to(path, {
-            strokeDashoffset: 0,
-            duration: 1.4,
-            ease: "power2.out",
-          }, "-=0.7");
-        } catch (e) {
-          gsap.set(path, { opacity: 0 });
-          arrivalTimeline.to(path, { opacity: 1, duration: 0.6 }, "-=0.6");
-        }
-      });
-    }
-
-    arrivalTimeline.to(focal, {
-      scale: 1,
-      opacity: 1,
-      filter: "blur(0px)",
-      duration: 1.0,
-      ease: "power3.out",
-    }, "-=0.6");
-
-    arrivalTimeline.to(title, {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      y: 0,
-      opacity: 1,
-      duration: 0.75,
-      ease: "power3.out",
-    }, "-=0.6");
-
-    arrivalTimeline.to(arTitle, {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      y: 0,
-      opacity: 1,
-      duration: 0.65,
-      ease: "power2.out",
-    }, "-=0.5");
-
-    arrivalTimeline.to(desc, {
-      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      y: 0,
-      opacity: 1,
-      duration: 0.65,
-      ease: "power2.out",
-    }, "-=0.5");
-
-    if (heroImage) {
-      arrivalTimeline.to(heroImage, {
+    if (reducedMotion) {
+      arrivalTimeline.to(bg, {
         opacity: 1,
-        y: 0,
+        duration: 0.2,
+        ease: "power2.out",
+      });
+      arrivalTimeline.to([title, arTitle, desc], {
+        opacity: 1,
+        duration: 0.2,
+        ease: "power2.out",
+        stagger: 0.02
+      }, "-=0.1");
+      if (heroImage) {
+        arrivalTimeline.to(heroImage, {
+          opacity: 1,
+          duration: 0.2,
+          ease: "power2.out"
+        }, "-=0.15");
+      }
+    } else {
+      arrivalTimeline.to(bg, {
         scale: 1,
-        duration: 0.8,
+        opacity: 1,
+        duration: 0.45,
         ease: "power3.out",
-      }, "-=0.6");
+      });
+
+      if (focal) {
+        const paths = focal.querySelectorAll("path, line, circle, rect, polygon");
+        paths.forEach((path: any) => {
+          try {
+            const length = path.getTotalLength ? path.getTotalLength() : 350;
+            gsap.set(path, {
+              strokeDasharray: length,
+              strokeDashoffset: length,
+            });
+            arrivalTimeline.to(path, {
+              strokeDashoffset: 0,
+              duration: 0.7,
+              ease: "power2.out",
+            }, "-=0.35");
+          } catch (e) {
+            gsap.set(path, { opacity: 0 });
+            arrivalTimeline.to(path, { opacity: 1, duration: 0.3 }, "-=0.3");
+          }
+        });
+      }
+
+      arrivalTimeline.to(focal, {
+        scale: 1,
+        opacity: 1,
+        filter: "blur(0px)",
+        duration: 0.5,
+        ease: "power3.out",
+      }, "-=0.3");
+
+      arrivalTimeline.to(title, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        y: 0,
+        opacity: 1,
+        duration: 0.4,
+        ease: "power3.out",
+      }, "-=0.3");
+
+      arrivalTimeline.to(arTitle, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        y: 0,
+        opacity: 1,
+        duration: 0.35,
+        ease: "power2.out",
+      }, "-=0.25");
+
+      arrivalTimeline.to(desc, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        y: 0,
+        opacity: 1,
+        duration: 0.35,
+        ease: "power2.out",
+      }, "-=0.25");
+
+      if (heroImage) {
+        arrivalTimeline.to(heroImage, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.45,
+          ease: "power3.out",
+        }, "-=0.35");
+      }
     }
 
     return () => {
       arrivalTimeline.kill();
+      isTransitioningRef.current = false;
     };
-  }, [activeIdx, loading]);
+  }, [activeIdx, loading, reducedMotion]);
 
   // Bind GSAP Observer for mouse wheel & touch swipes
   useEffect(() => {
@@ -342,11 +404,15 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
     const obs = Observer.create({
       target: window,
-      type: "wheel,touch,pointer",
+      type: "wheel,touch",
       wheelSpeed: 0.8,
-      tolerance: 15,
+      tolerance: 20,
+      preventDefault: false,
       onChangeY: (self) => {
         if (isTransitioningRef.current) return;
+        
+        // Skip vertical navigation if horizontal swipe dominates (e.g. side menus)
+        if (Math.abs(self.deltaX) > Math.abs(self.deltaY)) return;
 
         if (self.deltaY > 15) {
           const nextIdx = (activeIdx + 1) % categories.length;
@@ -359,11 +425,34 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Ensure user is not typing in a form input
+      const activeEl = document.activeElement;
+      if (activeEl) {
+        const tagName = activeEl.tagName.toLowerCase();
+        if (
+          tagName === "input" || 
+          tagName === "textarea" || 
+          tagName === "select" || 
+          activeEl.hasAttribute("contenteditable")
+        ) {
+          return;
+        }
+      }
+
       if (isTransitioningRef.current) return;
-      if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+
+      if (e.key === "ArrowDown" || e.key === "ArrowRight" || e.key === "PageDown") {
+        e.preventDefault();
         transitionTo((activeIdx + 1) % categories.length);
-      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+      } else if (e.key === "ArrowUp" || e.key === "ArrowLeft" || e.key === "PageUp") {
+        e.preventDefault();
         transitionTo((activeIdx - 1 + categories.length) % categories.length);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        transitionTo(0);
+      } else if (e.key === "End") {
+        e.preventDefault();
+        transitionTo(categories.length - 1);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -396,7 +485,11 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
         >
           
           {/* Burger Navigation Overlay */}
-          <CategoryNavigator categories={categories} />
+          <CategoryNavigator 
+            categories={categories}
+            activeIndex={activeIdx}
+            onSelectCategory={transitionTo}
+          />
 
           {/* Background Exhibition Atmosphere & Arches */}
           <div ref={bgWrapperRef} className="absolute inset-0 z-0">
@@ -451,24 +544,31 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
                 </span>
               </div>
 
-              {/* English Category Title */}
-              <h2
-                ref={titleRef}
-                className="font-condensed text-[54px] md:text-[90px] lg:text-[115px] font-black uppercase tracking-[0.03em] text-white leading-[0.85] w-full"
-                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
+              {/* Clickable English & Arabic Title Group */}
+              <Link
+                href={`/menu/${activeCategory.slug}`}
+                className="group/title block text-left focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson"
+                data-cursor-text="VIEW"
               >
-                {activeCategory.displayName}
-              </h2>
+                {/* English Category Title */}
+                <h2
+                  ref={titleRef}
+                  className="font-condensed text-[54px] md:text-[90px] lg:text-[115px] font-black uppercase tracking-[0.03em] text-white leading-[0.85] w-full transition-colors duration-300 group-hover/title:text-crimson cursor-pointer"
+                  style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
+                >
+                  {activeCategory.displayName}
+                </h2>
 
-              {/* Arabic translation on an opposite, offset baseline */}
-              <div
-                ref={arTitleRef}
-                dir="rtl"
-                className="font-arabic text-[22px] md:text-[28px] text-crimson font-bold mt-4 leading-none select-none"
-                style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
-              >
-                {activeCategory.arabicName}
-              </div>
+                {/* Arabic translation on an opposite, offset baseline */}
+                <div
+                  ref={arTitleRef}
+                  dir="rtl"
+                  className="font-arabic text-[22px] md:text-[28px] text-crimson font-bold mt-4 leading-none select-none transition-colors duration-300 group-hover/title:text-crimson/90 cursor-pointer"
+                  style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" }}
+                >
+                  {activeCategory.arabicName}
+                </div>
+              </Link>
 
               {/* Description */}
               <p
@@ -482,7 +582,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
               {/* Exploration control button */}
               <Link
                 href={`/menu/${activeCategory.slug}`}
-                className="interactive-hover mt-10 inline-flex items-center space-x-6 py-2 group"
+                className="interactive-hover mt-10 inline-flex items-center space-x-6 py-2 group focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson"
                 data-cursor-text="EXPLORE"
               >
                 <span className="font-condensed text-[11px] font-bold tracking-[0.25em] uppercase text-white group-hover:text-crimson transition-colors duration-300">
@@ -500,14 +600,18 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
               className="col-span-1 md:col-span-4 flex items-center justify-center relative w-full h-[25vh] md:h-[40vh] px-4 md:px-0"
             >
               {activeCategory.heroImage && (
-                <div className="relative w-full h-full flex items-center justify-center">
+                <Link
+                  href={`/menu/${activeCategory.slug}`}
+                  className="relative w-full h-full flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson"
+                  data-cursor-text="VIEW"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={activeCategory.heroImage}
                     alt={activeCategory.displayName}
                     className="max-w-full max-h-full object-contain filter brightness-[0.95] contrast-[1.02]"
                   />
-                </div>
+                </Link>
               )}
             </div>
 

@@ -35,19 +35,59 @@ export class StaticMenuRepository implements MenuRepository {
   async getCategories(): Promise<MenuCategory[]> {
     const isIpadMode = menuConfig.mode === "ipad";
 
-    return menuCategories
-      .filter((cat) => isIpadMode || cat.visibility === "standard")
-      .map((cat) => ({
+    const baseCategories = menuCategories.map((cat) => {
+      const visibility = (cat.id === "mojitos" ? "standard" : (cat.visibility || "standard")) as "standard" | "ipad";
+      return {
         id: cat.id,
         slug: cat.id,
-        name: cat.name,
+        name: cat.displayName,
         displayName: cat.displayName,
         arabicName: cat.arabicName,
         description: cat.description,
         items: cat.items.map((item) => this.mapItem(item, cat.id)),
-        visibility: (cat.visibility || "standard") as "standard" | "ipad",
-        heroImage: null,
-      }));
+        visibility,
+        heroImage: null as string | null,
+      };
+    });
+
+    const standardCategories = baseCategories.filter((cat) => isIpadMode || cat.visibility === "standard");
+
+    // Group 'mineral-water-small' and 'drink-and-chips-combo-offer' under a normalized 'special' category
+    const snowIceCat = standardCategories.find((cat) => cat.id === "snow-ice");
+    if (snowIceCat) {
+      const specialItems: MenuItem[] = [];
+      snowIceCat.items = snowIceCat.items.filter((item) => {
+        if (item.id === "mineral-water-small" || item.id === "drink-and-chips-combo-offer") {
+          item.category = "special";
+          specialItems.push(item);
+          return false;
+        }
+        return true;
+      });
+
+      if (specialItems.length > 0) {
+        const specialCat: MenuCategory = {
+          id: "special",
+          slug: "special",
+          name: "Special",
+          displayName: "Special",
+          arabicName: "العروض الخاصة",
+          description: "Mineral water, combo offers, and special menu items.",
+          visibility: "standard",
+          heroImage: null,
+          items: specialItems,
+        };
+
+        const snowIceIdx = standardCategories.findIndex((cat) => cat.id === "snow-ice");
+        if (snowIceIdx !== -1) {
+          standardCategories.splice(snowIceIdx + 1, 0, specialCat);
+        } else {
+          standardCategories.push(specialCat);
+        }
+      }
+    }
+
+    return standardCategories;
   }
 
   async getCategoryBySlug(slug: string): Promise<MenuCategory | null> {
@@ -56,22 +96,8 @@ export class StaticMenuRepository implements MenuRepository {
   }
 
   async getCategoryById(id: string): Promise<MenuCategory | null> {
-    const isIpadMode = menuConfig.mode === "ipad";
-    const cat = menuCategories.find((c) => c.id === id);
-    if (!cat) return null;
-    if (!isIpadMode && cat.visibility !== "standard") return null;
-
-    return {
-      id: cat.id,
-      slug: cat.id,
-      name: cat.name,
-      displayName: cat.displayName,
-      arabicName: cat.arabicName,
-      description: cat.description,
-      items: cat.items.map((item) => this.mapItem(item, cat.id)),
-      visibility: (cat.visibility || "standard") as "standard" | "ipad",
-      heroImage: null,
-    };
+    const categories = await this.getCategories();
+    return categories.find((c) => c.id === id) || null;
   }
 
   async getProductsByCategory(categoryId: string): Promise<MenuItem[]> {

@@ -220,6 +220,47 @@ const getSnapshotFromServer = cache(async () => {
   // Throws a controlled data-format error if malformed.
   const snapshot = validateAndNormalizePayload(rawPayload);
 
+  // 1. Force 'mojitos' category visibility to standard so it displays on standard customer menu
+  const mojitoCat = snapshot.categories.find((cat) => cat.id === "mojitos");
+  if (mojitoCat) {
+    mojitoCat.visibility = "standard";
+  }
+
+  // 2. Group 'mineral-water-small' and 'drink-and-chips-combo-offer' under a normalized 'special' category
+  const snowIceCat = snapshot.categories.find((cat) => cat.id === "snow-ice");
+  if (snowIceCat) {
+    const specialItems: MenuItem[] = [];
+    snowIceCat.items = snowIceCat.items.filter((item) => {
+      if (item.id === "mineral-water-small" || item.id === "drink-and-chips-combo-offer") {
+        item.category = "special";
+        specialItems.push(item);
+        return false;
+      }
+      return true;
+    });
+
+    if (specialItems.length > 0) {
+      const specialCat: MenuCategory = {
+        id: "special",
+        slug: "special",
+        name: "Special",
+        displayName: "Special",
+        arabicName: "العروض الخاصة",
+        description: "Mineral water, combo offers, and special menu items.",
+        visibility: "standard",
+        heroImage: null,
+        items: specialItems,
+      };
+
+      const snowIceIdx = snapshot.categories.findIndex((cat) => cat.id === "snow-ice");
+      if (snowIceIdx !== -1) {
+        snapshot.categories.splice(snowIceIdx + 1, 0, specialCat);
+      } else {
+        snapshot.categories.push(specialCat);
+      }
+    }
+  }
+
   // Apply public storage CDN URLs to all normalized images
   const getUrl = (path: string | null) => {
     if (!path) return null;
