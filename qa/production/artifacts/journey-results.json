@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-07-12T16:16:55.624Z",
+  "timestamp": "2026-07-12T20:02:31.522Z",
   "cmsResults": {
     "category_description": {
       "CMS_SAVE_CLICKED": "YES",
       "CMS_SUCCESS_STATE": "PASS",
       "PUBLIC_VALUE_BEFORE": "Warm. Fragrant. Perfectly brewed.",
-      "PUBLIC_VALUE_AFTER": "DULLY'S\n01\nHOT TEA\nالشاي الحار\n02\nHOT TEA LATTE\nشاي لاتيه حار\n03\nICED BOBA TEA\nشاي البوبا البارد\n04\nICED JAPANESE TEA\nالشاي الياباني البارد\n05\nICED FRUIT TEA\nشاي الفواكه البارد\n06\nICED BOBA MILK TEA\nشاي حليب البوبا البارد\n07\nICED BOBA MILK\nحليب البوبا البارد\n08\nSPECIAL DRINKS\nالمشروبات الخاصة\n09\nSNOW ICE\nثلج مبشور\n10\nSPECIAL\nالعروض الخاصة\n11\nMOJITOS\nموهيتو\nDULLY'S\n[ BACK TO HOME ]\nMENU 2026\nHOT TEA\nTEMP DESC 1783872930606\n01\nASAM BLACK TEA\nشاي أسام الأسود\n9\nSAR\nCAL.2\n02\nJASMINE GREEN TEA\nشاي الياسمين الأخضر\n9\nSAR\nCAL.2.5\n03\nOSMANTHUS OOLONG TEA\nشاي الأوسمانثوس الأولونغ\n9\nSAR\nCAL.2.5\nDULLY'S DIGITAL MENU EXPERIENCE\nDULLY'S\n© 2026",
-      "TIME_TO_PUBLIC_PROPAGATION_MS": 2999,
+      "PUBLIC_VALUE_AFTER": "DULLY'S\n01\nHOT TEA\nالشاي الحار\n02\nHOT TEA LATTE\nشاي لاتيه حار\n03\nICED BOBA TEA\nشاي البوبا البارد\n04\nICED JAPANESE TEA\nالشاي الياباني البارد\n05\nICED FRUIT TEA\nشاي الفواكه البارد\n06\nICED BOBA MILK TEA\nشاي حليب البوبا البارد\n07\nICED BOBA MILK\nحليب البوبا البارد\n08\nSPECIAL DRINKS\nالمشروبات الخاصة\n09\nSNOW ICE\nثلج مبشور\n10\nSPECIAL\nالعروض الخاصة\n11\nMOJITOS\nموهيتو\nDULLY'S\n[ BACK TO HOME ]\nMENU 2026\nHOT TEA\nTEMP DESC 1783886467937\n01\nASAM BLACK TEA\nشاي أسام الأسود\n9\nSAR\nCAL.2\n02\nJASMINE GREEN TEA\nشاي الياسمين الأخضر\n9\nSAR\nCAL.2.5\n03\nOSMANTHUS OOLONG TEA\nشاي الأوسمانثوس الأولونغ\n9\nSAR\nCAL.2.5\nDULLY'S DIGITAL MENU EXPERIENCE\nDULLY'S\n© 2026",
+      "TIME_TO_PUBLIC_PROPAGATION_MS": 4200,
       "RELOAD_REQUIRED": "NO",
       "HARD_RELOAD_REQUIRED": "NO",
       "RESTORE_THROUGH_CMS": "PASS"
@@ -16,7 +16,7 @@
       "CMS_SUCCESS_STATE": "PASS",
       "PUBLIC_VALUE_BEFORE": "NULL",
       "PUBLIC_VALUE_AFTER": "DULLY'S\n01\nHOT TEA\nالشاي الحار\n02\nHOT TEA LATTE\nشاي لاتيه حار\n03\nICED BOBA TEA\nشاي البوبا البارد\n04\nICED JAPANESE TEA\nالشاي الياباني البارد\n05\nICED FRUIT TEA\nشاي الفواكه البارد\n06\nICED BOBA MILK TEA\nشاي حليب البوبا البارد\n07\nICED BOBA MILK\nحليب البوبا البارد\n08\nSPECIAL DRINKS\nالمشروبات الخاصة\n09\nSNOW ICE\nثلج مبشور\n10\nSPECIAL\nالعروض الخاصة\n11\nMOJITOS\nموهيتو\nDULLY'S\n[ BACK TO HOME ]\nMENU 2026\nHOT TEA\nWARM. FRAGRANT. PERFECTLY BREWED.\n01\nASAM BLACK TEA\nشاي أسام الأسود\n9\nSAR\nCAL.2\n02\nJASMINE GREEN TEA\nشاي الياسمين الأخضر\n9\nSAR\nCAL.2.5\n03\nOSMANTHUS OOLONG TEA\nشاي الأوسمانثوس الأولونغ\n9\nSAR\nCAL.2.5\nDULLY'S DIGITAL MENU EXPERIENCE\nDULLY'S\n© 2026",
-      "TIME_TO_PUBLIC_PROPAGATION_MS": 3026,
+      "TIME_TO_PUBLIC_PROPAGATION_MS": 2980,
       "RELOAD_REQUIRED": "NO",
       "HARD_RELOAD_REQUIRED": "NO",
       "RESTORE_THROUGH_CMS": "PASS"
@@ -25,8 +25,8 @@
       "CMS_SAVE_CLICKED": "YES",
       "CMS_SUCCESS_STATE": "PASS",
       "PUBLIC_VALUE_BEFORE": "ASAM BLACK TEA",
-      "PUBLIC_VALUE_AFTER": "DULLY'S\n01\nHOT TEA\nالشاي الحار\n02\nHOT TEA LATTE\nشاي لاتيه حار\n03\nICED BOBA TEA\nشاي البوبا البارد\n04\nICED JAPANESE TEA\nالشاي الياباني البارد\n05\nICED FRUIT TEA\nشاي الفواكه البارد\n06\nICED BOBA MILK TEA\nشاي حليب البوبا البارد\n07\nICED BOBA MILK\nحليب البوبا البارد\n08\nSPECIAL DRINKS\nالمشروبات الخاصة\n09\nSNOW ICE\nثلج مبشور\n10\nSPECIAL\nالعروض الخاصة\n11\nMOJITOS\nموهيتو\nDULLY'S\n[ BACK TO HOME ]\nMENU 2026\nHOT TEA\nWARM. FRAGRANT. PERFECTLY BREWED.\n01\nTEMP ASAM TEA 1783872946738\nشاي أسام الأسود\n9\nSAR\nCAL.2\n02\nJASMINE GREEN TEA\nشاي الياسمين الأخضر\n9\nSAR\nCAL.2.5\n03\nOSMANTHUS OOLONG TEA\nشاي الأوسمانثوس الأولونغ\n9\nSAR\nCAL.2.5\nDULLY'S DIGITAL MENU EXPERIENCE\nDULLY'S\n© 2026",
-      "TIME_TO_PUBLIC_PROPAGATION_MS": 3106,
+      "PUBLIC_VALUE_AFTER": "DULLY'S\n01\nHOT TEA\nالشاي الحار\n02\nHOT TEA LATTE\nشاي لاتيه حار\n03\nICED BOBA TEA\nشاي البوبا البارد\n04\nICED JAPANESE TEA\nالشاي الياباني البارد\n05\nICED FRUIT TEA\nشاي الفواكه البارد\n06\nICED BOBA MILK TEA\nشاي حليب البوبا البارد\n07\nICED BOBA MILK\nحليب البوبا البارد\n08\nSPECIAL DRINKS\nالمشروبات الخاصة\n09\nSNOW ICE\nثلج مبشور\n10\nSPECIAL\nالعروض الخاصة\n11\nMOJITOS\nموهيتو\nDULLY'S\n[ BACK TO HOME ]\nMENU 2026\nHOT TEA\nWARM. FRAGRANT. PERFECTLY BREWED.\n01\nTEMP ASAM TEA 1783886488572\nشاي أسام الأسود\n9\nSAR\nCAL.2\n02\nJASMINE GREEN TEA\nشاي الياسمين الأخضر\n9\nSAR\nCAL.2.5\n03\nOSMANTHUS OOLONG TEA\nشاي الأوسمانثوس الأولونغ\n9\nSAR\nCAL.2.5\nDULLY'S DIGITAL MENU EXPERIENCE\nDULLY'S\n© 2026",
+      "TIME_TO_PUBLIC_PROPAGATION_MS": 3237,
       "RELOAD_REQUIRED": "NO",
       "HARD_RELOAD_REQUIRED": "NO",
       "RESTORE_THROUGH_CMS": "PASS"
@@ -34,9 +34,9 @@
     "product_image": {
       "CMS_SAVE_CLICKED": "YES",
       "CMS_SUCCESS_STATE": "PASS",
-      "PUBLIC_VALUE_BEFORE": "products/asam-black-tea/default/a31e2ab3-9d50-4bb5-8d7a-1795f34a893c.png",
-      "PUBLIC_VALUE_AFTER": "/_next/image?url=https%3A%2F%2Fylnpmujtjkgrpxxbtjej.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fmenu-products%2Fproducts%2Fasam-black-tea%2Fdefault%2F56a1567d-bc53-456a-91ff-22c9bdefd75f.png&w=384&q=75",
-      "TIME_TO_PUBLIC_PROPAGATION_MS": 3226,
+      "PUBLIC_VALUE_BEFORE": "products/asam-black-tea/default/204eb609-5c73-4162-b94b-0f5553288eac.png",
+      "PUBLIC_VALUE_AFTER": "/_next/image?url=https%3A%2F%2Fylnpmujtjkgrpxxbtjej.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fmenu-products%2Fproducts%2Fasam-black-tea%2Fdefault%2Fe1ef20db-192c-4dce-aed7-d589ab06eb89.png&w=384&q=75",
+      "TIME_TO_PUBLIC_PROPAGATION_MS": 2889,
       "RELOAD_REQUIRED": "NO",
       "HARD_RELOAD_REQUIRED": "NO",
       "RESTORE_THROUGH_CMS": "PASS"
@@ -46,7 +46,7 @@
       "CMS_SUCCESS_STATE": "PASS",
       "PUBLIC_VALUE_BEFORE": "9 SAR",
       "PUBLIC_VALUE_AFTER": "DULLY'S\n01\nHOT TEA\nالشاي الحار\n02\nHOT TEA LATTE\nشاي لاتيه حار\n03\nICED BOBA TEA\nشاي البوبا البارد\n04\nICED JAPANESE TEA\nالشاي الياباني البارد\n05\nICED FRUIT TEA\nشاي الفواكه البارد\n06\nICED BOBA MILK TEA\nشاي حليب البوبا البارد\n07\nICED BOBA MILK\nحليب البوبا البارد\n08\nSPECIAL DRINKS\nالمشروبات الخاصة\n09\nSNOW ICE\nثلج مبشور\n10\nSPECIAL\nالعروض الخاصة\n11\nMOJITOS\nموهيتو\nDULLY'S\n[ BACK TO HOME ]\nMENU 2026\nHOT TEA\nWARM. FRAGRANT. PERFECTLY BREWED.\n01\nASAM BLACK TEA\nشاي أسام الأسود\n19\nSAR\nCAL.2\n02\nJASMINE GREEN TEA\nشاي الياسمين الأخضر\n9\nSAR\nCAL.2.5\n03\nOSMANTHUS OOLONG TEA\nشاي الأوسمانثوس الأولونغ\n9\nSAR\nCAL.2.5\nDULLY'S DIGITAL MENU EXPERIENCE\nDULLY'S\n© 2026",
-      "TIME_TO_PUBLIC_PROPAGATION_MS": 3265,
+      "TIME_TO_PUBLIC_PROPAGATION_MS": 2887,
       "RELOAD_REQUIRED": "NO",
       "HARD_RELOAD_REQUIRED": "NO",
       "RESTORE_THROUGH_CMS": "PASS"
@@ -54,9 +54,9 @@
   },
   "coldImageResults": {
     "home_hero": {
-      "textVisibleMs": 41,
-      "imageVisibleMs": 769,
-      "imageLoadLatencyMs": 54,
+      "textVisibleMs": 28,
+      "imageVisibleMs": 720,
+      "imageLoadLatencyMs": 18,
       "naturalWidth": 640,
       "naturalHeight": 292,
       "heroBlankOver500ms": "NO"
@@ -65,92 +65,92 @@
       {
         "product": "ASAM BLACK TEA",
         "category": "hot-tea",
-        "enterTime": 408,
-        "loadDelayMs": 12,
+        "enterTime": 194,
+        "loadDelayMs": 8,
         "classification": "PASS"
       },
       {
         "product": "JASMINE GREEN TEA",
         "category": "hot-tea",
-        "enterTime": 352,
-        "loadDelayMs": 11,
+        "enterTime": 171,
+        "loadDelayMs": 3,
         "classification": "PASS"
       },
       {
         "product": "OSMANTHUS OOLONG TEA",
         "category": "hot-tea",
-        "enterTime": 291,
-        "loadDelayMs": 10,
+        "enterTime": 184,
+        "loadDelayMs": 5,
         "classification": "PASS"
       },
       {
         "product": "BLUEBERRY MOJITO",
         "category": "mojitos",
-        "enterTime": 244,
-        "loadDelayMs": 8,
+        "enterTime": 176,
+        "loadDelayMs": 6,
         "classification": "PASS"
       },
       {
         "product": "PASSION FRUIT MOJITO",
         "category": "mojitos",
-        "enterTime": 276,
-        "loadDelayMs": 9,
+        "enterTime": 164,
+        "loadDelayMs": 4,
         "classification": "PASS"
       },
       {
         "product": "BRAZELIAN LIMEADE",
         "category": "mojitos",
-        "enterTime": 550,
-        "loadDelayMs": 342,
-        "classification": "WARN"
+        "enterTime": 359,
+        "loadDelayMs": 186,
+        "classification": "PASS"
       },
       {
         "product": "DRAGON FRUIT MOJITO",
         "category": "mojitos",
-        "enterTime": 84,
-        "loadDelayMs": 8,
+        "enterTime": 115,
+        "loadDelayMs": 7,
         "classification": "PASS"
       },
       {
         "product": "OREO BLAST SNOW ICE",
         "category": "snow-ice",
-        "enterTime": 202,
-        "loadDelayMs": 11,
+        "enterTime": 160,
+        "loadDelayMs": 3,
         "classification": "PASS"
       },
       {
         "product": "MANGO SNOW ICE",
         "category": "snow-ice",
-        "enterTime": 253,
-        "loadDelayMs": 11,
+        "enterTime": 196,
+        "loadDelayMs": 4,
         "classification": "PASS"
       },
       {
         "product": "TARO SNOW ICE",
         "category": "snow-ice",
-        "enterTime": 750,
-        "loadDelayMs": 454,
+        "enterTime": 584,
+        "loadDelayMs": 390,
         "classification": "WARN"
       },
       {
         "product": "STRAWBERRY SNOW ICE",
         "category": "snow-ice",
-        "enterTime": 130,
-        "loadDelayMs": 9,
+        "enterTime": 53,
+        "loadDelayMs": 4,
         "classification": "PASS"
       },
       {
         "product": "THAI TEA SNOW ICE",
         "category": "snow-ice",
-        "enterTime": 93,
-        "loadDelayMs": 21,
+        "enterTime": 52,
+        "loadDelayMs": 3,
         "classification": "PASS"
       },
       {
         "product": "MATCHA SNOW ICE",
         "category": "snow-ice",
-        "enterTime": 114,
-        "loadDelayMs": 17,
+        "enterTime": 50,
+        "loadDelayMs": 3,
         "classification": "PASS"
       }
     ]
@@ -194,7 +194,7 @@
         "widthOccupancy": 0.818690119730735,
         "heightOccupancy": 0.7053686791166035,
         "areaOccupancy": 0.5774783683602825,
-        "bottomBaselineDiff": 2.8719774881999456
+        "bottomBaselineDiff": 9.080961863199946
       },
       {
         "product": "JASMINE GREEN TEA",
@@ -203,24 +203,24 @@
         "artworkWidth": 290.96435546875,
         "artworkHeight": 329.3376966634758,
         "stageWidth": 316.796875,
-        "stageHeight": 359.9999694824219,
+        "stageHeight": 360,
         "widthOccupancy": 0.9184571516646116,
-        "heightOccupancy": 0.9148270127271685,
-        "areaOccupancy": 0.8402294123752405,
-        "bottomBaselineDiff": -7.902077897264007
+        "heightOccupancy": 0.9148269351763217,
+        "areaOccupancy": 0.8402293411481107,
+        "bottomBaselineDiff": -7.438943131639007
       },
       {
         "product": "OSMANTHUS OOLONG TEA",
         "category": "hot-tea",
         "shapeGroup": "wide cup/bowl",
         "artworkWidth": 213.01958058852352,
-        "artworkHeight": 266.1346131606623,
+        "artworkHeight": 266.1346435546875,
         "stageWidth": 230.390625,
         "stageHeight": 287.9999694824219,
         "widthOccupancy": 0.924601774002408,
-        "heightOccupancy": 0.9240786158378599,
-        "areaOccupancy": 0.8544047275213749,
-        "bottomBaselineDiff": -2.289917239293345
+        "heightOccupancy": 0.9240787213726808,
+        "areaOccupancy": 0.8544048250990576,
+        "bottomBaselineDiff": -4.45184326171875
       },
       {
         "product": "DULLY'S",
@@ -320,11 +320,11 @@
         "artworkWidth": 257.428466796875,
         "artworkHeight": 294.975341796875,
         "stageWidth": 345.59375,
-        "stageHeight": 395.9999694824219,
+        "stageHeight": 396,
         "widthOccupancy": 0.7448875067818067,
-        "heightOccupancy": 0.7448872841642195,
-        "areaOccupancy": 0.5548572319345565,
-        "bottomBaselineDiff": -22.335395785577248
+        "heightOccupancy": 0.7448872267597854,
+        "areaOccupancy": 0.5548571891747108,
+        "bottomBaselineDiff": -5.770454379327248
       },
       {
         "product": "DULLY'S",
@@ -436,7 +436,7 @@
         "median": 4.041666666666667,
         "min": 0.5774783683602825,
         "max": 4.041666666666668,
-        "cv": 0.47829754723602075,
+        "cv": 0.4782975460427218,
         "count": 14
       },
       "medium vessel": {
@@ -447,10 +447,10 @@
         "count": 1
       },
       "tall narrow glass": {
-        "median": 0.5548572319345565,
+        "median": 0.5548571891747108,
         "min": 0.548092297172917,
         "max": 0.5726585622882793,
-        "cv": 0.014419066509403028,
+        "cv": 0.014419069149900347,
         "count": 6
       }
     }
