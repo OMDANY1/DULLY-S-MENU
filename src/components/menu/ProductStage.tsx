@@ -80,14 +80,18 @@ export function ProductVisual({
 
   let scale = 1.0;
   if (aspectRatio !== null) {
-    if (aspectRatio >= 0.9) {
-      scale = 0.72; // Wide cups/mugs
-    } else if (aspectRatio >= 0.7) {
-      scale = 0.82; // Bowls/snow-ice
-    } else if (aspectRatio >= 0.55) {
-      scale = 0.90; // Intermediate cups
+    const minRatio = 0.45; // Tall mojito glasses
+    const maxRatio = 1.15; // Wide cups/mugs
+    const minScale = 0.72;
+    const maxScale = 0.90;
+
+    if (aspectRatio <= minRatio) {
+      scale = minScale;
+    } else if (aspectRatio >= maxRatio) {
+      scale = maxScale;
     } else {
-      scale = 1.00; // Tall glasses
+      // Continuous linear interpolation
+      scale = minScale + ((aspectRatio - minRatio) / (maxRatio - minRatio)) * (maxScale - minScale);
     }
   }
 
@@ -122,7 +126,7 @@ export function ProductVisual({
           src={resolvedSrc}
           alt={product.name}
           onLoad={handleImageLoad}
-          className="w-full h-full object-contain filter drop-shadow-[0_24px_32px_rgba(0,0,0,0.9)]"
+          className="w-full h-full object-contain object-bottom filter drop-shadow-[0_24px_32px_rgba(0,0,0,0.9)]"
           style={{
             transform: `scale(${scale}) translateZ(30px)`,
             transformOrigin: "bottom center",

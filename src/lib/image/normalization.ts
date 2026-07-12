@@ -130,3 +130,10 @@ export async function normalizeProductImage(file: File): Promise<File> {
     img.src = objectUrl;
   });
 }
+
+export function getOptimizedImageUrl(src: string | null, width: number = 384): string {
+  if (!src) return "";
+  if (!src.startsWith("http")) return src;
+  if (src.includes("/_next/image")) return src;
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=75`;
+}

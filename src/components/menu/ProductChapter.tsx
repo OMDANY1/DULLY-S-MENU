@@ -90,7 +90,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
             const p = ch.items[0];
 
             return (
-              <ProductScene key={key} product={p}>
+              <ProductScene key={key} product={p} isPriority={cIdx === 0}>
                 {(scene) => (
                   <div className="w-full">
                     {/* Desktop Scene: Monumental off-center editorial */}
@@ -208,7 +208,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                   <div className="site-container relative z-20 flex flex-row items-center justify-between w-full">
                     {/* Left Column: Product A (Lower mass, large) */}
                     <div className="relative w-[47%] flex flex-row items-center justify-start mt-10">
-                      <ProductScene product={p1}>
+                      <ProductScene product={p1} isPriority={cIdx === 0}>
                         {(scene1) => (
                           <>
                             <div className="relative">
@@ -250,7 +250,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
 
                     {/* Right Column: Product B (Higher mass, smaller) */}
                     <div className="relative w-[47%] flex flex-row-reverse items-center justify-start mb-10">
-                      <ProductScene product={p2}>
+                      <ProductScene product={p2} isPriority={cIdx === 0}>
                         {(scene2) => (
                           <>
                             <div className="relative">
@@ -295,7 +295,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                 {/* Mobile Scene: Two sequential narratives */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
                   {[p1, p2].map((p) => (
-                    <ProductScene key={p.id} product={p}>
+                    <ProductScene key={p.id} product={p} isPriority={cIdx === 0}>
                       {(scene) => (
                         <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
                           <div className="relative w-full h-[45svh] flex items-center justify-center">
@@ -352,7 +352,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                   <div className="site-container grid grid-cols-3 gap-8 items-end relative z-20 w-full mt-4">
                     
                     {/* Left Arch Portal */}
-                    <ProductScene product={p1}>
+                    <ProductScene product={p1} isPriority={cIdx === 0}>
                       {(scene1) => (
                         <div className="flex flex-col items-center mb-6">
                           <div className="relative w-full h-[38vh] flex items-center justify-center">
@@ -391,7 +391,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                     </ProductScene>
 
                     {/* Center Arch Portal (Dominant center portal) */}
-                    <ProductScene product={p2}>
+                    <ProductScene product={p2} isPriority={cIdx === 0}>
                       {(scene2) => (
                         <div className="flex flex-col items-center mb-6">
                           <div className="relative w-full h-[46vh] flex items-center justify-center">
@@ -430,7 +430,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                     </ProductScene>
 
                     {/* Right Arch Portal */}
-                    <ProductScene product={p3}>
+                    <ProductScene product={p3} isPriority={cIdx === 0}>
                       {(scene3) => (
                         <div className="flex flex-col items-center mb-6">
                           <div className="relative w-full h-[38vh] flex items-center justify-center">
@@ -474,7 +474,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                 {/* Mobile Scene: Three sequential narratives */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
                   {[p1, p2, p3].map((p) => (
-                    <ProductScene key={p.id} product={p}>
+                    <ProductScene key={p.id} product={p} isPriority={cIdx === 0}>
                       {(scene) => (
                         <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
                           <div className="relative w-full h-[45svh] flex items-center justify-center">
@@ -530,7 +530,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                   <div className="site-container relative z-20 flex flex-row items-center justify-between w-full">
                     {/* Left Column: Product A (Visual giant) */}
                     <div className="relative w-[54%] flex flex-col items-start">
-                      <ProductScene product={p1}>
+                      <ProductScene product={p1} isPriority={cIdx === 0}>
                         {(scene1) => (
                           <>
                             <div className="relative">
@@ -572,7 +572,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
 
                     {/* Right Column: Product B (Small edge product) */}
                     <div className="relative w-[38%] flex flex-col items-end justify-center pr-4 mt-20">
-                      <ProductScene product={p2}>
+                      <ProductScene product={p2} isPriority={cIdx === 0}>
                         {(scene2) => (
                           <>
                             <div className="relative">
@@ -617,7 +617,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                 {/* Mobile Scene: Two sequential narratives */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
                   {[p1, p2].map((p) => (
-                    <ProductScene key={p.id} product={p}>
+                    <ProductScene key={p.id} product={p} isPriority={cIdx === 0}>
                       {(scene) => (
                         <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
                           <div className="relative w-full h-[45svh] flex items-center justify-center">
@@ -683,7 +683,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                   <div className="site-container relative z-20 flex flex-row items-center justify-between w-full">
                     {/* Left product overlapping the letters */}
                     <div className="relative w-[45%] flex flex-col items-start mt-6">
-                      <ProductScene product={p1}>
+                      <ProductScene product={p1} isPriority={cIdx === 0}>
                         {(scene1) => (
                           <div className="flex flex-col items-start w-full">
                             <div className="relative">
@@ -723,7 +723,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
 
                     {/* Right product overlapping letters */}
                     <div className="relative w-[45%] flex flex-col items-end mb-6">
-                      <ProductScene product={p2}>
+                      <ProductScene product={p2} isPriority={cIdx === 0}>
                         {(scene2) => (
                           <div className="flex flex-col items-end w-full">
                             <div className="relative">
@@ -767,7 +767,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                 {/* Mobile Scene */}
                 <div className="flex md:hidden flex-col space-y-24 w-full">
                   {[p1, p2].map((p) => (
-                    <ProductScene key={p.id} product={p}>
+                    <ProductScene key={p.id} product={p} isPriority={cIdx === 0}>
                       {(scene) => (
                         <div className="flex flex-col items-center min-h-[75svh] justify-center px-4">
                           <div className="relative w-full h-[45svh] flex items-center justify-center">
@@ -816,7 +816,7 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
             const p = ch.items[0];
 
             return (
-              <ProductScene key={key} product={p}>
+              <ProductScene key={key} product={p} isPriority={cIdx === 0}>
                 {(scene) => (
                   <div className="w-full">
                     {/* Desktop Scene: Full viewport bleed */}

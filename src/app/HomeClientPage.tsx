@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { Observer } from "gsap/Observer";
@@ -13,6 +13,7 @@ import Atmosphere from "@/components/effects/Atmosphere";
 import ArchFrame from "@/components/ui/ArchFrame";
 import Header from "@/components/navigation/Header";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { getOptimizedImageUrl } from "@/lib/image/normalization";
 
 // ==========================================
 // CATEGORY FOCAL VISUAL COMPONENT
@@ -135,11 +136,13 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
   }, []);
 
   const [activeIdx, setActiveIdx] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(false);
   const isTransitioningRef = useRef(false);
   const masterTransitionRef = useRef<gsap.core.Timeline | null>(null);
 
-  const categories = getVisibleCategories(rawCategories);
+  const categories = useMemo(() => getVisibleCategories(rawCategories), [rawCategories]);
   const activeCategory = categories[activeIdx];
+  const nextCategory = categories[(activeIdx + 1) % categories.length];
 
   const titleRef = useRef<HTMLHeadingElement>(null);
   const arTitleRef = useRef<HTMLDivElement>(null);
@@ -149,7 +152,39 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
   const heroImageRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const diffX = e.changedTouches[0].clientX - touchStartX.current;
+    const diffY = e.changedTouches[0].clientY - touchStartY.current;
+
+    // Dominant horizontal swipe with 50px threshold
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        // Swipe right -> Prev category
+        if (isTransitioningRef.current) return;
+        const prevIdx = (activeIdx - 1 + categories.length) % categories.length;
+        transitionTo(prevIdx);
+      } else {
+        // Swipe left -> Next category
+        if (isTransitioningRef.current) return;
+        const nextIdx = (activeIdx + 1) % categories.length;
+        transitionTo(nextIdx);
+      }
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
+
   // Transition handler (Departure Phase)
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   const transitionTo = useCallback((newIdx: number) => {
     if (newIdx === activeIdx || isTransitioningRef.current) return;
     isTransitioningRef.current = true;
@@ -168,8 +203,36 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // Switch state (which triggers the arrival phase effect)
-        setActiveIdx(newIdx);
+        setIsImageLoading(true);
+        const targetImageSrc = getOptimizedImageUrl(categories[newIdx].heroImage, 640);
+        if (!targetImageSrc) {
+          setIsImageLoading(false);
+          setActiveIdx(newIdx);
+          return;
+        }
+
+        let didStateTransition = false;
+        const triggerStateTransition = () => {
+          if (didStateTransition) return;
+          didStateTransition = true;
+          setIsImageLoading(false);
+          setActiveIdx(newIdx);
+        };
+
+        // Enforce maximum 400ms transition wait limit
+        const timeoutId = setTimeout(triggerStateTransition, 400);
+
+        const img = new window.Image();
+        img.src = targetImageSrc;
+        img.decode()
+          .then(() => {
+            clearTimeout(timeoutId);
+            triggerStateTransition();
+          })
+          .catch(() => {
+            clearTimeout(timeoutId);
+            triggerStateTransition();
+          });
       },
     });
 
@@ -229,7 +292,7 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
         }, "<");
       }
     }
-  }, [activeIdx, reducedMotion]);
+  }, [activeIdx, reducedMotion, categories]);
 
   // Stagger reveal on category entry (Arrival Phase)
   useEffect(() => {
@@ -473,10 +536,19 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
   return (
     <>
+      {nextCategory?.heroImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={getOptimizedImageUrl(nextCategory.heroImage, 640)}
+        />
+      )}
       {loading ? (
         <CinematicLoader onComplete={handleLoaderComplete} />
       ) : (
         <main 
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           className="relative w-full h-screen bg-[#060606] overflow-hidden flex flex-col justify-between select-none"
           style={{
             paddingTop: "max(var(--site-gutter-top), env(safe-area-inset-top))",
@@ -570,6 +642,15 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
                 </div>
               </Link>
 
+              {/* Dynamic Image Decode Loader Indicator */}
+              <div className="w-full flex justify-center md:justify-start h-[2px] mt-4">
+                <div 
+                  className={`h-full bg-crimson transition-all duration-300 ${
+                    isImageLoading ? "w-16 opacity-100 animate-pulse" : "w-0 opacity-0"
+                  }`} 
+                />
+              </div>
+
               {/* Description */}
               <p
                 ref={descRef}
@@ -600,46 +681,61 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
               className="col-span-1 md:col-span-4 flex items-center justify-center relative w-full h-[25vh] md:h-[40vh] px-4 md:px-0"
             >
               {activeCategory.heroImage && (
-                <Link
-                  href={`/menu/${activeCategory.slug}`}
-                  className="relative w-full h-full flex items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson"
-                  data-cursor-text="VIEW"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={activeCategory.heroImage}
-                    alt={activeCategory.displayName}
-                    className="max-w-full max-h-full object-contain filter brightness-[0.95] contrast-[1.02]"
-                  />
-                </Link>
+                <div className="relative w-full h-full flex items-center justify-center">
+                  <Link
+                    href={`/menu/${activeCategory.slug}`}
+                    className="hidden md:flex relative w-full h-full items-center justify-center cursor-pointer transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson"
+                    data-cursor-text="VIEW"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getOptimizedImageUrl(activeCategory.heroImage, 640)}
+                      alt={activeCategory.displayName}
+                      className="max-w-full max-h-full object-contain filter brightness-[0.95] contrast-[1.02]"
+                    />
+                  </Link>
+                  <div className="flex md:hidden relative w-full h-full items-center justify-center pointer-events-none">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getOptimizedImageUrl(activeCategory.heroImage, 640)}
+                      alt={activeCategory.displayName}
+                      className="max-w-full max-h-full object-contain filter brightness-[0.95] contrast-[1.02]"
+                    />
+                  </div>
+                </div>
               )}
             </div>
 
           </section>
 
-          {/* Explicit Scene Navigation Controls */}
-          <div className="site-container absolute bottom-24 left-0 right-0 z-20 flex justify-between items-center pointer-events-none w-full">
+          {/* Dedicated Bottom Navigation Rail (Mobile Only) */}
+          <div className="flex md:hidden fixed bottom-16 left-0 right-0 z-30 justify-between items-center px-6 pointer-events-none w-full">
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (isTransitioningRef.current) return;
                 const prevIdx = (activeIdx - 1 + categories.length) % categories.length;
                 transitionTo(prevIdx);
               }}
-              className="pointer-events-auto flex items-center font-condensed text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 hover:text-crimson transition-transform duration-300 transform hover:-translate-x-1 focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson py-3 px-4 cursor-pointer select-none"
-              aria-label="Previous category scene"
+              className="pointer-events-auto flex items-center justify-center w-12 h-12 rounded-full bg-black/60 border border-white/10 text-white/50 hover:text-crimson active:text-crimson transition-colors duration-300 font-condensed text-[12px] font-bold uppercase tracking-wider cursor-pointer"
+              aria-label="Previous category"
             >
-              [ ← PREV ]
+              ←
             </button>
+            <span className="font-condensed text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 select-none">
+              {(activeIdx + 1).toString().padStart(2, "0")} / {categories.length.toString().padStart(2, "0")}
+            </span>
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 if (isTransitioningRef.current) return;
                 const nextIdx = (activeIdx + 1) % categories.length;
                 transitionTo(nextIdx);
               }}
-              className="pointer-events-auto flex items-center font-condensed text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 hover:text-crimson transition-transform duration-300 transform hover:translate-x-1 focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson py-3 px-4 cursor-pointer select-none"
-              aria-label="Next category scene"
+              className="pointer-events-auto flex items-center justify-center w-12 h-12 rounded-full bg-black/60 border border-white/10 text-white/50 hover:text-crimson active:text-crimson transition-colors duration-300 font-condensed text-[12px] font-bold uppercase tracking-wider cursor-pointer"
+              aria-label="Next category"
             >
-              [ NEXT → ]
+              →
             </button>
           </div>
 

@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { MenuItem, MenuSize } from "@/domain/menu/types";
 import { imageCurtain } from "@/lib/motion";
 import { useReducedMotion } from "./useReducedMotion";
+import { getOptimizedImageUrl } from "@/lib/image/normalization";
 
 export interface SizeTransitionState {
   product: MenuItem;
@@ -21,7 +22,8 @@ export interface SizeTransitionState {
 
 export function useProductSizeTransition(
   product: MenuItem,
-  initialSizeIdx: number = 0
+  initialSizeIdx: number = 0,
+  isPriority: boolean = false
 ): SizeTransitionState {
   const [requestedIdx, setRequestedIdx] = useState(initialSizeIdx);
   const [displayedIdx, setDisplayedIdx] = useState(initialSizeIdx);
@@ -69,7 +71,8 @@ export function useProductSizeTransition(
     const requestedSize = product.sizes[requestedIdx];
     
     // Resolution order: requestedSize.image -> product.image -> fallback (null / "")
-    const targetAsset = requestedSize?.image || product.image || "";
+    const rawAsset = requestedSize?.image || product.image || "";
+    const targetAsset = getOptimizedImageUrl(rawAsset, 384);
 
     // If the target path is already displayed, just update metadata and indices
     if (targetAsset === currentAssetRef.current) {
@@ -121,33 +124,70 @@ export function useProductSizeTransition(
       }
     };
 
-    if (!targetAsset) {
-      // Transition immediately to empty image state
-      performTransition("", true);
-    } else {
-      // Preload image
-      const img = new Image();
-      img.onload = () => {
-        if (!active || activePreloadUrlRef.current !== targetAsset) return;
-        performTransition(targetAsset, false);
-      };
+    let observer: IntersectionObserver | null = null;
+    let hasLoadedOrObserved = false;
 
-      img.onerror = () => {
-        if (!active || activePreloadUrlRef.current !== targetAsset) return;
-        console.warn(`[IMAGE PRELOAD FAILURE] Failed to load target image: ${targetAsset}`);
+    const startPreload = () => {
+      if (hasLoadedOrObserved) return;
+      hasLoadedOrObserved = true;
+
+      if (!targetAsset) {
+        // Transition immediately to empty image state
         performTransition("", true);
-      };
+      } else {
+        // Preload image
+        const img = new Image();
+        img.onload = () => {
+          if (!active || activePreloadUrlRef.current !== targetAsset) return;
+          performTransition(targetAsset, false);
+        };
 
-      img.src = targetAsset;
+        img.onerror = () => {
+          if (!active || activePreloadUrlRef.current !== targetAsset) return;
+          console.warn(`[IMAGE PRELOAD FAILURE] Failed to load target image: ${targetAsset}`);
+          performTransition("", true);
+        };
+
+        img.src = targetAsset;
+      }
+    };
+
+    if (isPriority) {
+      startPreload();
+    } else {
+      // Use IntersectionObserver to lazy load below-fold products
+      const elementToObserve = imgRef.current || curtainRef.current;
+      if (elementToObserve && typeof window !== "undefined" && "IntersectionObserver" in window) {
+        observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                startPreload();
+                if (observer) {
+                  observer.disconnect();
+                  observer = null;
+                }
+              }
+            });
+          },
+          { rootMargin: "200px" }
+        );
+        observer.observe(elementToObserve);
+      } else {
+        startPreload();
+      }
     }
 
     return () => {
       active = false;
+      if (observer) {
+        observer.disconnect();
+      }
       if (transitionTimelineRef.current) {
         transitionTimelineRef.current.kill();
       }
     };
-  }, [product.id, requestedIdx, reducedMotion, product.image, product.sizes]);
+  }, [product.id, requestedIdx, reducedMotion, product.image, product.sizes, isPriority]);
 
   const displayedSize = product.sizes[displayedIdx] || product.sizes[0];
 
