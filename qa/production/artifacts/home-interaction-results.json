@@ -1,0 +1,56 @@
+[
+  {
+    "viewport": "desktop-large",
+    "initialTitle": "Hot Tea",
+    "nextTitle": "Hot Tea Latte",
+    "hasNavigatedNext": true,
+    "hasRestored": true,
+    "isStillOnHome": true,
+    "hasEnteredCategory": false
+  },
+  {
+    "viewport": "desktop-medium",
+    "initialTitle": "Hot Tea",
+    "nextTitle": "Hot Tea Latte",
+    "hasNavigatedNext": true,
+    "hasRestored": true,
+    "isStillOnHome": true,
+    "hasEnteredCategory": false
+  },
+  {
+    "viewport": "tablet-portrait",
+    "initialTitle": "Hot Tea",
+    "nextTitle": "Hot Tea Latte",
+    "hasNavigatedNext": true,
+    "hasRestored": true,
+    "isStillOnHome": true,
+    "hasEnteredCategory": false
+  },
+  {
+    "viewport": "mobile-large",
+    "initialTitle": "Hot Tea",
+    "nextTitle": "Hot Tea Latte",
+    "hasNavigatedNext": true,
+    "hasRestored": true,
+    "isStillOnHome": true,
+    "hasEnteredCategory": false
+  },
+  {
+    "viewport": "mobile-medium",
+    "initialTitle": "Hot Tea",
+    "nextTitle": "Hot Tea Latte",
+    "hasNavigatedNext": true,
+    "hasRestored": true,
+    "isStillOnHome": true,
+    "hasEnteredCategory": false
+  },
+  {
+    "viewport": "mobile-small",
+    "initialTitle": "Hot Tea",
+    "nextTitle": "Hot Tea Latte",
+    "hasNavigatedNext": true,
+    "hasRestored": true,
+    "isStillOnHome": true,
+    "hasEnteredCategory": false
+  }
+]

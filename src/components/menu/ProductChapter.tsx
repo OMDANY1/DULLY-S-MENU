@@ -90,47 +90,101 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
             const p = ch.items[0];
 
             return (
-              <ProductScene key={key} product={p} isPriority={cIdx === 0}>
-                {(scene) => (
-                  <div className="w-full">
-                    {/* Desktop Scene: Monumental off-center editorial */}
-                    <div className="hidden md:flex relative w-full min-h-[80svh] items-center justify-center overflow-hidden">
-                      {/* Background Huge Crop Letter */}
-                      <div className="absolute inset-0 flex items-center justify-start opacity-[0.03] select-none pointer-events-none z-0 px-8">
-                        <span className="text-[28vw] font-condensed font-black tracking-widest text-white uppercase leading-none">
-                          {p.name.split(" ")[0]}
-                        </span>
-                      </div>
-
-                      {/* Chapter-owned architecture and grounds */}
-                      <div className="absolute inset-y-0 right-10 w-1/2 flex items-center justify-center z-10 pointer-events-none">
-                        <div className="w-[110%] h-[85%] scale-[1.1] opacity-75">
-                          <ArchFrame family={getArchFamily(p.category)} />
+              <div key={key} className="w-full">
+                {/* Desktop Scene: Monumental off-center editorial */}
+                <div className="hidden md:flex relative w-full min-h-[80svh] items-center justify-center overflow-hidden">
+                  <ProductScene product={p} isPriority={cIdx === 0}>
+                    {(scene) => (
+                      <>
+                        {/* Background Huge Crop Letter */}
+                        <div className="absolute inset-0 flex items-center justify-start opacity-[0.03] select-none pointer-events-none z-0 px-8">
+                          <span className="text-[28vw] font-condensed font-black tracking-widest text-white uppercase leading-none">
+                            {p.name.split(" ")[0]}
+                          </span>
                         </div>
-                      </div>
 
-                      <div className="absolute bottom-4 right-[10%] w-[45%] h-36 z-10 pointer-events-none">
-                        <StoneStage variant="monolith" />
-                      </div>
+                        {/* Chapter-owned architecture and grounds */}
+                        <div className="absolute inset-y-0 right-10 w-1/2 flex items-center justify-center z-10 pointer-events-none">
+                          <div className="w-[110%] h-[85%] scale-[1.1] opacity-75">
+                            <ArchFrame family={getArchFamily(p.category)} />
+                          </div>
+                        </div>
 
-                      {/* Centered Site Container for Functional Content */}
-                      <div className="site-container relative z-20 flex flex-row items-center justify-between w-full">
-                        {/* Left Side: Edge Metadata arrangement */}
-                        <div className="w-1/3 flex flex-col items-start justify-center pr-6">
-                          <ProductIdentity
-                            num={p.num}
-                            name={p.name}
-                            arabicName={p.arabicName}
-                            align="left"
-                          />
+                        <div className="absolute bottom-4 right-[10%] w-[45%] h-36 z-10 pointer-events-none">
+                          <StoneStage variant="monolith" />
+                        </div>
 
-                          {/* Technical details roll block */}
-                          <div className="mt-8 pt-6 border-t border-crimson/20 w-36 flex flex-col items-start space-y-3">
-                            <ProductPrice price={scene.displayedSize.price} align="left" size="large" />
-                            <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="left" />
+                        {/* Centered Site Container for Functional Content */}
+                        <div className="site-container relative z-20 flex flex-row items-center justify-between w-full">
+                          {/* Left Side: Edge Metadata arrangement */}
+                          <div className="w-1/3 flex flex-col items-start justify-center pr-6">
+                            <ProductIdentity
+                              num={p.num}
+                              name={p.name}
+                              arabicName={p.arabicName}
+                              align="left"
+                            />
+
+                            {/* Technical details roll block */}
+                            <div className="mt-8 pt-6 border-t border-crimson/20 w-36 flex flex-col items-start space-y-3">
+                              <ProductPrice price={scene.displayedSize.price} align="left" size="large" />
+                              <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="left" />
+                            </div>
+
+                            <div className="mt-12">
+                              <ProductSizeSelector
+                                sizes={p.sizes}
+                                selectedIdx={scene.requestedIdx}
+                                onChange={scene.requestSizeChange}
+                              />
+                            </div>
                           </div>
 
-                          <div className="mt-12">
+                          {/* Right Side: Oversized Hero Product Visual */}
+                          <div className="w-3/5 flex items-center justify-center">
+                            <ProductVisual
+                              product={p}
+                              resolvedSrc={scene.resolvedSrc}
+                              imageError={scene.imageError}
+                              curtainRef={scene.curtainRef}
+                              imgRef={scene.imgRef}
+                              imageClass="w-[clamp(320px,34vw,660px)] h-[65vh] select-none"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </ProductScene>
+                </div>
+
+                {/* Mobile Scene: Single structured narrative view */}
+                <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
+                  <ProductScene product={p} isPriority={cIdx === 0}>
+                    {(scene) => (
+                      <>
+                        <div className="relative w-full h-[48svh] flex items-center justify-center">
+                          <div className="absolute inset-0 scale-[0.9] opacity-40">
+                            <ArchFrame family={getArchFamily(p.category)} />
+                          </div>
+                          <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
+                            <StoneStage variant="slab" />
+                          </div>
+                          <ProductVisual
+                            product={p}
+                            resolvedSrc={scene.resolvedSrc}
+                            imageError={scene.imageError}
+                            curtainRef={scene.curtainRef}
+                            imgRef={scene.imgRef}
+                            imageClass="w-[72vw] h-[40svh]"
+                          />
+                        </div>
+                        <div className="w-full text-center mt-6 flex flex-col items-center">
+                          <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                          <div className="mt-3 flex items-center space-x-6">
+                            <ProductPrice price={scene.displayedSize.price} align="center" />
+                            <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                          </div>
+                          <div className="mt-5">
                             <ProductSizeSelector
                               sizes={p.sizes}
                               selectedIdx={scene.requestedIdx}
@@ -138,57 +192,11 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
                             />
                           </div>
                         </div>
-
-                        {/* Right Side: Oversized Hero Product Visual */}
-                        <div className="w-3/5 flex items-center justify-center">
-                          <ProductVisual
-                            product={p}
-                            resolvedSrc={scene.resolvedSrc}
-                            imageError={scene.imageError}
-                            curtainRef={scene.curtainRef}
-                            imgRef={scene.imgRef}
-                            imageClass="w-[clamp(320px,34vw,660px)] h-[65vh] select-none"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Mobile Scene: Single structured narrative view */}
-                    <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
-                      <div className="relative w-full h-[48svh] flex items-center justify-center">
-                        <div className="absolute inset-0 scale-[0.9] opacity-40">
-                          <ArchFrame family={getArchFamily(p.category)} />
-                        </div>
-                        <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
-                          <StoneStage variant="slab" />
-                        </div>
-                        <ProductVisual
-                          product={p}
-                          resolvedSrc={scene.resolvedSrc}
-                          imageError={scene.imageError}
-                          curtainRef={scene.curtainRef}
-                          imgRef={scene.imgRef}
-                          imageClass="w-[72vw] h-[40svh]"
-                        />
-                      </div>
-                      <div className="w-full text-center mt-6 flex flex-col items-center">
-                        <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                        <div className="mt-3 flex items-center space-x-6">
-                          <ProductPrice price={scene.displayedSize.price} align="center" />
-                          <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
-                        </div>
-                        <div className="mt-5">
-                          <ProductSizeSelector
-                            sizes={p.sizes}
-                            selectedIdx={scene.requestedIdx}
-                            onChange={scene.requestSizeChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </ProductScene>
+                      </>
+                    )}
+                  </ProductScene>
+                </div>
+              </div>
             );
           }
 
@@ -816,113 +824,119 @@ export default function ProductChapter({ products, categoryId }: ProductChapterP
             const p = ch.items[0];
 
             return (
-              <ProductScene key={key} product={p} isPriority={cIdx === 0}>
-                {(scene) => (
-                  <div className="w-full">
-                    {/* Desktop Scene: Full viewport bleed */}
-                    <div className="hidden md:flex relative w-full h-[95svh] items-center justify-center overflow-hidden">
-                      
-                      {/* Huge crop arch overlay */}
-                      <div className="absolute inset-x-0 top-0 bottom-0 flex items-center justify-center opacity-30 pointer-events-none scale-[1.3] z-10">
-                        <ArchFrame family={getArchFamily(p.category)} />
-                      </div>
-
-                      {/* Volcanic Stage extending past screen borders */}
-                      <div className="absolute bottom-0 inset-x-0 h-40 scale-x-125 pointer-events-none z-15 opacity-80">
-                        <StoneStage variant="wide-platform" />
-                      </div>
-
-                      {/* Gigantic visual occupying 55vw */}
-                      <div className="relative z-20 flex items-center justify-center">
-                        <ProductVisual
-                          product={p}
-                          resolvedSrc={scene.resolvedSrc}
-                          imageError={scene.imageError}
-                          curtainRef={scene.curtainRef}
-                          imgRef={scene.imgRef}
-                          imageClass="w-[clamp(420px,50vw,900px)] h-[75vh]"
-                        />
-                      </div>
-
-                      {/* Site Container overlay for corner anchored functional metadata */}
-                      <div className="site-container absolute inset-0 pointer-events-none z-35 flex flex-col justify-between py-12">
-                        {/* Top row */}
-                        <div className="flex justify-between items-start w-full">
-                          {/* Top Left: English Identity */}
-                          <div className="text-left select-none pointer-events-auto">
-                            <span className="font-condensed text-[11px] text-crimson tracking-[0.25em] uppercase font-bold block mb-1">
-                              {p.num ? p.num.padStart(2, "0") : "00"}
-                            </span>
-                            <h3 className="font-condensed text-[24px] font-black text-white tracking-[0.15em] uppercase leading-tight">
-                              {p.name}
-                            </h3>
-                          </div>
-
-                          {/* Top Right: Arabic Identity */}
-                          <div className="text-right select-none pointer-events-auto" dir="rtl">
-                            <span className="font-arabic text-[18px] text-crimson font-medium leading-none">
-                              {p.arabicName}
-                            </span>
-                          </div>
+              <div key={key} className="w-full">
+                {/* Desktop Scene: Full viewport bleed */}
+                <div className="hidden md:flex relative w-full h-[95svh] items-center justify-center overflow-hidden">
+                  <ProductScene product={p} isPriority={cIdx === 0}>
+                    {(scene) => (
+                      <>
+                        {/* Huge crop arch overlay */}
+                        <div className="absolute inset-x-0 top-0 bottom-0 flex items-center justify-center opacity-30 pointer-events-none scale-[1.3] z-10">
+                          <ArchFrame family={getArchFamily(p.category)} />
                         </div>
 
-                        {/* Bottom row */}
-                        <div className="flex justify-between items-end w-full">
-                          {/* Bottom Left: Size control */}
-                          <div className="pointer-events-auto">
+                        {/* Volcanic Stage extending past screen borders */}
+                        <div className="absolute bottom-0 inset-x-0 h-40 scale-x-125 pointer-events-none z-15 opacity-80">
+                          <StoneStage variant="wide-platform" />
+                        </div>
+
+                        {/* Gigantic visual occupying 55vw */}
+                        <div className="relative z-20 flex items-center justify-center">
+                          <ProductVisual
+                            product={p}
+                            resolvedSrc={scene.resolvedSrc}
+                            imageError={scene.imageError}
+                            curtainRef={scene.curtainRef}
+                            imgRef={scene.imgRef}
+                            imageClass="w-[clamp(420px,50vw,900px)] h-[75vh]"
+                          />
+                        </div>
+
+                        {/* Site Container overlay for corner anchored functional metadata */}
+                        <div className="site-container absolute inset-0 pointer-events-none z-35 flex flex-col justify-between py-12">
+                          {/* Top row */}
+                          <div className="flex justify-between items-start w-full">
+                            {/* Top Left: English Identity */}
+                            <div className="text-left select-none pointer-events-auto">
+                              <span className="font-condensed text-[11px] text-crimson tracking-[0.25em] uppercase font-bold block mb-1">
+                                {p.num ? p.num.padStart(2, "0") : "00"}
+                              </span>
+                              <h3 className="font-condensed text-[24px] font-black text-white tracking-[0.15em] uppercase leading-tight">
+                                {p.name}
+                              </h3>
+                            </div>
+
+                            {/* Top Right: Arabic Identity */}
+                            <div className="text-right select-none pointer-events-auto" dir="rtl">
+                              <span className="font-arabic text-[18px] text-crimson font-medium leading-none">
+                                {p.arabicName}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Bottom row */}
+                          <div className="flex justify-between items-end w-full">
+                            {/* Bottom Left: Size control */}
+                            <div className="pointer-events-auto">
+                              <ProductSizeSelector
+                                sizes={p.sizes}
+                                selectedIdx={scene.requestedIdx}
+                                onChange={scene.requestSizeChange}
+                              />
+                            </div>
+
+                            {/* Bottom Right: Price / Calories specification */}
+                            <div className="flex flex-col items-end space-y-1 select-none pointer-events-auto">
+                              <ProductPrice price={scene.displayedSize.price} align="right" size="large" />
+                              <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="right" />
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </ProductScene>
+                </div>
+
+                {/* Mobile Scene */}
+                <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
+                  <ProductScene product={p} isPriority={cIdx === 0}>
+                    {(scene) => (
+                      <>
+                        <div className="relative w-full h-[48svh] flex items-center justify-center">
+                          <div className="absolute inset-0 scale-[0.9] opacity-40">
+                            <ArchFrame family={getArchFamily(p.category)} />
+                          </div>
+                          <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
+                            <StoneStage variant="slab" />
+                          </div>
+                          <ProductVisual
+                            product={p}
+                            resolvedSrc={scene.resolvedSrc}
+                            imageError={scene.imageError}
+                            curtainRef={scene.curtainRef}
+                            imgRef={scene.imgRef}
+                            imageClass="w-[72vw] h-[40svh]"
+                          />
+                        </div>
+                        <div className="w-full text-center mt-6 flex flex-col items-center">
+                          <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
+                          <div className="mt-3 flex items-center space-x-6">
+                            <ProductPrice price={scene.displayedSize.price} align="center" />
+                            <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
+                          </div>
+                          <div className="mt-5">
                             <ProductSizeSelector
                               sizes={p.sizes}
                               selectedIdx={scene.requestedIdx}
                               onChange={scene.requestSizeChange}
                             />
                           </div>
-
-                          {/* Bottom Right: Price / Calories specification */}
-                          <div className="flex flex-col items-end space-y-1 select-none pointer-events-auto">
-                            <ProductPrice price={scene.displayedSize.price} align="right" size="large" />
-                            <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="right" />
-                          </div>
                         </div>
-                      </div>
-
-                    </div>
-
-                    {/* Mobile Scene */}
-                    <div className="flex md:hidden flex-col items-center justify-center min-h-[75svh] w-full px-4">
-                      <div className="relative w-full h-[48svh] flex items-center justify-center">
-                        <div className="absolute inset-0 scale-[0.9] opacity-40">
-                          <ArchFrame family={getArchFamily(p.category)} />
-                        </div>
-                        <div className="absolute bottom-0 w-4/5 h-20 opacity-60">
-                          <StoneStage variant="slab" />
-                        </div>
-                        <ProductVisual
-                          product={p}
-                          resolvedSrc={scene.resolvedSrc}
-                          imageError={scene.imageError}
-                          curtainRef={scene.curtainRef}
-                          imgRef={scene.imgRef}
-                          imageClass="w-[72vw] h-[40svh]"
-                        />
-                      </div>
-                      <div className="w-full text-center mt-6 flex flex-col items-center">
-                        <ProductIdentity num={p.num} name={p.name} arabicName={p.arabicName} align="center" />
-                        <div className="mt-3 flex items-center space-x-6">
-                          <ProductPrice price={scene.displayedSize.price} align="center" />
-                          <ProductCalories calories={scene.displayedSize.calories} calorieNote={scene.displayedSize.calorieNote} align="center" />
-                        </div>
-                        <div className="mt-5">
-                          <ProductSizeSelector
-                            sizes={p.sizes}
-                            selectedIdx={scene.requestedIdx}
-                            onChange={scene.requestSizeChange}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </ProductScene>
+                      </>
+                    )}
+                  </ProductScene>
+                </div>
+              </div>
             );
           }
 

@@ -1,0 +1,16 @@
+{
+  "initialRequestsCount": 2,
+  "requests": [
+    {
+      "url": "https://dullys-menu-app.vercel.app/_next/image?url=%2Fbrand%2Fdullys-logo.png&w=128&q=75",
+      "resourceType": "image",
+      "method": "GET"
+    },
+    {
+      "url": "https://dullys-menu-app.vercel.app/_next/image?url=https%3A%2F%2Fylnpmujtjkgrpxxbtjej.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fmenu-products%2Fcategories%2Fhot-tea-latte%2Fhero%2F186906cb-4548-4a29-88c6-f7050f9bae13.png&w=640&q=75",
+      "resourceType": "image",
+      "method": "GET"
+    }
+  ],
+  "distantHeroRequestsCount": 0
+}

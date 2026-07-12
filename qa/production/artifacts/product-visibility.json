@@ -1,0 +1,736 @@
+[
+  {
+    "id": "asam-black-tea",
+    "name": "ASAM BLACK TEA",
+    "category": "hot-tea",
+    "imageUrl": "products/asam-black-tea/default/1a4ca442-98ce-4c01-b642-be4435d0a7eb.png",
+    "layout": {
+      "naturalWidth": 286,
+      "naturalHeight": 247,
+      "width": 213.7644805908203,
+      "height": 267.21649169921875,
+      "top": 532.3621215820312,
+      "bottom": 799.57861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.9, 0, 0, 0, 0, 0.9, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "jasmine-green-tea",
+    "name": "JASMINE GREEN TEA",
+    "category": "hot-tea",
+    "imageUrl": "products/jasmine-green-tea/default/019f525d-a273-41ac-b625-0602d35f90d1.png",
+    "layout": {
+      "naturalWidth": 282,
+      "naturalHeight": 253,
+      "width": 290.96435546875,
+      "height": 330.64459228515625,
+      "top": 419.04742431640625,
+      "bottom": 749.6920166015625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.890903, 0, 0, 0, 0, 0.890903, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "158.398px 360px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "osmanthus-oolong-tea",
+    "name": "OSMANTHUS OOLONG TEA",
+    "category": "hot-tea",
+    "imageUrl": "products/osmanthus-oolong-tea/default/ab5a37db-9faf-45da-80ed-1ed67b345a93.png",
+    "layout": {
+      "naturalWidth": 287,
+      "naturalHeight": 247,
+      "width": 213.764404296875,
+      "height": 267.21649169921875,
+      "top": 502.36212158203125,
+      "bottom": 769.57861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.9, 0, 0, 0, 0, 0.9, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "thai-tea-latte",
+    "name": "THAI TEA LATTE",
+    "category": "hot-tea-latte",
+    "imageUrl": "products/thai-tea-latte/default/75a6355b-78f2-48aa-a324-f988d5ae7d2b.png",
+    "layout": {
+      "naturalWidth": 283,
+      "naturalHeight": 276,
+      "width": 206.1521759033203,
+      "height": 257.70068359375,
+      "top": 541.8779296875,
+      "bottom": 799.57861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.86795, 0, 0, 0, 0, 0.86795, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "matcha-green-tea-latte",
+    "name": "MATCHA GREEN TEA LATTE",
+    "category": "hot-tea-latte",
+    "imageUrl": "products/matcha-green-tea-latte/default/39472c4e-89a5-402a-bc5e-38a46aaa199a.png",
+    "layout": {
+      "naturalWidth": 284,
+      "naturalHeight": 274,
+      "width": 284.403076171875,
+      "height": 323.1884765625,
+      "top": 426.5035400390625,
+      "bottom": 749.6920166015625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.870813, 0, 0, 0, 0, 0.870813, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "158.398px 360px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "hojicha-latte",
+    "name": "HOJICHA LATTE",
+    "category": "hot-tea-latte",
+    "imageUrl": "products/hojicha-latte/default/619f2f1c-fa36-4da9-96e3-957f65e7afc2.png",
+    "layout": {
+      "naturalWidth": 284,
+      "naturalHeight": 277,
+      "width": 206.146484375,
+      "height": 257.6937255859375,
+      "top": 511.8848876953125,
+      "bottom": 769.57861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.867927, 0, 0, 0, 0, 0.867927, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "iced-osmanthus-oolong-boba-tea",
+    "name": "ICED OSMANTHUS OOLONG BOBA TEA",
+    "category": "iced-tea",
+    "imageUrl": "products/iced-osmanthus-oolong-boba-tea/default/bec78333-6c2f-42c2-bf5c-27304be34a6d.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 810,
+      "width": 258.728759765625,
+      "height": 296.46539306640625,
+      "top": 517.7833251953125,
+      "bottom": 814.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.72619, 0, 0, 0, 0, 0.72619, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "iced-hibiscus-boba-tea",
+    "name": "ICED HIBISCUS BOBA TEA",
+    "category": "iced-tea",
+    "imageUrl": "products/iced-hibiscus-boba-tea/default/6668c0eb-17d9-40f2-af4c-ee9decef613f.png",
+    "layout": {
+      "naturalWidth": 310,
+      "naturalHeight": 737,
+      "width": 256.523193359375,
+      "height": 293.93817138671875,
+      "top": 520.310546875,
+      "bottom": 814.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.72, 0, 0, 0, 0, 0.72, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "iced-assam-black-boba-tea",
+    "name": "ICED ASSAM BLACK BOBA TEA",
+    "category": "iced-tea",
+    "imageUrl": "products/iced-assam-black-boba-tea/default/9a67bcd8-9b93-4ad0-a44a-5a92c410edfb.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 815,
+      "width": 409.22998046875,
+      "height": 417.3165283203125,
+      "top": 309.9373779296875,
+      "bottom": 727.25390625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.725443, 0, 0, 0, 0, 0.725443, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "273.594px 558px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "iced-jasmine-green-boba-tea",
+    "name": "ICED JASMINE GREEN BOBA TEA",
+    "category": "iced-tea",
+    "imageUrl": "products/iced-jasmine-green-boba-tea/default/679a864c-6015-468f-97a9-b5a22f60ee95.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 801,
+      "width": 205.21240234375,
+      "height": 256.521240234375,
+      "top": 333.3924560546875,
+      "bottom": 589.9136962890625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.72756, 0, 0, 0, 0, 0.72756, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "136.797px 342px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "mastic-matcha-boba-milk-tea",
+    "name": "MASTIC MATCHA BOBA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/mastic-matcha-boba-milk-tea/default/271c5641-1547-4f97-8bdc-7e4ccecc6fe3.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 761,
+      "width": 261.52532958984375,
+      "height": 299.6697998046875,
+      "top": 519.5728759765625,
+      "bottom": 819.24267578125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.73404, 0, 0, 0, 0, 0.73404, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "strawberry-matcha-milk-tea",
+    "name": "STRAWBERRY MATCHA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/strawberry-matcha-milk-tea/default/dcdd6450-d0ad-4391-a6c2-9d3e489d8439.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 835,
+      "width": 257.428466796875,
+      "height": 294.975341796875,
+      "top": 519.2733764648438,
+      "bottom": 814.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.722541, 0, 0, 0, 0, 0.722541, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "matcha-boba-milk-tea",
+    "name": "MATCHA BOBA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/matcha-boba-milk-tea/default/3ae106b5-1735-4ed3-8244-399a4ac51a83.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 809,
+      "width": 172.5177459716797,
+      "height": 215.65594482421875,
+      "top": 292.42266845703125,
+      "bottom": 508.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.726341, 0, 0, 0, 0, 0.726341, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "tropical-matcha-milk-tea",
+    "name": "TROPICAL MATCHA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/tropical-matcha-milk-tea/default/7d60e1d4-5635-4c28-9329-6fcaa8f4b348.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 813,
+      "width": 237.0230712890625,
+      "height": 269.3470458984375,
+      "top": 218.844970703125,
+      "bottom": 488.1920166015625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.725741, 0, 0, 0, 0, 0.725741, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "158.398px 360px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "cracking-white-chocolate-matcha-boba-milk-tea",
+    "name": "CRACKING WHITE CHOCOLATE MATCHA BOBA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/cracking-white-chocolate-matcha-boba-milk-tea/default/659bbc1f-15b1-439e-83b3-acb396072a73.png",
+    "layout": {
+      "naturalWidth": 376,
+      "naturalHeight": 797,
+      "width": 172.341064453125,
+      "height": 215.43524169921875,
+      "top": 267.64337158203125,
+      "bottom": 483.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.725598, 0, 0, 0, 0, 0.725598, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "taro-matcha-boba-milk-tea",
+    "name": "TARO MATCHA BOBA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/taro-matcha-boba-milk-tea/default/73e65456-99c5-4c19-812c-2c2a608c8928.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 839,
+      "width": 171.4811248779297,
+      "height": 214.360107421875,
+      "top": 461.718505859375,
+      "bottom": 676.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.721977, 0, 0, 0, 0, 0.721977, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "matcha-lemonade-boba-tea",
+    "name": "MATCHA LEMONADE BOBA TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/matcha-lemonade-boba-tea/default/a73cc2d7-7886-4e4a-839e-6513c8f9057e.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 777,
+      "width": 238.86083984375,
+      "height": 271.435546875,
+      "top": 384.7564697265625,
+      "bottom": 656.1920166015625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.731368, 0, 0, 0, 0, 0.731368, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "158.398px 360px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "matcha-colada-boba-milk-tea",
+    "name": "MATCHA COLADA BOBA MILK TEA",
+    "category": "iced-japanese-tea",
+    "imageUrl": "products/matcha-colada-boba-milk-tea/default/5f2d02c2-7a95-4bb6-b908-853837f0594f.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 808,
+      "width": 172.5537109375,
+      "height": 215.7008056640625,
+      "top": 460.3778076171875,
+      "bottom": 676.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.726492, 0, 0, 0, 0, 0.726492, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "strawberry-jasmine-tea-cheezi",
+    "name": "STRAWBERRY JASMINE TEA CHEEZI",
+    "category": "iced-fruit-tea",
+    "imageUrl": "products/strawberry-jasmine-tea-cheezi/default/71cf20bb-6c96-4dd9-af6f-66764d3b1880.png",
+    "layout": {
+      "naturalWidth": 306,
+      "naturalHeight": 633,
+      "width": 259.58428955078125,
+      "height": 297.44573974609375,
+      "top": 546.802978515625,
+      "bottom": 844.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.728592, 0, 0, 0, 0, 0.728592, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "very-berry-jasmine-tea-cheezi",
+    "name": "VERY BERRY JASMINE TEA CHEEZI",
+    "category": "iced-fruit-tea",
+    "imageUrl": "products/very-berry-jasmine-tea-cheezi/default/a3b68378-eb2b-4317-b3aa-6b9e960d7ee9.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 796,
+      "width": 259.49267578125,
+      "height": 297.3406982421875,
+      "top": 516.9080200195312,
+      "bottom": 814.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.728335, 0, 0, 0, 0, 0.728335, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "mango-jasmine-tea-cheezi",
+    "name": "MANGO JASMINE TEA CHEEZI",
+    "category": "iced-fruit-tea",
+    "imageUrl": "products/mango-jasmine-tea-cheezi/default/c3ff0f75-c175-430b-96e0-ec98ee06e5bf.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 780,
+      "width": 173.5955810546875,
+      "height": 217.0032958984375,
+      "top": 291.0753173828125,
+      "bottom": 508.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.730879, 0, 0, 0, 0, 0.730879, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "green-grape-osmanthos-tea-freezi",
+    "name": "GREEN GRAPE OSMANTHOS TEA FREEZI",
+    "category": "iced-fruit-tea",
+    "imageUrl": "products/green-grape-osmanthos-tea-freezi/default/940fc68f-15c2-4a55-b3bb-fbadb93d0207.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 756,
+      "width": 240.0137939453125,
+      "height": 272.74566650390625,
+      "top": 215.44635009765625,
+      "bottom": 488.1920166015625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.734898, 0, 0, 0, 0, 0.734898, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "158.398px 360px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "watermelon-prickly-pear-assam-tea-freezi",
+    "name": "WATERMELON PRICKLY PEAR ASSAM TEA FREEZI",
+    "category": "iced-fruit-tea",
+    "imageUrl": "products/watermelon-prickly-pear-assam-tea-freezi/default/b31cd8e6-a717-411e-b81b-b5f01614b393.png",
+    "layout": {
+      "naturalWidth": 356,
+      "naturalHeight": 788,
+      "width": 171.1201171875,
+      "height": 213.9088134765625,
+      "top": 269.1697998046875,
+      "bottom": 483.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.720457, 0, 0, 0, 0, 0.720457, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "passion-fruit-osmanthus-oolong-tea-freezi",
+    "name": "PASSION FRUIT OSMANTHUS OOLONG TEA FREEZI",
+    "category": "iced-fruit-tea",
+    "status": "FAILED",
+    "reason": "Image element not found in DOM after scroll sweep and timeout"
+  },
+  {
+    "id": "hojicha-boba-milk-tea",
+    "name": "HOJICHA BOBA MILK TEA",
+    "category": "special-drinks",
+    "imageUrl": "products/hojicha-boba-milk-tea/default/dfd63b05-7000-433b-922b-e80e816f1ecf.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 850,
+      "width": 256.68487548828125,
+      "height": 294.1234130859375,
+      "top": 550.1253051757812,
+      "bottom": 844.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.720454, 0, 0, 0, 0, 0.720454, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "kiddy-bunny-mango-boba-milk-tea",
+    "name": "KIDDY BUNNY MANGO BOBA MILK TEA",
+    "category": "special-drinks",
+    "imageUrl": "products/kiddy-bunny-mango-boba-milk-tea/default/117d9a20-5bff-4bb5-8aaa-a66fd889de71.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 597,
+      "width": 274.224853515625,
+      "height": 314.22161865234375,
+      "top": 514.7598266601562,
+      "bottom": 828.9814453125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.769684, 0, 0, 0, 0, 0.769684, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "kiddy-kitty-strawberry-boba-milk-tea",
+    "name": "KIDDY KITTY STRAWBERRY BOBA MILK TEA",
+    "category": "special-drinks",
+    "imageUrl": "products/kiddy-kitty-strawberry-boba-milk-tea/default/c79e3d71-3b78-4422-a35a-30600130a40c.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 457,
+      "width": 462.7701416015625,
+      "height": 471.91455078125,
+      "top": 255.33935546875,
+      "bottom": 727.25390625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.820353, 0, 0, 0, 0, 0.820353, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "273.594px 558px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "kiddy-teddy-chocolate-boba-milk-tea",
+    "name": "KIDDY TEDDY CHOCOLATE BOBA MILK TEA",
+    "category": "special-drinks",
+    "imageUrl": "products/kiddy-teddy-chocolate-boba-milk-tea/default/655c80f5-a298-496e-8ea8-434d881b85d5.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 612,
+      "width": 215.9501953125,
+      "height": 269.94390869140625,
+      "top": 329.46978759765625,
+      "bottom": 599.4136962890625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.76563, 0, 0, 0, 0, 0.76563, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "136.797px 342px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "oreo-blast-snow-ice",
+    "name": "OREO BLAST SNOW ICE",
+    "category": "snow-ice",
+    "imageUrl": "products/oreo-blast-snow-ice/default/21a2888a-1b71-41a3-aec5-904b32d46ad3.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 435,
+      "width": 296.1705322265625,
+      "height": 339.36822509765625,
+      "top": 504.8804931640625,
+      "bottom": 844.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.831281, 0, 0, 0, 0, 0.831281, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "mango-snow-ice",
+    "name": "MANGO SNOW ICE",
+    "category": "snow-ice",
+    "imageUrl": "products/mango-snow-ice/default/0eaf607f-36d6-454f-998d-165b072cb645.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 408,
+      "width": 301.5224609375,
+      "height": 345.5008239746094,
+      "top": 468.7478942871094,
+      "bottom": 814.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.846303, 0, 0, 0, 0, 0.846303, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "taro-snow-ice",
+    "name": "TARO SNOW ICE",
+    "category": "snow-ice",
+    "imageUrl": "products/taro-snow-ice/default/536b7d14-30c9-4247-a003-57656a15ab07.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 439,
+      "width": 196.95130920410156,
+      "height": 246.19915771484375,
+      "top": 261.87945556640625,
+      "bottom": 508.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.829212, 0, 0, 0, 0, 0.829212, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "strawberry-snow-ice",
+    "name": "STRAWBERRY SNOW ICE",
+    "category": "snow-ice",
+    "imageUrl": "products/strawberry-snow-ice/default/ec9f8e3c-24ca-4360-8be7-3f8f33f59c1b.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 466,
+      "width": 266.5601806640625,
+      "height": 302.9122314453125,
+      "top": 185.27978515625,
+      "bottom": 488.1920166015625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.81618, 0, 0, 0, 0, 0.81618, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "158.398px 360px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "thai-tea-snow-ice",
+    "name": "THAI TEA SNOW ICE",
+    "category": "snow-ice",
+    "imageUrl": "products/thai-tea-snow-ice/default/8f88e24c-6797-494d-bf35-ddda8e5bdc9b.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 446,
+      "width": 196.11279296875,
+      "height": 245.15106201171875,
+      "top": 262.92755126953125,
+      "bottom": 508.07861328125,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.825682, 0, 0, 0, 0, 0.825682, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "115.195px 288px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "matcha-snow-ice",
+    "name": "MATCHA SNOW ICE",
+    "category": "snow-ice",
+    "status": "FAILED",
+    "reason": "Image element not found in DOM after scroll sweep and timeout"
+  },
+  {
+    "id": "blueberry-mojito",
+    "name": "BLUEBERRY MOJITO",
+    "category": "mojitos",
+    "imageUrl": "products/blueberry-mojito/default/967740c3-b5f9-4134-b2b2-7c8156e282d9.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 845,
+      "width": 256.92974853515625,
+      "height": 294.404052734375,
+      "top": 530.8074951171875,
+      "bottom": 825.2115478515625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.721141, 0, 0, 0, 0, 0.721141, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "passion-fruit-mojito",
+    "name": "PASSION FRUIT MOJITO",
+    "category": "mojitos",
+    "imageUrl": "products/passion-fruit-mojito/default/4731abc8-1794-4ad1-bcbf-416b582cfdb3.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 858,
+      "width": 256.523193359375,
+      "height": 293.93817138671875,
+      "top": 520.310546875,
+      "bottom": 814.2487182617188,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.72, 0, 0, 0, 0, 0.72, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "172.797px 396px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "brazelian-limeade",
+    "name": "BRAZELIAN LIMEADE",
+    "category": "mojitos",
+    "imageUrl": "products/brazelian-limeade/default/8d366b64-eaa7-41f4-964b-677c19dc708a.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 807,
+      "width": 409.9075927734375,
+      "height": 418.0074462890625,
+      "top": 309.2464599609375,
+      "bottom": 727.25390625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.726644, 0, 0, 0, 0, 0.726644, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "273.594px 558px"
+    },
+    "isVisible": true
+  },
+  {
+    "id": "dragon-fruit-mojito",
+    "name": "DRAGON FRUIT MOJITO",
+    "category": "mojitos",
+    "imageUrl": "products/dragon-fruit-mojito/default/3bb53d9e-0122-4ab0-b609-bb82394b606b.png",
+    "layout": {
+      "naturalWidth": 384,
+      "naturalHeight": 901,
+      "width": 203.079833984375,
+      "height": 253.855712890625,
+      "top": 336.0579833984375,
+      "bottom": 589.9136962890625,
+      "opacity": 1,
+      "visibility": "visible",
+      "display": "block",
+      "transform": "matrix3d(0.72, 0, 0, 0, 0, 0.72, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+      "transformOrigin": "136.797px 342px"
+    },
+    "isVisible": true
+  }
+]

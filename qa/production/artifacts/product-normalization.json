@@ -1,0 +1,72 @@
+[
+  {
+    "product": "osmanthus-oolong-tea",
+    "category": "hot-tea",
+    "family": "TEACUP",
+    "naturalWidth": 287,
+    "naturalHeight": 247,
+    "renderedWidth": 213.764404296875,
+    "renderedHeight": 267.21649169921875,
+    "parentWidth": 230.390625,
+    "parentHeight": 288,
+    "transform": "matrix3d(0.9, 0, 0, 0, 0, 0.9, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+    "transformOrigin": "115.195px 288px",
+    "bottomOffset": -4.45361328125
+  },
+  {
+    "product": "matcha-green-tea-latte",
+    "category": "hot-tea-latte",
+    "family": "MUG",
+    "naturalWidth": 284,
+    "naturalHeight": 274,
+    "renderedWidth": 284.403076171875,
+    "renderedHeight": 323.1884765625,
+    "parentWidth": 316.796875,
+    "parentHeight": 360,
+    "transform": "matrix3d(0.870813, 0, 0, 0, 0, 0.870813, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+    "transformOrigin": "158.398px 360px",
+    "bottomOffset": -5.5670166015625
+  },
+  {
+    "product": "matcha-boba-milk-tea",
+    "category": "iced-japanese-tea",
+    "family": "BOBA CUP",
+    "naturalWidth": 384,
+    "naturalHeight": 809,
+    "renderedWidth": 172.5177459716797,
+    "renderedHeight": 215.65594482421875,
+    "parentWidth": 230.390625,
+    "parentHeight": 288,
+    "transform": "matrix3d(0.726341, 0, 0, 0, 0, 0.726341, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+    "transformOrigin": "115.195px 288px",
+    "bottomOffset": -4.45361328125
+  },
+  {
+    "product": "watermelon-prickly-pear-assam-tea-freezi",
+    "category": "iced-fruit-tea",
+    "family": "COMBO COMPOSITION",
+    "naturalWidth": 356,
+    "naturalHeight": 788,
+    "renderedWidth": 171.1201171875,
+    "renderedHeight": 213.9088134765625,
+    "parentWidth": 230.390625,
+    "parentHeight": 288,
+    "transform": "matrix3d(0.720457, 0, 0, 0, 0, 0.720457, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+    "transformOrigin": "115.195px 288px",
+    "bottomOffset": -4.45361328125
+  },
+  {
+    "product": "blueberry-mojito",
+    "category": "mojitos",
+    "family": "TALL MOJITO GLASS",
+    "naturalWidth": 384,
+    "naturalHeight": 845,
+    "renderedWidth": 256.92974853515625,
+    "renderedHeight": 294.404052734375,
+    "parentWidth": 345.59375,
+    "parentHeight": 395.9999694824219,
+    "transform": "matrix3d(0.721141, 0, 0, 0, 0, 0.721141, 0, 0, 0, 0, 1, 0, 0, 0, 30, 1)",
+    "transformOrigin": "172.797px 396px",
+    "bottomOffset": -6.123779296875
+  }
+]

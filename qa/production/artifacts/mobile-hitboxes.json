@@ -1,0 +1,158 @@
+[
+  {
+    "viewport": "mobile-large",
+    "elements": {
+      "prev": {
+        "x": 0,
+        "y": 732,
+        "width": 48,
+        "height": 48,
+        "top": 732,
+        "right": 48,
+        "bottom": 780,
+        "left": 0
+      },
+      "next": {
+        "x": 342,
+        "y": 732,
+        "width": 48,
+        "height": 48,
+        "top": 732,
+        "right": 390,
+        "bottom": 780,
+        "left": 342
+      },
+      "title": {
+        "x": 105.78125,
+        "y": 225.84375,
+        "width": 178.421875,
+        "height": 67.890625,
+        "top": 225.84375,
+        "right": 284.203125,
+        "bottom": 293.734375,
+        "left": 105.78125
+      },
+      "explore": {
+        "x": 61.390625,
+        "y": 313.609375,
+        "width": 267.203125,
+        "height": 21,
+        "top": 313.609375,
+        "right": 328.59375,
+        "bottom": 334.609375,
+        "left": 61.390625
+      }
+    },
+    "intersections": {
+      "prevXTitle": false,
+      "prevXExplore": false,
+      "nextXTitle": false,
+      "nextXExplore": false
+    },
+    "hasHorizontalOverflow": false
+  },
+  {
+    "viewport": "mobile-medium",
+    "elements": {
+      "prev": {
+        "x": 0,
+        "y": 688,
+        "width": 48,
+        "height": 48,
+        "top": 688,
+        "right": 48,
+        "bottom": 736,
+        "left": 0
+      },
+      "next": {
+        "x": 312,
+        "y": 688,
+        "width": 48,
+        "height": 48,
+        "top": 688,
+        "right": 360,
+        "bottom": 736,
+        "left": 312
+      },
+      "title": {
+        "x": 90.78125,
+        "y": 214.421875,
+        "width": 178.421875,
+        "height": 67.890625,
+        "top": 214.421875,
+        "right": 269.203125,
+        "bottom": 282.3125,
+        "left": 90.78125
+      },
+      "explore": {
+        "x": 46.390625,
+        "y": 302.1875,
+        "width": 267.203125,
+        "height": 21,
+        "top": 302.1875,
+        "right": 313.59375,
+        "bottom": 323.1875,
+        "left": 46.390625
+      }
+    },
+    "intersections": {
+      "prevXTitle": false,
+      "prevXExplore": false,
+      "nextXTitle": false,
+      "nextXExplore": false
+    },
+    "hasHorizontalOverflow": false
+  },
+  {
+    "viewport": "mobile-small",
+    "elements": {
+      "prev": {
+        "x": 0,
+        "y": 456,
+        "width": 48,
+        "height": 48,
+        "top": 456,
+        "right": 48,
+        "bottom": 504,
+        "left": 0
+      },
+      "next": {
+        "x": 272,
+        "y": 456,
+        "width": 48,
+        "height": 48,
+        "top": 456,
+        "right": 320,
+        "bottom": 504,
+        "left": 272
+      },
+      "title": {
+        "x": 70.78125,
+        "y": 155.703125,
+        "width": 178.421875,
+        "height": 67.890625,
+        "top": 155.703125,
+        "right": 249.203125,
+        "bottom": 223.59375,
+        "left": 70.78125
+      },
+      "explore": {
+        "x": 26.390625,
+        "y": 243.46875,
+        "width": 267.203125,
+        "height": 21,
+        "top": 243.46875,
+        "right": 293.59375,
+        "bottom": 264.46875,
+        "left": 26.390625
+      }
+    },
+    "intersections": {
+      "prevXTitle": false,
+      "prevXExplore": false,
+      "nextXTitle": false,
+      "nextXExplore": false
+    },
+    "hasHorizontalOverflow": false
+  }
+]
