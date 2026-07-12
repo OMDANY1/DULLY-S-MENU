@@ -1,6 +1,6 @@
 # Real User Journey QA Verification Report
 
-Generated dynamically on 7/12/2026, 7:03:34 PM
+Generated dynamically on 7/12/2026, 7:07:56 PM
 
 ## 1. CMS -> LIVE WEBSITE E2E MUTATIONS
 | Mutation Area | Save Clicked | CMS Success State | Value Before | Value After | Propagation Time | Reload Required | Restore CMS |
@@ -43,7 +43,7 @@ DULLY'S
 [ BACK TO HOME ]
 MENU 2026
 HOT TEA
-TEMP DESC 1783872118483
+TEMP DESC 1783872385246
 01
 ASAM BLACK TEA
 شاي أسام الأسود
@@ -64,7 +64,7 @@ SAR
 CAL.2.5
 DULLY'S DIGITAL MENU EXPERIENCE
 DULLY'S
-© 2026" | 3977 ms | NO | PASS |
+© 2026" | 3600 ms | NO | PASS |
 | Category Hero Image | YES | PASS | "NULL" | "DULLY'S
 01
 HOT TEA
@@ -124,7 +124,7 @@ SAR
 CAL.2.5
 DULLY'S DIGITAL MENU EXPERIENCE
 DULLY'S
-© 2026" | 2939 ms | NO | PASS |
+© 2026" | 3738 ms | NO | PASS |
 | Product English Name | YES | PASS | "ASAM BLACK TEA" | "DULLY'S
 01
 HOT TEA
@@ -165,7 +165,7 @@ MENU 2026
 HOT TEA
 WARM. FRAGRANT. PERFECTLY BREWED.
 01
-TEMP ASAM TEA 1783872137266
+TEMP ASAM TEA 1783872403332
 شاي أسام الأسود
 9
 SAR
@@ -184,8 +184,8 @@ SAR
 CAL.2.5
 DULLY'S DIGITAL MENU EXPERIENCE
 DULLY'S
-© 2026" | 3088 ms | NO | PASS |
-| Product Image | YES | PASS | "products/asam-black-tea/default/5d860d29-085f-47ea-9d26-e30d970a4d09.png" | "/_next/image?url=https%3A%2F%2Fylnpmujtjkgrpxxbtjej.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fmenu-products%2Fproducts%2Fasam-black-tea%2Fdefault%2F3f2c6c2c-ab58-49f7-b19d-4f2179f991aa.png&w=384&q=75" | 3907 ms | NO | PASS |
+© 2026" | 3503 ms | NO | PASS |
+| Product Image | YES | PASS | "products/asam-black-tea/default/7239bb20-60b6-43cd-9ec0-726dc760c12f.png" | "/_next/image?url=https%3A%2F%2Fylnpmujtjkgrpxxbtjej.supabase.co%2Fstorage%2Fv1%2Fobject%2Fpublic%2Fmenu-products%2Fproducts%2Fasam-black-tea%2Fdefault%2F1e3389a1-ec24-4215-8f7d-5a1efbc3f81f.png&w=384&q=75" | 3213 ms | NO | PASS |
 | Variant Price | YES | PASS | 9 SAR | DULLY'S
 01
 HOT TEA
@@ -245,15 +245,15 @@ SAR
 CAL.2.5
 DULLY'S DIGITAL MENU EXPERIENCE
 DULLY'S
-© 2026 | 3990 ms | NO | PASS |
+© 2026 | 3631 ms | NO | PASS |
 
 ## 2. COLD-LOAD IMAGE UX PERFORMANCE
-*   **Active Home Hero Render Delay**: 733 ms
+*   **Active Home Hero Render Delay**: 1233 ms
 *   **Hero Blank stage > 500ms**: YES
 *   **Category Product Card Entries**:
-    *   **PASS (<= 300ms)**: 10 products
+    *   **PASS (<= 300ms)**: 11 products
     *   **WARN (301-700ms)**: 2 products
-    *   **FAIL (> 700ms)**: 1 products
+    *   **FAIL (> 700ms)**: 0 products
 
 ## 3. VISUAL PRODUCT SCALE NORMALIZATION
 *   **Grouped Occupancy Statistics**:
@@ -285,6 +285,6 @@ DULLY'S
 ## DEFECTS DISCOVERED
 
 
-*   **Lazy Loading Timing Violations**: 1 product images had render delays > 700ms when scrolling at normal pace.
+
 
 # PRODUCTION STATUS: NOT VERIFIED

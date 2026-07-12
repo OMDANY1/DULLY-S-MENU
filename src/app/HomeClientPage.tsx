@@ -536,6 +536,13 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
   return (
     <>
+      {activeCategory?.heroImage && (
+        <link
+          rel="preload"
+          as="image"
+          href={getOptimizedImageUrl(activeCategory.heroImage, 640)}
+        />
+      )}
       {nextCategory?.heroImage && (
         <link
           rel="preload"
