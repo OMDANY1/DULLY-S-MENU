@@ -19,7 +19,6 @@ export default function ProductsManager({ categories, initialProducts }: Product
   const [menuCode, setMenuCode] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [nameAr, setNameAr] = useState("");
-  const [dairyMilk, setDairyMilk] = useState("");
   const [availabilityStatus, setAvailabilityStatus] = useState<"available" | "out_of_stock">("available");
   const [launchDate, setLaunchDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -51,7 +50,6 @@ export default function ProductsManager({ categories, initialProducts }: Product
       menu_code: menuCode,
       name_en: nameEn,
       name_ar: nameAr,
-      dairy_milk: dairyMilk || null,
       availability_status: availabilityStatus,
       launch_date: launchDate || null,
       end_date: endDate || null,
@@ -66,7 +64,6 @@ export default function ProductsManager({ categories, initialProducts }: Product
         setMenuCode("");
         setNameEn("");
         setNameAr("");
-        setDairyMilk("");
         setLaunchDate("");
         setEndDate("");
         
@@ -152,52 +149,51 @@ export default function ProductsManager({ categories, initialProducts }: Product
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* Left Columns: Products List */}
-        <div className="lg:col-span-2 space-y-6">
+        {/* Left Columns: Products listing */}
+        <div className="lg:col-span-2 space-y-4">
           <div className="bg-charcoal/10 border border-white/5 p-6">
             <h2 className="font-condensed text-[14px] font-bold uppercase tracking-widest text-white/60 mb-6">
-              Products in Section
+              Product List
             </h2>
 
             {filteredProducts.length === 0 ? (
-              <div className="py-6 text-center font-condensed text-[11px] text-white/30 uppercase tracking-widest">
-                No products found in this category.
+              <div className="border border-white/5 bg-black/15 p-12 text-center select-none">
+                <span className="text-[18px] opacity-40">☕</span>
+                <p className="font-condensed text-[10px] uppercase tracking-widest text-white/40 mt-3">
+                  No products configured under this category hierarchy.
+                </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {filteredProducts.map((prod, idx) => (
+              <div className="space-y-3">
+                {filteredProducts.map((p, idx) => (
                   <div
-                    key={prod.id}
+                    key={p.id}
                     className="border border-white/5 bg-charcoal/5 p-4 flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0"
                   >
                     <div>
                       <div className="flex items-center space-x-3">
-                        <span className="font-condensed text-[10px] text-crimson font-bold">
-                          {prod.menu_code ? prod.menu_code.padStart(2, "0") : "00"}
+                        <span className="px-2 py-0.5 bg-white/5 border border-white/10 text-white text-[9px] font-condensed tracking-wider font-bold rounded">
+                          {p.menu_code || "00"}
                         </span>
                         <span className="font-condensed text-[14px] font-bold uppercase tracking-wider text-white">
-                          {prod.name}
+                          {p.name}
                         </span>
-                        <span className="font-arabic text-[12px] text-crimson">
-                          {prod.arabic_name}
+                        <span className="font-arabic text-[11px] text-crimson">
+                          {p.arabic_name}
                         </span>
-                        {!prod.is_active && (
+                        {!p.is_active && (
                           <span className="px-1.5 py-0.5 bg-crimson/15 border border-crimson/30 text-crimson text-[7px] font-condensed tracking-widest uppercase rounded">
                             INACTIVE
                           </span>
                         )}
-                        {prod.availability_status === "out_of_stock" && (
-                          <span className="px-1.5 py-0.5 bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[7px] font-condensed tracking-widest uppercase rounded">
+                        {p.availability_status === "out_of_stock" && (
+                          <span className="px-1.5 py-0.5 bg-amber-500/10 border border-amber-500/25 text-amber-400 text-[7px] font-condensed tracking-widest uppercase rounded">
                             OUT OF STOCK
                           </span>
                         )}
                       </div>
-                      <p className="font-condensed text-[9px] text-white/40 tracking-wider mt-1 uppercase">
-                        ID: {prod.id} {prod.dairy_milk ? `— Milk: ${prod.dairy_milk}` : ""}
-                      </p>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex items-center space-x-2 font-condensed text-[9px] tracking-widest">
                       <button
                         onClick={() => handleMove(idx, "up")}
@@ -214,10 +210,10 @@ export default function ProductsManager({ categories, initialProducts }: Product
                         ▼ DOWN
                       </button>
                       <Link
-                        href={`/admin/products/${prod.id}`}
-                        className="p-1.5 border border-white/5 bg-white/5 hover:bg-white/10 uppercase"
+                        href={`/admin/products/${p.id}`}
+                        className="p-1.5 border border-white/5 bg-white/5 hover:bg-white/10 text-white select-none block"
                       >
-                        EDIT DETAILS
+                        EDIT SPECIFICATIONS
                       </Link>
                     </div>
                   </div>
@@ -238,22 +234,22 @@ export default function ProductsManager({ categories, initialProducts }: Product
               <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">Product Slug (ID)</label>
               <input
                 value={prodId}
-                onChange={(e) => setProdId(e.target.value.toLowerCase())}
+                onChange={(e) => setProdId(e.target.value.toLowerCase().replace(/\s+/g, "-"))}
                 required
                 className="bg-black border border-white/10 p-2.5 text-[12px] text-white focus:outline-none focus:border-crimson font-condensed"
-                placeholder="matcha-latte"
+                placeholder="passion-fruit-mojito"
               />
               {fieldErrors.id && <span className="text-crimson text-[9px] font-condensed">{fieldErrors.id[0]}</span>}
             </div>
 
             <div className="flex flex-col space-y-1">
-              <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">Menu Code Number</label>
+              <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">Menu Code</label>
               <input
                 value={menuCode}
                 onChange={(e) => setMenuCode(e.target.value)}
                 required
                 className="bg-black border border-white/10 p-2.5 text-[12px] text-white focus:outline-none focus:border-crimson font-condensed"
-                placeholder="03"
+                placeholder="01"
               />
               {fieldErrors.menu_code && <span className="text-crimson text-[9px] font-condensed">{fieldErrors.menu_code[0]}</span>}
             </div>
@@ -281,16 +277,6 @@ export default function ProductsManager({ categories, initialProducts }: Product
                 dir="rtl"
               />
               {fieldErrors.name_ar && <span className="text-crimson text-[9px] font-condensed">{fieldErrors.name_ar[0]}</span>}
-            </div>
-
-            <div className="flex flex-col space-y-1">
-              <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">Dairy/Milk Options</label>
-              <input
-                value={dairyMilk}
-                onChange={(e) => setDairyMilk(e.target.value)}
-                className="bg-black border border-white/10 p-2.5 text-[12px] text-white focus:outline-none focus:border-crimson font-condensed"
-                placeholder="Oat Milk / Soy Milk available"
-              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import gsap from "gsap";
 import { MenuItem } from "@/domain/menu/types";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -29,6 +29,7 @@ export function ProductVisual({
 }: ProductVisualProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
+  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
 
   // Pointer Parallax quickTo (presentation-only)
   useEffect(() => {
@@ -70,10 +71,30 @@ export function ProductVisual({
     };
   }, [reducedMotion]);
 
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.naturalWidth && img.naturalHeight) {
+      setAspectRatio(img.naturalWidth / img.naturalHeight);
+    }
+  };
+
+  let scale = 1.0;
+  if (aspectRatio !== null) {
+    if (aspectRatio >= 0.9) {
+      scale = 0.72; // Wide cups/mugs
+    } else if (aspectRatio >= 0.7) {
+      scale = 0.82; // Bowls/snow-ice
+    } else if (aspectRatio >= 0.55) {
+      scale = 0.90; // Intermediate cups
+    } else {
+      scale = 1.00; // Tall glasses
+    }
+  }
+
   return (
     <div
       ref={containerRef}
-      className={`relative flex items-center justify-center select-none ${imageClass}`}
+      className={`relative flex items-end justify-center select-none ${imageClass}`}
       style={{ transformStyle: "preserve-3d", perspective: 1000 }}
     >
       {/* Visual sweep transition curtain overlay */}
@@ -100,8 +121,12 @@ export function ProductVisual({
           ref={imgRef}
           src={resolvedSrc}
           alt={product.name}
+          onLoad={handleImageLoad}
           className="w-full h-full object-contain filter drop-shadow-[0_24px_32px_rgba(0,0,0,0.9)]"
-          style={{ transform: "translateZ(30px)" }}
+          style={{
+            transform: `scale(${scale}) translateZ(30px)`,
+            transformOrigin: "bottom center",
+          }}
         />
       )}
     </div>

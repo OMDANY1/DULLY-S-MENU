@@ -617,6 +617,32 @@ export default function HomeClientPage({ categories: rawCategories }: HomeClient
 
           </section>
 
+          {/* Explicit Scene Navigation Controls */}
+          <div className="site-container absolute bottom-24 left-0 right-0 z-20 flex justify-between items-center pointer-events-none w-full">
+            <button
+              onClick={() => {
+                if (isTransitioningRef.current) return;
+                const prevIdx = (activeIdx - 1 + categories.length) % categories.length;
+                transitionTo(prevIdx);
+              }}
+              className="pointer-events-auto flex items-center font-condensed text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 hover:text-crimson transition-transform duration-300 transform hover:-translate-x-1 focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson py-3 px-4 cursor-pointer select-none"
+              aria-label="Previous category scene"
+            >
+              [ ← PREV ]
+            </button>
+            <button
+              onClick={() => {
+                if (isTransitioningRef.current) return;
+                const nextIdx = (activeIdx + 1) % categories.length;
+                transitionTo(nextIdx);
+              }}
+              className="pointer-events-auto flex items-center font-condensed text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 hover:text-crimson transition-transform duration-300 transform hover:translate-x-1 focus:outline-none focus-visible:ring-1 focus-visible:ring-crimson py-3 px-4 cursor-pointer select-none"
+              aria-label="Next category scene"
+            >
+              [ NEXT → ]
+            </button>
+          </div>
+
           {/* Footer Bar */}
           <footer className="site-container relative z-20 flex items-end justify-between text-white/30 text-[9px] font-condensed tracking-[0.2em] uppercase mt-auto w-full">
             <div>

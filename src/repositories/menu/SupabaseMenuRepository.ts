@@ -3,6 +3,8 @@ import { MenuRepository } from "./MenuRepository";
 import { supabase as browserClient } from "@/lib/supabase/client";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { cache } from "react";
+import { unstable_cache } from "next/cache";
+import { publicServerClient } from "@/lib/supabase/public-server";
 
 // ─── RPC Type Interfaces ───────────────────────────────────────
 interface RpcSize {
@@ -207,79 +209,86 @@ async function getClient() {
 }
 
 // ─── Request-level Caching ─────────────────────────────────────
-const getSnapshotFromServer = cache(async () => {
-  const client = await getClient();
-  const { data: rawPayload, error } = await client.rpc("get_public_menu");
+const getSnapshotFromServer = unstable_cache(
+  async () => {
+    const client = publicServerClient;
+    const { data: rawPayload, error } = await client.rpc("get_public_menu");
 
-  if (error) {
-    console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
-    throw new Error("Failed to load menu data. Please try again later.");
-  }
+    if (error) {
+      console.error("[DATABASE RPC ERROR] get_public_menu failed:", error.message, error.details);
+      throw new Error("Failed to load menu data. Please try again later.");
+    }
 
-  // Perform complete payload validation and normalization.
-  // Throws a controlled data-format error if malformed.
-  const snapshot = validateAndNormalizePayload(rawPayload);
+    // Perform complete payload validation and normalization.
+    // Throws a controlled data-format error if malformed.
+    const snapshot = validateAndNormalizePayload(rawPayload);
 
-  // 1. Force 'mojitos' category visibility to standard so it displays on standard customer menu
-  const mojitoCat = snapshot.categories.find((cat) => cat.id === "mojitos");
-  if (mojitoCat) {
-    mojitoCat.visibility = "standard";
-  }
+    // 1. Force 'mojitos' category visibility to standard so it displays on standard customer menu
+    const mojitoCat = snapshot.categories.find((cat) => cat.id === "mojitos");
+    if (mojitoCat) {
+      mojitoCat.visibility = "standard";
+    }
 
-  // 2. Group 'mineral-water-small' and 'drink-and-chips-combo-offer' under a normalized 'special' category
-  const snowIceCat = snapshot.categories.find((cat) => cat.id === "snow-ice");
-  if (snowIceCat) {
-    const specialItems: MenuItem[] = [];
-    snowIceCat.items = snowIceCat.items.filter((item) => {
-      if (item.id === "mineral-water-small" || item.id === "drink-and-chips-combo-offer") {
-        item.category = "special";
-        specialItems.push(item);
-        return false;
-      }
-      return true;
-    });
+    // 2. Group 'mineral-water-small' and 'drink-and-chips-combo-offer' under a normalized 'special' category
+    const snowIceCat = snapshot.categories.find((cat) => cat.id === "snow-ice");
+    if (snowIceCat) {
+      const specialItems: MenuItem[] = [];
+      snowIceCat.items = snowIceCat.items.filter((item) => {
+        if (item.id === "mineral-water-small" || item.id === "drink-and-chips-combo-offer") {
+          item.category = "special";
+          specialItems.push(item);
+          return false;
+        }
+        return true;
+      });
 
-    if (specialItems.length > 0) {
-      const specialCat: MenuCategory = {
-        id: "special",
-        slug: "special",
-        name: "Special",
-        displayName: "Special",
-        arabicName: "العروض الخاصة",
-        description: "Mineral water, combo offers, and special menu items.",
-        visibility: "standard",
-        heroImage: null,
-        items: specialItems,
-      };
+      if (specialItems.length > 0) {
+        const specialCat: MenuCategory = {
+          id: "special",
+          slug: "special",
+          name: "Special",
+          displayName: "Special",
+          arabicName: "العروض الخاصة",
+          description: "Mineral water, combo offers, and special menu items.",
+          visibility: "standard",
+          heroImage: null,
+          items: specialItems,
+        };
 
-      const snowIceIdx = snapshot.categories.findIndex((cat) => cat.id === "snow-ice");
-      if (snowIceIdx !== -1) {
-        snapshot.categories.splice(snowIceIdx + 1, 0, specialCat);
-      } else {
-        snapshot.categories.push(specialCat);
+        const snowIceIdx = snapshot.categories.findIndex((cat) => cat.id === "snow-ice");
+        if (snowIceIdx !== -1) {
+          snapshot.categories.splice(snowIceIdx + 1, 0, specialCat);
+        } else {
+          snapshot.categories.push(specialCat);
+        }
       }
     }
-  }
 
-  // Apply public storage CDN URLs to all normalized images
-  const getUrl = (path: string | null) => {
-    if (!path) return null;
-    if (path.startsWith("http")) return path;
-    return client.storage.from("menu-products").getPublicUrl(path).data.publicUrl;
-  };
+    // Apply public storage CDN URLs to all normalized images
+    const getUrl = (path: string | null) => {
+      if (!path) return null;
+      if (path.startsWith("http")) return path;
+      return client.storage.from("menu-products").getPublicUrl(path).data.publicUrl;
+    };
 
-  snapshot.categories.forEach((cat) => {
-    cat.heroImage = getUrl(cat.heroImage);
-    cat.items.forEach((item) => {
-      item.image = getUrl(item.image);
-      item.sizes.forEach((sz) => {
-        sz.image = getUrl(sz.image);
+    snapshot.categories.forEach((cat) => {
+      cat.heroImage = getUrl(cat.heroImage);
+      cat.items.forEach((item) => {
+        item.image = getUrl(item.image);
+        item.sizes.forEach((sz) => {
+          sz.image = getUrl(sz.image);
+        });
       });
     });
-  });
 
-  return snapshot;
-});
+    return snapshot;
+  },
+  ["supabase-public-menu"],
+  {
+    tags: ["menu"],
+    revalidate: 3600,
+  }
+);
 
 export class SupabaseMenuRepository implements MenuRepository {
   private async loadPublicMenuSnapshot() {

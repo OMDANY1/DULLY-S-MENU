@@ -12,7 +12,6 @@ const ProductSchema = z.object({
   menu_code: z.string().min(1),
   name_en: z.string().min(2),
   name_ar: z.string().min(2),
-  dairy_milk: z.string().nullable().optional(),
   availability_status: z.enum(["available", "out_of_stock"]),
   launch_date: z.string().nullable().optional(),
   end_date: z.string().nullable().optional(),
@@ -35,7 +34,6 @@ export async function createProduct(formData: any): Promise<ActionResult<any>> {
       menu_code,
       name_en,
       name_ar,
-      dairy_milk,
       availability_status,
       launch_date,
       end_date,
@@ -62,7 +60,6 @@ export async function createProduct(formData: any): Promise<ActionResult<any>> {
         menu_code,
         name: name_en,
         arabic_name: name_ar,
-        dairy_milk: dairy_milk || null,
         availability_status,
         launch_date: launch_date ? new Date(launch_date).toISOString() : null,
         end_date: end_date ? new Date(end_date).toISOString() : null,
@@ -85,7 +82,6 @@ export async function createProduct(formData: any): Promise<ActionResult<any>> {
 
     const catSlug = cat?.id || category_id;
     revalidateTag("menu", "default");
-    revalidateTag(`menu:category:${catSlug}`, "default");
     revalidatePath("/", "layout");
     revalidatePath(`/menu/${catSlug}`, "page");
 
@@ -111,7 +107,6 @@ export async function updateProduct(id: string, formData: any): Promise<ActionRe
       menu_code,
       name_en,
       name_ar,
-      dairy_milk,
       availability_status,
       launch_date,
       end_date,
@@ -134,7 +129,6 @@ export async function updateProduct(id: string, formData: any): Promise<ActionRe
         menu_code,
         name: name_en,
         arabic_name: name_ar,
-        dairy_milk: dairy_milk || null,
         availability_status,
         launch_date: launch_date ? new Date(launch_date).toISOString() : null,
         end_date: end_date ? new Date(end_date).toISOString() : null,
@@ -150,17 +144,14 @@ export async function updateProduct(id: string, formData: any): Promise<ActionRe
 
     // Invalidate affected categories cache
     revalidateTag("menu", "default");
-    revalidateTag(`menu:product:${id}`, "default");
     revalidatePath("/", "layout");
 
     const oldCatSlug = currentProduct?.category_id;
     if (oldCatSlug) {
-      revalidateTag(`menu:category:${oldCatSlug}`, "default");
       revalidatePath(`/menu/${oldCatSlug}`, "page");
     }
 
     if (category_id !== oldCatSlug) {
-      revalidateTag(`menu:category:${category_id}`, "default");
       revalidatePath(`/menu/${category_id}`, "page");
     }
 
@@ -188,7 +179,6 @@ export async function reorderProducts(categoryId: string, productIds: string[]):
     }
 
     revalidateTag("menu", "default");
-    revalidateTag(`menu:category:${categoryId}`, "default");
     revalidatePath("/", "layout");
     revalidatePath(`/menu/${categoryId}`, "page");
 

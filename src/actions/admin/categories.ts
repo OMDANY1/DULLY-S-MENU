@@ -56,7 +56,6 @@ export async function createCategory(formData: any): Promise<ActionResult<any>> 
     }
 
     revalidateTag("menu", "default");
-    revalidateTag("menu:categories", "default");
     revalidatePath("/", "layout");
 
     return { success: true, data };
@@ -98,8 +97,6 @@ export async function updateCategory(slug: string, formData: any): Promise<Actio
     }
 
     revalidateTag("menu", "default");
-    revalidateTag("menu:categories", "default");
-    revalidateTag(`menu:category:${slug}`, "default");
     revalidatePath("/", "layout");
     revalidatePath(`/menu/${slug}`, "page");
 
@@ -128,7 +125,6 @@ export async function reorderCategories(slugs: string[]): Promise<ActionResult<a
     }
 
     revalidateTag("menu", "default");
-    revalidateTag("menu:categories", "default");
     revalidatePath("/", "layout");
 
     return { success: true, data: slugs };

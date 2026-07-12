@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { updateProduct } from "@/actions/admin/products";
 import { createVariant, updateVariant, reorderVariants } from "@/actions/admin/variants";
 import { uploadProductImage, removeProductImage } from "@/actions/admin/assets";
+import { normalizeProductImage } from "@/lib/image/normalization";
 
 interface ProductEditorProps {
   product: any;
@@ -27,7 +28,6 @@ export default function ProductEditor({
   const [nameEn, setNameEn] = useState(product.name || "");
   const [nameAr, setNameAr] = useState(product.arabic_name || "");
   const [categoryId, setCategoryId] = useState(product.category_id || "");
-  const [dairyMilk, setDairyMilk] = useState(product.dairy_milk || "");
   const [availabilityStatus, setAvailabilityStatus] = useState(product.availability_status || "available");
   const [isActive, setIsActive] = useState(product.is_active !== false);
   const [launchDate, setLaunchDate] = useState(
@@ -46,7 +46,6 @@ export default function ProductEditor({
   const [newPrice, setNewPrice] = useState("");
   const [newCalories, setNewCalories] = useState("");
   const [newCalNote, setNewCalNote] = useState("");
-  const [newOz, setNewOz] = useState("");
   const [variantMsg, setVariantMsg] = useState<string | null>(null);
   const [variantErr, setVariantErr] = useState<string | null>(null);
 
@@ -56,7 +55,6 @@ export default function ProductEditor({
   const [editPrice, setEditPrice] = useState("");
   const [editCalories, setEditCalories] = useState("");
   const [editCalNote, setEditCalNote] = useState("");
-  const [editOz, setEditOz] = useState("");
   const [editIsActive, setEditIsActive] = useState(true);
 
   // SECTION 3: ASSETS STATES
@@ -76,7 +74,6 @@ export default function ProductEditor({
       menu_code: menuCode,
       name_en: nameEn,
       name_ar: nameAr,
-      dairy_milk: dairyMilk || null,
       availability_status: availabilityStatus,
       launch_date: launchDate || null,
       end_date: endDate || null,
@@ -111,7 +108,6 @@ export default function ProductEditor({
       price: Number(newPrice),
       calories: newCalories ? Number(newCalories) : null,
       calorie_note: newCalNote || null,
-      oz: newOz ? Number(newOz) : null,
       is_active: true,
     };
 
@@ -124,7 +120,6 @@ export default function ProductEditor({
         setNewPrice("");
         setNewCalories("");
         setNewCalNote("");
-        setNewOz("");
         setVariants([...variants, res.data]);
       } else {
         setVariantMsg(null);
@@ -140,7 +135,6 @@ export default function ProductEditor({
     setEditPrice(v.price.toString());
     setEditCalories(v.calories !== null ? v.calories.toString() : "");
     setEditCalNote(v.calorie_note || "");
-    setEditOz(v.oz !== null ? v.oz.toString() : "");
     setEditIsActive(v.is_active);
     setVariantMsg(null);
     setVariantErr(null);
@@ -155,7 +149,6 @@ export default function ProductEditor({
       price: Number(editPrice),
       calories: editCalories ? Number(editCalories) : null,
       calorie_note: editCalNote || null,
-      oz: editOz ? Number(editOz) : null,
       is_active: editIsActive,
     };
 
@@ -210,10 +203,18 @@ export default function ProductEditor({
     setUploadMsg(null);
     setUploadErr(null);
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
     startTransition(async () => {
+      let fileToUpload = selectedFile;
+      setUploadMsg("Normalizing image...");
+      try {
+        fileToUpload = await normalizeProductImage(selectedFile);
+      } catch (err) {
+        console.error("[IMAGE NORMALIZATION ERROR] Failed to crop transparent outer padding:", err);
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+
       setUploadMsg("Uploading image to storage...");
       const res = await uploadProductImage(product.id, null, formData);
       if (res.success) {
@@ -339,15 +340,6 @@ export default function ProductEditor({
                   />
                 </div>
 
-                <div className="md:col-span-2 flex flex-col space-y-1.5">
-                  <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">Dairy/Milk Options</label>
-                  <input
-                    value={dairyMilk}
-                    onChange={(e) => setDairyMilk(e.target.value)}
-                    className="bg-black border border-white/10 p-2.5 text-[12px] focus:outline-none focus:border-crimson font-condensed"
-                  />
-                </div>
-
                 <div className="flex flex-col space-y-1.5">
                   <label className="font-condensed text-[9px] uppercase tracking-widest text-white/40">Launch Date</label>
                   <input
@@ -459,15 +451,7 @@ export default function ProductEditor({
                             className="bg-black border border-white/10 p-1.5 text-[11px] focus:outline-none focus:border-crimson"
                           />
                         </div>
-                        <div className="flex flex-col space-y-1">
-                          <label className="text-[8px] uppercase text-white/40">Oz</label>
-                          <input
-                            type="number"
-                            value={editOz}
-                            onChange={(e) => setEditOz(e.target.value)}
-                            className="bg-black border border-white/10 p-1.5 text-[11px] focus:outline-none focus:border-crimson"
-                          />
-                        </div>
+
                         <div className="col-span-2 flex flex-col space-y-1">
                           <label className="text-[8px] uppercase text-white/40">Calorie Note</label>
                           <input
@@ -586,16 +570,7 @@ export default function ProductEditor({
                     placeholder="120"
                   />
                 </div>
-                <div className="flex flex-col space-y-1">
-                  <label className="text-[8px] uppercase text-white/40">Oz</label>
-                  <input
-                    type="number"
-                    value={newOz}
-                    onChange={(e) => setNewOz(e.target.value)}
-                    className="bg-black border border-white/10 p-2 text-[11px] focus:outline-none focus:border-crimson"
-                    placeholder="16"
-                  />
-                </div>
+
                 <div className="col-span-2 flex flex-col space-y-1">
                   <label className="text-[8px] uppercase text-white/40">Calorie Note</label>
                   <input
