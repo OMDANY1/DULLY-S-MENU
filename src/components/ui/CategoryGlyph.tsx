@@ -66,7 +66,6 @@ export default function CategoryGlyph({ categoryId, active = true }: CategoryGly
           </>
         );
       case "iced-boba-milk-tea":
-      case "iced-boba-milk":
         // Concentric pearl circles
         return (
           <>
@@ -74,6 +73,14 @@ export default function CategoryGlyph({ categoryId, active = true }: CategoryGly
             <circle cx="50" cy="50" r="28" />
             <circle cx="50" cy="50" r="14" />
             <line x1="50" y1="8" x2="50" y2="92" strokeDasharray="3 3" />
+          </>
+        );
+      case "special":
+        // Star diamond shape representing special offers
+        return (
+          <>
+            <path d="M 50,8 L 66,38 L 92,50 L 66,62 L 50,92 L 34,62 L 8,50 L 34,38 Z" />
+            <circle cx="50" cy="50" r="12" strokeDasharray="2 2" />
           </>
         );
       case "special-drinks":

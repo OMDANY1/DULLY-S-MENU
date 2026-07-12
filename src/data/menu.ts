@@ -1169,13 +1169,23 @@ export const menuCategories: MenuCategory[] = [
             "calorieNote": null
           }
         ]
-      },
+      }
+    ]
+  },
+  {
+    "id": "special",
+    "name": "SPECIAL",
+    "displayName": "Special",
+    "arabicName": "العروض الخاصة",
+    "description": "Mineral water, combo offers, and special menu items.",
+    "visibility": "standard",
+    "items": [
       {
         "id": "mineral-water-small",
         "name": "MINERAL WATER SMALL",
         "arabicName": "مياه معدنية صغيرة",
         "num": "45",
-        "category": "snow-ice",
+        "category": "special",
         "image": "/assets/products/mineral-water-small.png",
         "dairyMilk": null,
         "sizes": [
@@ -1193,7 +1203,7 @@ export const menuCategories: MenuCategory[] = [
         "name": "DRINK & CHIPS COMBO OFFER",
         "arabicName": "عرض كومبو المشروب والبطاطس",
         "num": "46",
-        "category": "snow-ice",
+        "category": "special",
         "image": "/assets/products/drink-and-chips-combo-offer.png",
         "dairyMilk": null,
         "sizes": [
@@ -1214,7 +1224,7 @@ export const menuCategories: MenuCategory[] = [
     "displayName": "Mojitos",
     "arabicName": "موهيتو",
     "description": "Icy, zesty limeades and mojitos.",
-    "visibility": "ipad",
+    "visibility": "standard",
     "items": [
       {
         "id": "blueberry-mojito",

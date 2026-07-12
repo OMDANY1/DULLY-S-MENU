@@ -26,7 +26,7 @@ export function getArchFamily(categoryId: string): ArchFamily {
     case "iced-fruit-tea":
       return "ORGANIC_FRUIT";
     case "iced-boba-milk-tea":
-    case "iced-boba-milk":
+    case "special":
       return "TRIPLE_PORTAL";
     case "snow-ice":
       return "CRYSTALLINE_SNOW";

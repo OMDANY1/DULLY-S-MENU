@@ -11,7 +11,7 @@ interface AtmosphereProps {
     | "iced-japanese-tea"
     | "iced-fruit-tea"
     | "iced-boba-milk-tea"
-    | "iced-boba-milk"
+    | "special"
     | "snow-ice"
     | "mojitos"
     | "special-drinks";
@@ -100,7 +100,7 @@ export default function Atmosphere({ profile, color }: AtmosphereProps) {
             profile === "iced-tea" ||
             profile === "iced-fruit-tea" ||
             profile === "mojitos" ||
-            profile === "iced-boba-milk" ||
+            profile === "special" ||
             profile === "iced-boba-milk-tea") && (
             <>
               <div

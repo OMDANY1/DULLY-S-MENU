@@ -52,40 +52,7 @@ export class StaticMenuRepository implements MenuRepository {
 
     const standardCategories = baseCategories.filter((cat) => isIpadMode || cat.visibility === "standard");
 
-    // Group 'mineral-water-small' and 'drink-and-chips-combo-offer' under a normalized 'special' category
-    const snowIceCat = standardCategories.find((cat) => cat.id === "snow-ice");
-    if (snowIceCat) {
-      const specialItems: MenuItem[] = [];
-      snowIceCat.items = snowIceCat.items.filter((item) => {
-        if (item.id === "mineral-water-small" || item.id === "drink-and-chips-combo-offer") {
-          item.category = "special";
-          specialItems.push(item);
-          return false;
-        }
-        return true;
-      });
 
-      if (specialItems.length > 0) {
-        const specialCat: MenuCategory = {
-          id: "special",
-          slug: "special",
-          name: "Special",
-          displayName: "Special",
-          arabicName: "العروض الخاصة",
-          description: "Mineral water, combo offers, and special menu items.",
-          visibility: "standard",
-          heroImage: null,
-          items: specialItems,
-        };
-
-        const snowIceIdx = standardCategories.findIndex((cat) => cat.id === "snow-ice");
-        if (snowIceIdx !== -1) {
-          standardCategories.splice(snowIceIdx + 1, 0, specialCat);
-        } else {
-          standardCategories.push(specialCat);
-        }
-      }
-    }
 
     return standardCategories;
   }

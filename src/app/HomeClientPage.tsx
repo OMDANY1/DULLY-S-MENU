@@ -77,13 +77,12 @@ function CategoryFocalVisual({ categoryId }: { categoryId: string }) {
           <line x1="50" y1="10" x2="50" y2="60" />
         </svg>
       );
-    case "iced-boba-milk":
-      // fluid milk density columns and stacked layers
+    case "special":
+      // diamond star coordinates representing special curated offers
       return (
-        <svg className="w-full h-full text-crimson/25" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.35">
-          <path d="M 30,90 C 30,50 40,40 40,10" />
-          <path d="M 70,90 C 70,60 60,50 60,10" />
-          <circle cx="50" cy="50" r="22" strokeDasharray="3,3" />
+        <svg className="w-full h-full text-crimson/35" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.4">
+          <path d="M 50,15 L 65,45 L 95,50 L 65,55 L 50,85 L 35,55 L 5,50 L 35,45 Z" />
+          <circle cx="50" cy="50" r="8" strokeDasharray="1,1" />
         </svg>
       );
     case "snow-ice":

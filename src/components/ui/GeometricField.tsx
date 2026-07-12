@@ -35,7 +35,6 @@ export default function GeometricField({ categoryId, active = true }: GeometricF
         );
       case "iced-tea":
       case "iced-boba-milk-tea":
-      case "iced-boba-milk":
         // Boba circles array / rhythmic coordinates grid
         return (
           <svg className="w-full h-full text-crimson/5" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="0.15">
